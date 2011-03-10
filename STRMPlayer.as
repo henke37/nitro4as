@@ -50,10 +50,13 @@
 		private var endOfStream:Boolean=false;
 
 		private function render(e:SampleDataEvent):void {
-			const renderSize:uint=8000;			
+			const renderSize:uint=8000;
+			const blockHeaderLength:uint=4;
 			
 			//init the decode count as zero
-			var samplesLeftToDecode:uint=renderSize;	
+			var samplesLeftToDecode:uint=renderSize;
+			
+			stream.sdat.endian=Endian.LITTLE_ENDIAN;
 			
 			//repeat at least once:
 			do {
@@ -64,7 +67,7 @@
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				if(blockNumber-(1-stream.channels)==stream.nBlock) {
+				if(blockNumber==stream.nBlock/2) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -76,11 +79,11 @@
 				
 				//init the decoders if the offset is zero
 				if(blockCurrentSample==0) {
-					stream.sdat.endian=Endian.LITTLE_ENDIAN;
 					stream.sdat.position=blockStartOffset;
-					var predictor:uint=stream.sdat.readUnsignedShort();
-					var stepIndex:uint=stream.sdat.readUnsignedShort();
+					
 					for each(decoder in decoders) {
+						var predictor:uint=stream.sdat.readShort();
+						var stepIndex:uint=stream.sdat.readUnsignedShort();
 						decoder.init(predictor,stepIndex);
 					}
 				}
@@ -97,7 +100,7 @@
 				//decode the blocks for each channel
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
 					var blockStartOffset:uint=stream.dataPos+blockNumber*stream.blockLength*(currentChannel+1);
-					stream.sdat.position=blockStartOffset+4+blockCurrentSample/2;
+					stream.sdat.position=blockStartOffset+blockHeaderLength+blockCurrentSample/2;
 					decoders[currentChannel].decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
 				}
 				//write the decoded data to the output buffer

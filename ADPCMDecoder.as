@@ -46,12 +46,24 @@
 				stepIndex=88;
 			}
 			
-			predictor+=(nibbleToNumber(nibble) + 0.5) * step / 4;
-			if(predictor<-32767) {
-				predictor=-32767;
-			} else if(predictor>32767) {
-				predictor=32767;
-			}			
+			var diff:uint = step >> 3;
+			if(nibble & 1) diff += step >> 2;
+			if(nibble & 2) diff += step >> 1;
+			if(nibble & 4) diff += step;
+
+			if(nibble & 8) {
+				predictor-=diff;
+				if(predictor<-32767) {
+					predictor=-32767;
+				}
+			} else {
+				predictor+=diff;
+				if(predictor>32767) {
+					predictor=32767;
+				}
+			}
+			
+			//predictor+=(nibbleToNumber(nibble) + 0.5) * step / 4;
 			
 			step=stepTable[stepIndex];
 			

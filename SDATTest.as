@@ -19,7 +19,7 @@
 			reader=new SDATReader(new sdatClass());
 			
 			//listWaveArchives();
-			//listStreams();
+			listStreams();
 			streamTest();
 			//swarTest(2,0);
 			
@@ -51,7 +51,7 @@
 			var i:uint;
 			for each(var stream:STRM in reader.streams) {
 				var name:String=reader.streamSymbols[i];
-				trace(name);
+				trace(i,name,stream.length,stream.channels,stream.loop,stream.dataPos);
 				i++;
 			}
 		}
@@ -68,9 +68,9 @@
 			}*/
 			
 			
-			stream=reader.streams[8];
+			stream=reader.streams[0];
 			
-			//trace(stream.dataPos,stream.blockLength,stream.nBlock);
+			trace(stream.dataPos,stream.blockLength,stream.nBlock,stream.blockSamples,stream.channels);
 			//reader.sdat.position=stream.dataPos;
 			
 			//strmData=new ByteArray();
