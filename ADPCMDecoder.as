@@ -47,8 +47,8 @@
 			}
 			
 			predictor+=(nibbleToNumber(nibble) + 0.5) * step / 4;
-			if(predictor<-32768) {
-				predictor=-32768;
+			if(predictor<-32767) {
+				predictor=-32767;
 			} else if(predictor>32767) {
 				predictor=32767;
 			}			

@@ -64,7 +64,7 @@
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				if(blockNumber==stream.nBlock/stream.channels) {
+				if(blockNumber-(1-stream.channels)==stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -95,8 +95,8 @@
 				}
 				
 				//decode the blocks for each channel
-				for(var currentChannel:uint;currentChannel<stream.channels;++currentChannel) {
-					var blockStartOffset:uint=stream.dataPos+blockNumber*stream.blockLength*currentChannel;
+				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
+					var blockStartOffset:uint=stream.dataPos+blockNumber*stream.blockLength*(currentChannel+1);
 					stream.sdat.position=blockStartOffset+4+blockCurrentSample/2;
 					decoders[currentChannel].decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
 				}
