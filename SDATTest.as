@@ -4,6 +4,8 @@
 	import flash.events.*;
 	import flash.utils.*;
 	
+	import SDAT.*;
+	
 	use namespace strmInternal;
 	use namespace sdatInternal;
 	
@@ -19,8 +21,8 @@
 			reader=new SDATReader(new sdatClass());
 			
 			//listWaveArchives();
-			listStreams();
-			streamTest();
+			//listStreams();
+			//streamTest();
 			//swarTest(2,0);
 			
 		}
