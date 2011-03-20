@@ -33,7 +33,9 @@
 			blockPos=wave.dataPos;
 			
 			if(wave.encoding==Wave.ADPCM) {
-				blockPos+=4;
+				var predictor:uint=wave.sdat.readShort();
+				var stepIndex:uint=wave.sdat.readShort();
+				decoder.init(predictor,stepIndex);
 			}
 			
 			playChannel=playSound.play();
@@ -43,6 +45,9 @@
 			var sampleBuffer:Vector.<Number>=new Vector.<Number>();
 			
 			wave.sdat.position=blockPos;
+			
+			
+			
 			decoder.decodeBlock(wave.sdat,wave.duration,sampleBuffer);
 			
 			for each(var sample:Number in sampleBuffer) {

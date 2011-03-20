@@ -24,7 +24,7 @@
 			
 			//listWaveArchives();
 			listStreams();
-			streamTest(3);
+			streamTest(7);
 			//swarTest(2,0);
 			
 		}
@@ -82,8 +82,8 @@
 			
 			streamPlayer=new STRMPlayer(stream);
 			
-			dumpWave(streamPlayer);
-			//streamPlayer.play();
+			//dumpWave(streamPlayer);
+			streamPlayer.play();
 		}
 		
 		var wave:WaveWriter;
@@ -93,12 +93,18 @@
 			
 			var readSize:uint;
 			
+			const chunkSize:uint=50000;
+			
+			player.loopAllowed=false;//would get us into an infinite loop. That would be bad.
+			
 			do {
 				buff.position=0;
-				readSize=player.render(buff,8000);
+				buff.length=0;
+				readSize=player.render(buff,chunkSize);
+				
 				buff.position=0;
 				wave.addSamples(buff);
-			} while(readSize==8000);
+			} while(readSize==chunkSize);
 			wave.finalize();
 			
 			stage.addEventListener(MouseEvent.CLICK,saveIt);
