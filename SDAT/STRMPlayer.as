@@ -13,6 +13,8 @@
 		
 		private var decoders:Vector.<ADPCMDecoder>;
 		private var decodeBuffers:Vector.<Vector.<Number>>;
+		
+		public var loopAllowed:Boolean=true;
 
 		public function STRMPlayer(_stream:STRM) {
 			if(!_stream) {
@@ -79,7 +81,7 @@
 				
 				//trace(blockNumber,stream.nBlock);
 				
-				if(blockNumber+1==stream.nBlock) {
+				if(blockNumber+stream.channels==stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -129,7 +131,12 @@
 				samplesLeftToDecode-=samplesToDecode;
 				position+=samplesToDecode;
 				
-			} while(samplesLeftToDecode>0 && !(endOfStream));//keep repeating while we have not decoded enough samples and not(EOS flag set and not looping)
+				if(endOfStream && stream.loop && loopAllowed) {
+					seek(stream.loopPoint);
+					endOfStream=false;
+				}
+				
+			} while(samplesLeftToDecode>0 && !endOfStream);//keep repeating while we have not decoded enough samples and not(EOS flag set and not looping)
 			
 			return renderSize-samplesLeftToDecode;
 		}
@@ -140,6 +147,15 @@
 		}
 		public static function shortToNumber(short:uint):Number {
 			return Number(short)/(2<<16);
+		}
+		
+		public function seek(newPos:uint):void {
+			//position ourself at the begining of the block
+			position=uint(newPos/stream.blockSamples)*stream.blockSamples;
+			
+			//and then rend past the stuff in the block we don't need
+			var renderSize:uint=newPos % stream.blockSamples;
+			render(new ByteArray(),renderSize);
 		}
 
 	}
