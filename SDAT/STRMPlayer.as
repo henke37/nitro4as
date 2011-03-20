@@ -49,7 +49,6 @@
 		}
 		
 		private var position:uint=0;//measured in samples
-		private var endOfStream:Boolean=false;
 		
 		private function onSampleRequest(e:SampleDataEvent):void {
 			const renderSize:uint=8000;
@@ -57,7 +56,6 @@
 		}
 		
 		public function reset():void {
-			endOfStream=false;
 			position=0;
 		}
 
@@ -69,6 +67,8 @@
 			var samplesLeftToDecode:uint=renderSize;
 			
 			stream.sdat.endian=Endian.LITTLE_ENDIAN;
+			
+			var endOfStream:Boolean=false;
 			
 			//repeat at least once:
 			do {
@@ -102,7 +102,10 @@
 				
 				//decode the blocks for each channel
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
-					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels+currentChannel)*stream.blockLength;
+
+					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels)*stream.blockLength;					
+					blockStartOffset += currentChannel*blockLen;
+
 					var decoder:ADPCMDecoder=decoders[currentChannel];
 					
 					//init the decoder if the offset is zero
