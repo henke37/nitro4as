@@ -12,8 +12,8 @@
 		
 		public function init(p:int=0,si:int=0):void {
 			predictor=p;
-			stepIndex=si;
 			step=stepTable[stepIndex];
+			stepIndex=si;			
 		}
 		
 		public function decodeBlock(block:ByteArray,blockSamples:uint,outBuff:Vector.<Number>):void {
@@ -25,12 +25,12 @@
 				
 				var byte:uint=block.readByte();
 				var nibble:uint;
-				nibble=byte & 15;
+				nibble=byte & 0x0F;
 											
 				sample=parseNibble(nibble);
 				outBuff[i++]=sample;
 				
-				nibble=(byte>>4) & 15;
+				nibble=(byte>>4) & 0x0F;
 				sample=parseNibble(nibble);
 				outBuff[i++]=sample;
 

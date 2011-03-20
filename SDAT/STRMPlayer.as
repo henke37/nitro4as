@@ -70,16 +70,16 @@
 			
 			//repeat at least once:
 			do {
-				var decoder:ADPCMDecoder;
+				
 				//find offset into current block and the current block
 				var blockCurrentSample:uint=position%stream.blockSamples;
 				var blockNumber:uint=position/stream.blockSamples;
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				trace(blockNumber,stream.nBlock);
+				//trace(blockNumber,stream.nBlock);
 				
-				if(blockNumber==stream.nBlock) {
+				if(blockNumber+(stream.channels-1)==stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -87,17 +87,6 @@
 					blockLen=stream.blockLength;
 					blockSamples=stream.blockSamples;
 					endOfStream=false;
-				}
-				
-				//init the decoders if the offset is zero
-				if(blockCurrentSample==0) {
-					stream.sdat.position=blockStartOffset;
-					
-					for each(decoder in decoders) {
-						var predictor:uint=stream.sdat.readShort();
-						var stepIndex:uint=stream.sdat.readUnsignedShort();
-						decoder.init(predictor,stepIndex);
-					}
 				}
 				
 				//calculate how many samples there are left in the block and set the samplecount to that
@@ -112,8 +101,19 @@
 				//decode the blocks for each channel
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
 					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels+currentChannel)*stream.blockLength;
+					var decoder:ADPCMDecoder=decoders[currentChannel];
+					
+					//init the decoder if the offset is zero
+					if(blockCurrentSample==0) {
+						stream.sdat.position=blockStartOffset;
+						
+						var predictor:uint=stream.sdat.readShort();
+						var stepIndex:uint=stream.sdat.readUnsignedShort();
+						decoder.init(predictor,stepIndex);
+					}
+					
 					stream.sdat.position=blockStartOffset+blockHeaderLength+blockCurrentSample/2;
-					decoders[currentChannel].decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
+					decoder.decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
 				}
 				//write the decoded data to the output buffer
 				for(var i:uint=0;i<samplesToDecode;++i) {
