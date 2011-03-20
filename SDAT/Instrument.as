@@ -2,8 +2,10 @@
 	
 	public class Instrument {
 
+		var definitions:Vector.<InstrumentRegion>;
+
 		public function Instrument() {
-			// constructor code
+			definitions=new Vector.<InstrumentRegion>();
 		}
 
 	}
