@@ -9,7 +9,7 @@
 	public class STRMPlayer {
 		
 		private var playSound:Sound,playChannel:SoundChannel;
-		private var stream:STRM;
+		strmInternal var stream:STRM;
 		
 		private var decoders:Vector.<ADPCMDecoder>;
 		private var decodeBuffers:Vector.<Vector.<Number>>;
@@ -33,11 +33,11 @@
 			}
 			
 			playSound=new Sound();
-			playSound.addEventListener(SampleDataEvent.SAMPLE_DATA,render);
+			playSound.addEventListener(SampleDataEvent.SAMPLE_DATA,onSampleRequest);
 		}
 		
 		public function play():void {
-			endOfStream=false;
+			reset();
 			
 			playChannel=playSound.play();
 		}
@@ -48,9 +48,19 @@
 		
 		private var position:uint=0;//measured in samples
 		private var endOfStream:Boolean=false;
-
-		private function render(e:SampleDataEvent):void {
+		
+		private function onSampleRequest(e:SampleDataEvent):void {
 			const renderSize:uint=8000;
+			render(e.data,renderSize);
+		}
+		
+		public function reset():void {
+			endOfStream=false;
+			position=0;
+		}
+
+		public function render(ob:ByteArray,renderSize:uint):uint {
+			
 			const blockHeaderLength:uint=4;
 			
 			//init the decode count as zero
@@ -67,7 +77,9 @@
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				if(blockNumber==stream.nBlock/2) {
+				trace(blockNumber,stream.nBlock);
+				
+				if(blockNumber==stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -99,18 +111,18 @@
 				
 				//decode the blocks for each channel
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
-					var blockStartOffset:uint=stream.dataPos+blockNumber*stream.blockLength*(currentChannel+1);
+					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels+currentChannel)*stream.blockLength;
 					stream.sdat.position=blockStartOffset+blockHeaderLength+blockCurrentSample/2;
 					decoders[currentChannel].decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
 				}
 				//write the decoded data to the output buffer
 				for(var i:uint=0;i<samplesToDecode;++i) {
 					if(stream.channels==2) {
-						e.data.writeFloat(decodeBuffers[0][i]);
-						e.data.writeFloat(decodeBuffers[1][i]);
+						ob.writeFloat(decodeBuffers[0][i]);
+						ob.writeFloat(decodeBuffers[1][i]);
 					} else {
-						e.data.writeFloat(decodeBuffers[0][i]);
-						e.data.writeFloat(decodeBuffers[0][i]);
+						ob.writeFloat(decodeBuffers[0][i]);
+						ob.writeFloat(decodeBuffers[0][i]);
 					}
 				}
 				//update the decode count
@@ -119,7 +131,7 @@
 				
 			} while(samplesLeftToDecode>0 && !(endOfStream));//keep repeating while we have not decoded enough samples and not(EOS flag set and not looping)
 			
-			1+1;
+			return renderSize-samplesLeftToDecode;
 		}
 		
 		

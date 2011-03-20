@@ -5,6 +5,8 @@
 	import flash.utils.*;
 	
 	import SDAT.*;
+	import HTools.WaveWriter;
+	import flash.net.FileReference;
 	
 	use namespace strmInternal;
 	use namespace sdatInternal;
@@ -21,8 +23,8 @@
 			reader=new SDATReader(new sdatClass());
 			
 			//listWaveArchives();
-			//listStreams();
-			//streamTest();
+			listStreams();
+			streamTest(3);
 			//swarTest(2,0);
 			
 		}
@@ -59,7 +61,7 @@
 		}
 		
 		var streamPlayer:STRMPlayer;
-		private function streamTest():void {
+		private function streamTest(streamNumber:uint):void {
 				
 			var strmData:ByteArray;
 			var stream:STRM;
@@ -70,7 +72,7 @@
 			}*/
 			
 			
-			stream=reader.streams[0];
+			stream=reader.streams[streamNumber];
 			
 			trace(stream.dataPos,stream.blockLength,stream.nBlock,stream.blockSamples,stream.channels);
 			//reader.sdat.position=stream.dataPos;
@@ -78,8 +80,33 @@
 			//strmData=new ByteArray();
 			//strmData.writeBytes(reader.sdat,stream.dataPos,stream.blockLength*stream.nBlock);
 			
-			streamPlayer=new STRMPlayer(reader.streams[8]);
-			streamPlayer.play();
+			streamPlayer=new STRMPlayer(stream);
+			
+			dumpWave(streamPlayer);
+			//streamPlayer.play();
+		}
+		
+		var wave:WaveWriter;
+		private function dumpWave(player:STRMPlayer):void {
+			wave=new WaveWriter(true,32,player.stream.sampleRate);
+			var buff:ByteArray=new ByteArray();
+			
+			var readSize:uint;
+			
+			do {
+				buff.position=0;
+				readSize=player.render(buff,8000);
+				buff.position=0;
+				wave.addSamples(buff);
+			} while(readSize==8000);
+			wave.finalize();
+			
+			stage.addEventListener(MouseEvent.CLICK,saveIt);
+		}
+		
+		private function saveIt(e:MouseEvent):void {
+			var fr:FileReference=new FileReference();
+			fr.save(wave.outBuffer,"strm.wav");
 		}
 		
 		var wavePlayer:WavePlayer;
