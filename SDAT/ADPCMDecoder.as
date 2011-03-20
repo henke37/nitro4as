@@ -30,7 +30,7 @@
 				sample=parseNibble(nibble);
 				outBuff[i++]=sample;
 				
-				nibble=(byte>>16) & 15;
+				nibble=(byte>>4) & 15;
 				sample=parseNibble(nibble);
 				outBuff[i++]=sample;
 
