@@ -53,6 +53,12 @@
 			blockLength=sdat.readUnsignedInt();
 			blockSamples=sdat.readUnsignedInt();
 			
+			if(loop) {
+				if(loopPoint>sampleCount) {
+					throw new ArgumentError("Invalid STRM, loopPoint>sampleCount");
+				}
+			}
+			
 			sdat.position=dataPos-8;//header before raw data
 			var dataType:String=sdat.readUTFBytes(4);
 			if(dataType!="DATA") {
