@@ -79,7 +79,7 @@
 				
 				//trace(blockNumber,stream.nBlock);
 				
-				if(blockNumber+(stream.channels-1)==stream.nBlock) {
+				if(blockNumber+1==stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					endOfStream=true;
@@ -108,7 +108,7 @@
 						stream.sdat.position=blockStartOffset;
 						
 						var predictor:uint=stream.sdat.readShort();
-						var stepIndex:uint=stream.sdat.readUnsignedShort();
+						var stepIndex:uint=stream.sdat.readShort();
 						decoder.init(predictor,stepIndex);
 					}
 					

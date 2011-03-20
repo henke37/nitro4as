@@ -12,8 +12,8 @@
 		
 		public function init(p:int=0,si:int=0):void {
 			predictor=p;
+			stepIndex=si;
 			step=stepTable[stepIndex];
-			stepIndex=si;			
 		}
 		
 		public function decodeBlock(block:ByteArray,blockSamples:uint,outBuff:Vector.<Number>):void {
