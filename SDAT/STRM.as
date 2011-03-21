@@ -52,6 +52,8 @@
 			nBlock=sdat.readUnsignedInt();
 			blockLength=sdat.readUnsignedInt();
 			blockSamples=sdat.readUnsignedInt();
+			lastBlockLength=sdat.readUnsignedInt();
+			lastBlockSamples=sdat.readUnsignedInt();
 			
 			if(loop) {
 				if(loopPoint>sampleCount) {
