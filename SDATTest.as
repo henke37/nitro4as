@@ -24,7 +24,7 @@
 			
 			//listWaveArchives();
 			listStreams();
-			streamTest(7);
+			streamTest(3,true);
 			//swarTest(2,0);
 			
 		}
@@ -61,46 +61,36 @@
 		}
 		
 		var streamPlayer:STRMPlayer;
-		private function streamTest(streamNumber:uint):void {
-				
-			var strmData:ByteArray;
-			var stream:STRM;
-			
-			/*for(var i:uint;i<reader.streams.length;++i) {
-				stream=reader.streams[i];
-				trace(reader.streamSymbols[i],stream.length,stream.encoding);
-			}*/
-			
-			
-			stream=reader.streams[streamNumber];
+		private function streamTest(streamNumber:uint,dump:Boolean):void {
+			var stream:STRM=reader.streams[streamNumber];
 			
 			trace(stream.dataPos,stream.blockLength,stream.nBlock,stream.blockSamples,stream.channels);
-			//reader.sdat.position=stream.dataPos;
-			
-			//strmData=new ByteArray();
-			//strmData.writeBytes(reader.sdat,stream.dataPos,stream.blockLength*stream.nBlock);
-			
-			streamPlayer=new STRMPlayer(stream);
-			
-			//dumpWave(streamPlayer);
-			streamPlayer.play();
+						
+			if(dump) {
+				dumpWave(stream);
+			} else {
+				streamPlayer=new STRMPlayer(stream);
+				streamPlayer.play();
+			}
 		}
 		
 		var wave:WaveWriter;
-		private function dumpWave(player:STRMPlayer):void {
-			wave=new WaveWriter(true,32,player.stream.sampleRate);
+		private function dumpWave(stream:STRM):void {
+			wave=new WaveWriter(true,32,stream.sampleRate);
 			var buff:ByteArray=new ByteArray();
 			
 			var readSize:uint;
 			
 			const chunkSize:uint=50000;
 			
-			player.loopAllowed=false;//would get us into an infinite loop. That would be bad.
+			var decoder:STRMDecoder=new STRMDecoder(stream);
+			
+			decoder.loopAllowed=false;//would get us into an infinite loop. That would be bad.
 			
 			do {
 				buff.position=0;
 				buff.length=0;
-				readSize=player.render(buff,chunkSize);
+				readSize=decoder.render(buff,chunkSize);
 				
 				buff.position=0;
 				wave.addSamples(buff);
