@@ -24,7 +24,7 @@
 			
 			//listWaveArchives();
 			listStreams();
-			streamTest(3,true);
+			streamTest(7,false);
 			//swarTest(2,0);
 			
 		}
