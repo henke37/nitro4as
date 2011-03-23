@@ -11,6 +11,8 @@
 		public var streams:Vector.<STRM>;
 		public var soundBanks:Vector.<SBNK>;
 		public var waveArchives:Vector.<SWAR>;
+		public var sequences:Vector.<SSEQ>;
+		public var sequenceArchives:Vector.<SSAR>;
 		
 		public var files:Vector.<FATRecord>;
 		
@@ -28,6 +30,8 @@
 			streams=new Vector.<STRM>();
 			soundBanks=new Vector.<SBNK>();
 			waveArchives=new Vector.<SWAR>();
+			sequences=new Vector.<SSEQ>();
+			sequenceArchives=new Vector.<SSAR>();
 			
 			var type:String=sdat.readUTFBytes(4);
 			if(type!="SDAT") {
@@ -85,7 +89,11 @@
 					break;
 					
 					case "SSAR":
+						sequenceArchives.push(new SSAR(file.pos,sdat));
+					break;
+					
 					case "SSEQ":
+						sequences.push(new SSEQ(file.pos,sdat));
 					break;
 					
 					default:
@@ -93,6 +101,13 @@
 					break;
 				}
 			}
+			
+			
+			streams.fixed=true;
+			soundBanks.fixed=true;
+			waveArchives.fixed=true;
+			sequences.fixed=true;
+			sequenceArchives.fixed=true;
 		}
 		
 		private function parseFat(fatPos:uint):Vector.<FATRecord> {

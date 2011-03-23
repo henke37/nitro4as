@@ -7,7 +7,6 @@
 	public class SWAR {
 
 		private var sdat:ByteArray;
-		private var type:String;
 		
 		public var waves:Vector.<Wave>;
 
@@ -17,15 +16,18 @@
 				throw new ArgumentError("sdat can not be null!");
 			}
 			sdat.position=swarPos;
+			
+			var type:String;
+			
 			type=sdat.readUTFBytes(4);
 			if(type!="SWAR") {
 				throw new ArgumentError("Invalid SWAR block, wrong type id");
 			}
 			
 			sdat.position=swarPos+16;
-			var headType:String=sdat.readUTFBytes(4);
-			if(headType!="DATA") {
-				throw new ArgumentError("Invalid SWAR block, wrong head id " + headType);
+			type=sdat.readUTFBytes(4);
+			if(type!="DATA") {
+				throw new ArgumentError("Invalid SWAR block, wrong head id " + type);
 			}
 			
 			sdat.position=swarPos+56;
