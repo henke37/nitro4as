@@ -5,6 +5,8 @@
 	public class SSAR {
 		
 		private var sdat:ByteArray;
+		
+		sequenceInternal var offset:uint;
 
 		public function SSAR(ssarPos:uint,_sdat:ByteArray) {
 			

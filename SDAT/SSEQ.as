@@ -2,9 +2,13 @@
 	
 	import flash.utils.*;
 	
+	use namespace sequenceInternal;
+	
 	public class SSEQ {
 		
 		private var sdat:ByteArray;
+		
+		sequenceInternal var tracks;
 
 		public function SSEQ(sseqPos:uint,_sdat:ByteArray) {
 			
@@ -26,6 +30,14 @@
 			if(type!="DATA") {
 				throw new ArgumentError("Invalid SSEQ block, wrong head id " + type);
 			}
+			
+			var offset:uint;
+			
+			sdat.position=sseqPos+24;
+			offset=sdat.readUnsignedInt();
+			offset+=sseqPos;
+			
+			tracks=SequenceDataParser.parse(sdat,offset);
 		}
 
 	}
