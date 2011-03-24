@@ -5,7 +5,7 @@
 	import flash.utils.*;
 	
 	import SDAT.*;
-	import HTools.WaveWriter;
+	import HTools.Audio.WaveWriter;
 	import flash.net.FileReference;
 	
 	use namespace strmInternal;
@@ -23,8 +23,8 @@
 			reader=new SDATReader(new sdatClass());
 			
 			//listWaveArchives();
-			listStreams();
-			streamTest(7,false);
+			//listStreams();
+			//streamTest(7,false);
 			//swarTest(2,0);
 			
 		}
