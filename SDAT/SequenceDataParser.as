@@ -20,6 +20,8 @@
 			
 			sdat.position=offset;
 			
+			//var offsets:Vector.<Object>=new Vector.<Object>();
+			
 			for(;;) {
 				
 				var trackOver:Boolean=false;
@@ -37,29 +39,131 @@
 						track.events.push(new RestEvent(readVarLen(sdat)));
 					break;
 					
+					case 0x81:
+						track.events.push(new ProgramChangeEvent(readVarLen(sdat)));
+					break;
+					
 					case 0x93://open track
 						sdat.position+=1;//skip past the id
 						trackStarts.push(read3ByteInt(sdat));
 					break;
 					
 					case 0x94:
-						track.events.push(new JumpEvent(read3ByteInt(sdat)));
+						track.events.push(new JumpEvent(read3ByteInt(sdat),false));
+					break;
+					
+					case 0x95://call
+						track.events.push(new JumpEvent(read3ByteInt(sdat),true));
+					break;
+					
+					case 0xC0:
+						track.events.push(new PanEvent(sdat.readUnsignedByte()));
+					break;
+					
+					case 0xC1:
+						track.events.push(new VolumeEvent(sdat.readUnsignedByte(),false));
+					break;
+					
+					case 0xC2:
+						track.events.push(new VolumeEvent(sdat.readUnsignedByte(),true));//master
+					break;
+					
+					case 0xC3:
+						track.events.push(new TransposeEvent(sdat.readUnsignedByte()));
+					break;
+					
+					case 0xC4:
+						track.events.push(new PitchBendEvent(sdat.readUnsignedByte(),false));
+					break;
+					
+					case 0xC5:
+						track.events.push(new PitchBendEvent(sdat.readUnsignedByte(),true));//range
+					break;
+					
+					case 0xC6:
+						track.events.push(new PriorityEvent(sdat.readUnsignedByte()));
 					break;
 					
 					case 0xC7:
 						track.events.push(new MonoPolyEvent(sdat.readBoolean()));
 					break;
 					
+					case 0xCA:
+						track.events.push(new ModulationEvent("depth",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xCB:
+						track.events.push(new ModulationEvent("speed",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xCC:
+						track.events.push(new ModulationEvent("type",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xCD:
+						track.events.push(new ModulationEvent("range",sdat.readUnsignedByte()));
+					break;
+					
+					/*case 0xCE:
+					break;
+					case 0xCF:
+					break;*/
+					
+					case 0xD0:
+						track.events.push(new ADSREvent("A",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xD1:
+						track.events.push(new ADSREvent("D",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xD2:
+						track.events.push(new ADSREvent("S",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xD3:
+						track.events.push(new ADSREvent("R",sdat.readUnsignedByte()));
+					break;
+					
+					case 0xE0:
+						track.events.push(new ModulationEvent("delay",sdat.readUnsignedShort()));
+					break;
+					
 					case 0xE1:
 						track.events.push(new TempoEvent(sdat.readUnsignedShort()));
 					break;
+					
+					case 0xE3:
+						track.events.push(new SweepPitchEvent(sdat.readUnsignedShort()));
+					break;
+					
+					case 0xD4:
+						track.events.push(new LoopStartEvent(sdat.readUnsignedByte()));
+					break;
+					
+					case 0xD5://Expression
+					case 0xD6://print var
+						sdat.position+=1;
+					break;					
 					
 					case 0xFE://Multitrack marker op
 						sdat.position+=2;//unknown data
 					break;
 					
+					case 0xFC:
+						track.events.push(new LoopEndEvent());
+					break;
+					
+					case 0xFD:
+						track.events.push(new ReturnEvent());
+					break;
+					
 					case 0xFF:
 						trackOver=true;
+					break;
+					
+					default:
+						trace("unknown command: "+command.toString(16));
 					break;
 				}
 				
