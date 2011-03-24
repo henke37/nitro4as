@@ -40,7 +40,7 @@
 
 		public function render(ob:ByteArray,renderSize:uint):uint {
 			
-			const blockHeaderLength:uint=4;
+			const adpcmHeaderLength:uint=4;
 			
 			//init the decode count as zero
 			var samplesLeftToDecode:uint=renderSize;
@@ -84,20 +84,27 @@
 
 					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels)*stream.blockLength;					
 					blockStartOffset += currentChannel*blockLen;
-
-					var decoder:ADPCMDecoder=decoders[currentChannel];
 					
-					//init the decoder if the offset is zero
-					if(blockCurrentSample==0) {
-						stream.sdat.position=blockStartOffset;
+					if(stream.encoding==Wave.ADPCM) {
+	
+						var decoder:ADPCMDecoder=decoders[currentChannel];
 						
-						var predictor:uint=stream.sdat.readShort();
-						var stepIndex:uint=stream.sdat.readShort();
-						decoder.init(predictor,stepIndex);
+						//init the decoder if the offset is zero
+						if(blockCurrentSample==0) {
+							stream.sdat.position=blockStartOffset;
+							
+							var predictor:uint=stream.sdat.readShort();
+							var stepIndex:uint=stream.sdat.readShort();
+							decoder.init(predictor,stepIndex);
+						}
+						
+						stream.sdat.position=blockStartOffset+adpcmHeaderLength+blockCurrentSample/2;
+						decoder.decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
+					} else {
+						stream.sdat.position=blockStartOffset+blockCurrentSample/2;
+						
+						decodePCM(samplesToDecode,decodeBuffers[currentChannel]);
 					}
-					
-					stream.sdat.position=blockStartOffset+blockHeaderLength+blockCurrentSample/2;
-					decoder.decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
 				}
 				//write the decoded data to the output buffer
 				for(var i:uint=0;i<samplesToDecode;++i) {
@@ -129,6 +136,19 @@
 		}
 		public static function shortToNumber(short:uint):Number {
 			return Number(short)/(2<<16);
+		}
+		
+		private function decodePCM(blockSamples:uint,outBuf:Vector.<Number>):void {
+			var sample:Number;
+			var i:uint;
+			for(i=0;i<blockSamples;++i) {
+				if(stream.encoding==1) {
+					sample=shortToNumber(stream.sdat.readUnsignedShort());
+				} else {
+					sample=byteToNumber(stream.sdat.readByte());
+				}				
+				outBuf[i]=sample;
+			}
 		}
 		
 		public function seek(newPos:uint):void {
