@@ -104,10 +104,13 @@
 						track.events.push(new ModulationEvent("range",sdat.readUnsignedByte()));
 					break;
 					
-					/*case 0xCE:
+					case 0xCE:
+						track.events.push(new PortamentoEvent(sdat.readBoolean()));
 					break;
+					
 					case 0xCF:
-					break;*/
+						track.events.push(new PortamentoTimeEvent(sdat.readUnsignedByte()));
+					break;
 					
 					case 0xD0:
 						track.events.push(new ADSREvent("A",sdat.readUnsignedByte()));
@@ -142,6 +145,9 @@
 					break;
 					
 					case 0xD5://Expression
+						track.events.push(new ExpressionEvent(sdat.readUnsignedByte()));
+					break;
+					
 					case 0xD6://print var
 						sdat.position+=1;
 					break;					
