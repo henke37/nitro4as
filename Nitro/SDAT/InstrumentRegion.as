@@ -1,4 +1,4 @@
-﻿package SDAT {
+﻿package Nitro.SDAT {
 	import flash.utils.ByteArray;
 	
 	public class InstrumentRegion {

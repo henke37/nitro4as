@@ -1,4 +1,4 @@
-﻿package SDAT.SequenceEvents {
+﻿package Nitro.SDAT.SequenceEvents {
 	
 	public class RestEvent extends SequenceEvent {
 

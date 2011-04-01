@@ -4,7 +4,7 @@
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import SDAT.*;
+	import Nitro.SDAT.*;
 	import HTools.Audio.WaveWriter;
 	import flash.net.FileReference;
 	

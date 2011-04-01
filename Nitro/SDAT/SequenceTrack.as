@@ -1,8 +1,8 @@
-﻿package SDAT {
+﻿package Nitro.SDAT {
 	
 	use namespace sequenceInternal;
 	
-	import SDAT.SequenceEvents.*;
+	import Nitro.SDAT.SequenceEvents.*;
 	
 	public class SequenceTrack {
 		

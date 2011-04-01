@@ -1,4 +1,4 @@
-﻿package SDAT {
+﻿package Nitro.SDAT {
 	
 	public class Instrument {
 

@@ -1,7 +1,7 @@
-﻿package SDAT {
+﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
-	import SDAT.SequenceEvents.*;
+	import Nitro.SDAT.SequenceEvents.*;
 	
 	use namespace sequenceInternal;
 	
