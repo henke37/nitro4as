@@ -93,10 +93,51 @@
 			return entry;
 		}
 		
-		public function openFile(path:String):ByteArray {
+		public function searchForFile(baseDir:Directory,filter:RegExp,allowRecursion:Boolean=false):Vector.<AbstractFile> {
+			
+			var out:Vector.<AbstractFile>=new Vector.<AbstractFile>();
+			
+			for each(var entry:AbstractFile in baseDir.files) {
+				
+				if(entry.name.match(filter)) {
+					out.push(entry);
+				}
+				
+				var subDir:Directory=entry as Directory;
+				
+				if(subDir && allowRecursion) {
+					out=out.concat(searchForFile(subDir,filter,true));
+				}
+				
+			}
+			
+			return out;
+		}
+		
+		public function getFullNameForFile(file:AbstractFile):String {
+			var o:String;
+			
+			o=file.name;
+			
+			file=file.parent;
+			
+			while(file.parent) {
+				o=file.name+"/"+o;
+				file=file.parent;
+			}
+			
+			return o;
+		}
+		
+		public function openFileByName(path:String):ByteArray {
 			var file:File=File(resolvePath(path));
 			
-			nds.position=file.fileId*8+FATPos;
+			return openFileById(file.fileId);
+		}
+		
+		public function openFileById(id:uint):ByteArray {
+			
+			nds.position=id*8+FATPos;
 			
 			var start:uint=nds.readUnsignedInt();
 			var stop:uint=nds.readUnsignedInt();

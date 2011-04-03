@@ -41,6 +41,15 @@
 			
 			if(parser.gameCode=="AGCE") {
 				playStream("sound_data.sdat","STRM_BGM19DS_REQ");
+			} else {
+				trace("unknown game");
+				
+				var files:Vector.<AbstractFile>=parser.fileSystem.searchForFile(parser.fileSystem.rootDir,/\.sdat$/i,true);
+				
+				for each(var file:AbstractFile in files) {
+					trace(parser.fileSystem.getFullNameForFile(file));
+				}
+				
 			}
 			
 			//trace(dumpFs(parser.fileSystem.rootDir));
@@ -62,11 +71,20 @@
 		
 		private var player:STRMPlayer;
 		private function playStream(fileName:String,streamName:String):void {
-			var file:ByteArray=parser.fileSystem.openFile(fileName);
+			var file:ByteArray=parser.fileSystem.openFileByName(fileName);
 			var sdat:SDATReader=new SDATReader(file);
 			var stream:STRM=sdat.getStreamByName(streamName);
 			player=new STRMPlayer(stream);
 			player.play();
+		}
+		
+		private function listStreams(fileName:String):void {
+			var file:ByteArray=parser.fileSystem.openFileByName(fileName);
+			var sdat:SDATReader=new SDATReader(file);
+			
+			for each(var streamName:String in sdat.streamSymbols) {
+				trace(streamName);
+			}
 		}
 	}
 	
