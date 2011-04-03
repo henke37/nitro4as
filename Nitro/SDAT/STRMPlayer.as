@@ -15,7 +15,7 @@
 
 		public function STRMPlayer(strm:STRM) {
 			decoder=new STRMDecoder(strm);
-			trace(strm.sampleRate);
+			//trace(strm.sampleRate);
 			resampler=new HoldResampler(strm.sampleRate,44100,decoder.render);
 			
 			playSound=new Sound();

@@ -29,7 +29,7 @@
 				throw new ArgumentError("Invalid SSAR block, wrong head id " + type);
 			}
 			
-			trace(ssarPos);
+			//trace(ssarPos);
 		}
 
 	}

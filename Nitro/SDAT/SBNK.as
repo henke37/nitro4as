@@ -105,7 +105,7 @@
 				instrument.definitions.push(new InstrumentRegion(sdat));
 			}
 			
-			trace(range);
+			//trace(range);
 			
 			return instrument;
 		}
