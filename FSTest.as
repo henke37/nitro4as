@@ -21,9 +21,9 @@
 		private function loaded(e:Event):void {
 			var parser:NDSParser=new NDSParser(loader.data);
 			
-			trace(parser.gameCode,parser.gameName,parser.makerCode,parser.cardSize,parser.enTitle);
+			trace(parser.gameCode,parser.gameName,parser.makerCode,parser.cardSize,parser.banner.enTitle);
 			
-			var icon:Bitmap=new Bitmap(parser.icon);
+			var icon:Bitmap=new Bitmap(parser.banner.icon);
 			icon.scaleX=12;
 			icon.scaleY=12;
 			addChild(icon);
