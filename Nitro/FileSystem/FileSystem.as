@@ -62,6 +62,53 @@
 			}
 			
 		}
+		
+		public function resolvePath(path:String):AbstractFile {
+			var folders:Array=path.split("/");
+			
+			var dir:Directory=rootDir;
+			
+			var entry:AbstractFile;
+			
+			while(folders.length) {
+				var fileName:String=folders.shift();
+				
+				entry=null;
+				var foundFile:Boolean=false;
+				
+				for each(entry in dir.files) {
+					if(entry.name==fileName) {
+						foundFile=true;
+						break;
+					}
+				}
+				
+				if(!foundFile) {
+					throw new ArgumentError("Unknown filename \""+fileName+"\" in \""+path+"\".");
+				}
+				
+				dir=entry as Directory;
+			}
+			
+			return entry;
+		}
+		
+		public function openFile(path:String):ByteArray {
+			var file:File=File(resolvePath(path));
+			
+			nds.position=file.fileId*8+FATPos;
+			
+			var start:uint=nds.readUnsignedInt();
+			var stop:uint=nds.readUnsignedInt();
+			var len:uint=stop-start+1;
+			
+			var out:ByteArray=new ByteArray();
+			
+			nds.position=start;
+			nds.readBytes(out,0,len);
+			
+			return out;
+		}
 
 	}
 	

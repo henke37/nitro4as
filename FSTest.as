@@ -3,13 +3,18 @@
 	import flash.display.*;
 	import flash.utils.*;
 	import flash.net.*;
+	import flash.events.*;
+	import flash.text.*;
 	
 	import Nitro.FileSystem.*;
-	import flash.events.Event;
+	
+	import Nitro.SDAT.*;
 	
 	public class FSTest extends MovieClip {
 		
 		private var loader:URLLoader;
+		
+		private var parser:NDSParser;
 		
 		public function FSTest() {
 			loader=new URLLoader();
@@ -19,16 +24,26 @@
 		}
 		
 		private function loaded(e:Event):void {
-			var parser:NDSParser=new NDSParser(loader.data);
-			
-			trace(parser.gameCode,parser.gameName,parser.makerCode,parser.cardSize,parser.banner.enTitle);
+			parser=new NDSParser(loader.data);
 			
 			var icon:Bitmap=new Bitmap(parser.banner.icon);
 			icon.scaleX=12;
 			icon.scaleY=12;
 			addChild(icon);
 			
-			trace(dumpFs(parser.fileSystem.rootDir));
+			var title:TextField=new TextField();
+			title.x=32*12;
+			title.width=550-32*12;
+			title.wordWrap=true;
+			title.autoSize=TextFieldAutoSize.LEFT;
+			title.text=parser.banner.enTitle;
+			addChild(title);
+			
+			if(parser.gameCode=="AGCE") {
+				playStream("sound_data.sdat","STRM_BGM19DS_REQ");
+			}
+			
+			//trace(dumpFs(parser.fileSystem.rootDir));
 		}
 		
 		private function dumpFs(dir:Directory) {
@@ -43,6 +58,15 @@
 				}
 			}
 			return o;
+		}
+		
+		private var player:STRMPlayer;
+		private function playStream(fileName:String,streamName:String):void {
+			var file:ByteArray=parser.fileSystem.openFile(fileName);
+			var sdat:SDATReader=new SDATReader(file);
+			var stream:STRM=sdat.getStreamByName(streamName);
+			player=new STRMPlayer(stream);
+			player.play();
 		}
 	}
 	

@@ -211,6 +211,17 @@
 	
 			return(value);
 		}
+		
+		public function getStreamByName(name:String):STRM {
+			var i:uint;
+			for each(var symbName:String in streamSymbols) {
+				if(symbName==name) {
+					return streams[i];
+				}
+				++i;
+			}
+			throw new ArgumentError("Unknown stream name");
+		}
 	}
 	
 }
