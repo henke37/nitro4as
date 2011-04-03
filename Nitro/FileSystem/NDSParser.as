@@ -24,11 +24,7 @@
 		
 		private var nds:ByteArray;
 		
-		private var fileNameTablePos:uint;
-		private var fileNameTableSize:uint;
-		
-		private var fileAllocationTablePos:uint;
-		private var fileAllocationTableSize:uint;
+		public var fileSystem:FileSystem;
 		
 		public var banner:Banner;
 
@@ -60,11 +56,11 @@
 			arm7Mirror=nds.readUnsignedInt();
 			arm7Len=nds.readUnsignedInt();
 			
-			fileNameTablePos=nds.readUnsignedInt();
-			fileNameTableSize=nds.readUnsignedInt();
+			var fileNameTablePos:uint=nds.readUnsignedInt();
+			var fileNameTableSize:uint=nds.readUnsignedInt();
 			
-			fileAllocationTablePos=nds.readUnsignedInt();
-			fileAllocationTableSize=nds.readUnsignedInt();
+			var fileAllocationTablePos:uint=nds.readUnsignedInt();
+			var fileAllocationTableSize:uint=nds.readUnsignedInt();
 			
 			nds.position+=4*4;//overlays
 			
@@ -93,11 +89,7 @@
 				banner=new Banner(nds,bannerOffset);
 			}
 			
-			parseFileSystem();
-			
-		}
-		
-		private function parseFileSystem():void {
+			fileSystem=new FileSystem(nds,fileNameTablePos,fileNameTableSize,fileAllocationTablePos,fileAllocationTableSize);
 			
 		}
 
