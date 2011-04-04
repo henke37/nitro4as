@@ -19,44 +19,75 @@
 		private var sdat:SDATReader;
 		
 		private var status:TextField;
+		private var title:TextField;
 		
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
 		
-		public function FSTest() {
-			loader=new URLLoader();
-			loader.addEventListener(Event.COMPLETE,loaded);
-			loader.dataFormat=URLLoaderDataFormat.BINARY;
-			loader.load(new URLRequest("game.nds"));
-			
+		public function FSTest() {			
 			status=new TextField();
 			status.x=Banner.ICON_WIDTH*iconZoom;
 			status.y=titleHeight;
 			status.width=550-Banner.ICON_WIDTH*iconZoom;
 			status.wordWrap=true;
 			status.multiline=true;
-			status.text="Loading data";
 			status.autoSize=TextFieldAutoSize.LEFT;
 			addChild(status);
+			
+			title=new TextField();
+			title.x=Banner.ICON_WIDTH*iconZoom;
+			title.width=550-Banner.ICON_WIDTH*iconZoom;
+			title.wordWrap=true;
+			title.height=titleHeight;
+			title.text="Nitro SDAT Stream player WIP";
+			addChild(title);
+			
+			if(false && loaderInfo.url.match(/^file:/)) {
+				status.text="Loading data";
+				loader=new URLLoader();
+				loader.addEventListener(Event.COMPLETE,loaded);
+				loader.dataFormat=URLLoaderDataFormat.BINARY;
+				loader.load(new URLRequest("game.nds"));
+			} else {
+				status.text="Click to load game from disk";
+				stage.addEventListener(MouseEvent.CLICK,stageClick);
+			}
+		}
+		
+		var fr:FileReference;
+		
+		private function stageClick(e:MouseEvent):void {
+			
+			fr=new FileReference();
+			fr.addEventListener(Event.SELECT,fileSelected);
+			fr.browse([new FileFilter("Nitro games","*.nds")]);
+		}
+		
+		private function fileSelected(e:Event):void {
+			stage.removeEventListener(MouseEvent.CLICK,stageClick);
+			
+			fr.addEventListener(Event.COMPLETE,frLoaded);
+			fr.load();
+			
+		}
+		
+		private function frLoaded(e:Event):void {	
+			nds=new NDSParser(fr.data);
+			setup();
 		}
 		
 		private function loaded(e:Event):void {
 			nds=new NDSParser(loader.data);
-			
+			setup();
+		}
+		
+		private function setup():void {
 			var icon:Bitmap=new Bitmap(nds.banner.icon);
 			icon.scaleX=iconZoom;
 			icon.scaleY=iconZoom;
 			addChild(icon);
 			
-			var title:TextField=new TextField();
-			title.x=Banner.ICON_WIDTH*iconZoom;
-			title.width=550-Banner.ICON_WIDTH*iconZoom;
-			title.wordWrap=true;
-			title.height=titleHeight;
 			title.text=nds.banner.enTitle;
-			addChild(title);
-			
-			
 			
 			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,true);
 			
