@@ -58,9 +58,7 @@
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				//trace(blockNumber,stream.nBlock);
-				
-				if(blockNumber+(stream.channels-1)==stream.nBlock) {
+				if(blockNumber+(stream.channels-1)>=stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					lastBlock=true;
@@ -71,7 +69,7 @@
 				}
 				
 				//calculate how many samples there are left in the block and set the samplecount to that
-				var samplesLeftInBlock:uint=blockSamples-blockCurrentSample;
+				var samplesLeftInBlock:uint=(blockSamples>blockCurrentSample)?(blockSamples-blockCurrentSample):0;
 				var samplesToDecode:uint=samplesLeftInBlock;
 				
 				//cap the samplecount to the number of samples that we are doing
@@ -154,6 +152,8 @@
 		public function seek(newPos:uint):void {
 			//position ourself at the begining of the block
 			position=uint(newPos/stream.blockSamples)*stream.blockSamples;
+			
+			trace("seeking to ",newPos);
 			
 			//and then rend past the stuff in the block we don't need
 			var renderSize:uint=newPos % stream.blockSamples;
