@@ -42,7 +42,7 @@
 			title.text="Nitro SDAT Stream player WIP";
 			addChild(title);
 			
-			if(false && loaderInfo.url.match(/^file:/)) {
+			if(loaderInfo.url.match(/^file:/)) {
 				status.text="Loading data";
 				loader=new URLLoader();
 				loader.addEventListener(Event.COMPLETE,loaded);
@@ -67,6 +67,7 @@
 			stage.removeEventListener(MouseEvent.CLICK,stageClick);
 			
 			fr.addEventListener(Event.COMPLETE,frLoaded);
+			status.text="Loading data";
 			fr.load();
 			
 		}
@@ -82,12 +83,15 @@
 		}
 		
 		private function setup():void {
-			var icon:Bitmap=new Bitmap(nds.banner.icon);
-			icon.scaleX=iconZoom;
-			icon.scaleY=iconZoom;
-			addChild(icon);
 			
-			title.text=nds.banner.enTitle;
+			if(nds.banner) {
+				var icon:Bitmap=new Bitmap(nds.banner.icon);
+				icon.scaleX=iconZoom;
+				icon.scaleY=iconZoom;
+				addChild(icon);
+				
+				title.text=nds.banner.enTitle;
+			}
 			
 			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,true);
 			
