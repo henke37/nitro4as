@@ -36,9 +36,9 @@
 				var g:uint=(entry >> 5) & 0x1F;
 				var b:uint=(entry >> 10) & 0x1F;
 				
-				r<<=3;
-				g<<=3;
-				b<<=3;
+				r=colorScale(r);
+				g=colorScale(g);
+				b=colorScale(b);
 				
 				pallete[i]=b | g << 8 | r << 16;
 			}
@@ -97,6 +97,14 @@
 				o+=String.fromCharCode(b.readUnsignedShort());
 			}
 			
+			return o;
+		}
+		
+		private static function colorScale(x:uint):uint {
+			var o:uint=x<<3;
+			if(x & 1) {
+				o+=7;
+			}
 			return o;
 		}
 
