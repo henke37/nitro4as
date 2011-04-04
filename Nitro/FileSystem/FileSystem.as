@@ -93,7 +93,7 @@
 			return entry;
 		}
 		
-		public function searchForFile(baseDir:Directory,filter:RegExp,allowRecursion:Boolean=false):Vector.<AbstractFile> {
+		public function searchForFile(baseDir:Directory,filter:RegExp,allowRecursion:Boolean=false,justFirst:Boolean=false):Vector.<AbstractFile> {
 			
 			var out:Vector.<AbstractFile>=new Vector.<AbstractFile>();
 			
@@ -109,6 +109,9 @@
 					out=out.concat(searchForFile(subDir,filter,true));
 				}
 				
+				if(justFirst && out.length>0) {
+					break;
+				}
 			}
 			
 			return out;
@@ -132,6 +135,10 @@
 		public function openFileByName(path:String):ByteArray {
 			var file:File=File(resolvePath(path));
 			
+			return openFileByReference(file);
+		}
+		
+		public function openFileByReference(file:File):ByteArray {
 			return openFileById(file.fileId);
 		}
 		

@@ -13,6 +13,12 @@
 		public var esTitle:String;
 		
 		public var icon:BitmapData;
+		
+		private static const blockSize:uint=8;
+		private static const blockCount:uint=4;
+		
+		public static const ICON_WIDTH:uint=blockSize*blockCount;
+		public static const ICON_HEIGHT:uint=blockSize*blockCount;
 
 		public function Banner(nds:ByteArray,bannerOffset:uint) {
 			nds.position=bannerOffset;
@@ -50,8 +56,7 @@
 			icon=new BitmapData(32,32,true);
 			icon.lock();
 			
-			const blockSize:uint=8;
-			const blockCount:uint=4;
+			
 			
 			for(var blockY:uint=0;blockY<blockCount;++blockY) {
 				for(var blockX:uint=0;blockX<blockCount;++blockX) {
