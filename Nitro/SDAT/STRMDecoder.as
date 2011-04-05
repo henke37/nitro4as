@@ -91,6 +91,8 @@
 						if(blockCurrentSample==0) {
 							stream.sdat.position=blockStartOffset;
 							
+							trace("block init",blockNumber);
+							
 							var predictor:uint=stream.sdat.readShort();
 							var stepIndex:uint=stream.sdat.readShort();
 							decoder.init(predictor,stepIndex);

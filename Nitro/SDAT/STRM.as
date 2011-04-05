@@ -6,7 +6,6 @@
 	
 	public class STRM {
 		
-		private var type:String;
 		strmInternal var encoding:uint;
 		public var loop:Boolean;
 		strmInternal var channels:uint;
@@ -29,15 +28,18 @@
 				throw new ArgumentError("sdat can not be null!");
 			}
 			sdat.position=strmPos;
+			
+			var type:String;
+			
 			type=sdat.readUTFBytes(4);
 			if(type!="STRM") {
-				throw new ArgumentError("Invalid STRM block, wrong type id");
+				throw new ArgumentError("Invalid STRM block, wrong type id "+type);
 			}
 			
 			sdat.position=strmPos+16;
-			var headType:String=sdat.readUTFBytes(4);
-			if(headType!="HEAD") {
-				throw new ArgumentError("Invalid STRM block, wrong head id");
+			type=sdat.readUTFBytes(4);
+			if(type!="HEAD") {
+				throw new ArgumentError("Invalid STRM block, wrong head id "+type);
 			}
 			sdat.position+=4;
 			encoding=sdat.readUnsignedByte();
@@ -62,9 +64,9 @@
 			}
 			
 			sdat.position=dataPos-8;//header before raw data
-			var dataType:String=sdat.readUTFBytes(4);
-			if(dataType!="DATA") {
-				throw new ArgumentError("Invalid STRM block, incorrect DATA header type");
+			type=sdat.readUTFBytes(4);
+			if(type!="DATA") {
+				throw new ArgumentError("Invalid STRM block, incorrect DATA header type "+type);
 			}
 		}
 		
