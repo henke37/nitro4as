@@ -7,7 +7,7 @@
 	import flash.filesystem.*;
 	
 	import Nitro.FileSystem.*;
-	import Nitro.SDAT.PAC;
+	import Nitro.*;
 	
 	public class PACTest extends MovieClip {
 		

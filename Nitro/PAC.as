@@ -1,4 +1,4 @@
-﻿package Nitro.SDAT {
+﻿package Nitro {
 	import flash.utils.*;
 	
 	public class PAC {
