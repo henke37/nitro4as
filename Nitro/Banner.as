@@ -86,23 +86,13 @@
 			
 			nds.position=576+bannerOffset;
 			
-			jpTitle=readUTF16(nds,256);
-			enTitle=readUTF16(nds,256);
-			frTitle=readUTF16(nds,256);
-			deTitle=readUTF16(nds,256);
-			itTitle=readUTF16(nds,256);
-			esTitle=readUTF16(nds,256);
+			jpTitle=nds.readMultiByte(256,"unicode");
+			enTitle=nds.readMultiByte(256,"unicode");
+			frTitle=nds.readMultiByte(256,"unicode");
+			deTitle=nds.readMultiByte(256,"unicode");
+			itTitle=nds.readMultiByte(256,"unicode");
+			esTitle=nds.readMultiByte(256,"unicode");
 			
-		}
-		
-		private static function readUTF16(b:ByteArray,len:uint):String {
-			var o:String="";
-			
-			for(var i:uint;i<len;i+=2) {
-				o+=String.fromCharCode(b.readUnsignedShort());
-			}
-			
-			return o;
 		}
 		
 		private static function colorScale(x:uint):uint {
