@@ -24,7 +24,7 @@
 		
 		public function RomMapGen() {			
 			
-			if(loaderInfo.url.match(/^file:/)) {
+			if(loaderInfo.url.match(/^file:/) && false) {
 				status_txt.text="Loading data";
 				loader=new URLLoader();
 				loader.addEventListener(Event.COMPLETE,loaded);
@@ -88,7 +88,30 @@
 			}
 			
 			xml.appendChild(dumpFs(nds.fileSystem.rootDir));
+			
+			if(nds.arm7Overlays) {
+				var overlay:XML=<overlays cpu="arm7" offset={nds.arm7OverlayOffset} size={nds.arm7OverlaySize}/>;
+				addOverlays(overlay,nds.arm7Overlays);
+				xml.appendChild(overlay);
+			}
+			
+			if(nds.arm9Overlays) {
+				overlay=<overlays cpu="arm9" offset={nds.arm9OverlayOffset} size={nds.arm9OverlaySize}/>;
+				addOverlays(overlay,nds.arm9Overlays);
+				xml.appendChild(overlay);
+			}
+			
+			
 			fr.save(xml,"ndsmap.xml");
+		}
+		
+		private static function addOverlays(xml:XML,overlays:Vector.<Overlay>):void {
+			for each(var overlay:Overlay in overlays) {
+				xml.appendChild(<overlay id={overlay.id} fileId={overlay.fileId}>
+					<ram address={overlay.ramAddress} size={overlay.ramSize} />
+					<bss size={overlay.bssSize} start={overlay.bssStart} stop={overlay.bssStop} />
+				</overlay>);
+			}
 		}
 	}
 }
