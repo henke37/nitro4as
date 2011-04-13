@@ -52,7 +52,7 @@
 							var subId:uint=nds.readUnsignedShort();
 							dirIndex[subId & 0x0FFF].dir=subDir;
 						} else {
-							dir.files.push(new File(name,dir,fileId++));
+							dir.files.push(makeFile(name,dir,fileId++));
 						}
 					}
 					
@@ -139,7 +139,12 @@
 		}
 		
 		public function openFileByReference(file:File):ByteArray {
-			return openFileById(file.fileId);
+			var out:ByteArray=new ByteArray();
+			
+			nds.position=file.offset;
+			nds.readBytes(out,0,file.size);
+			
+			return out;
 		}
 		
 		public function openFileById(id:uint):ByteArray {
@@ -156,6 +161,27 @@
 			nds.readBytes(out,0,len);
 			
 			return out;
+		}
+		
+		private function makeFile(name:String,parent:Directory,id:uint):File {
+			var file:File=new File(name,parent,id);
+			
+			var readPos:uint=nds.position;
+			
+			try {
+				nds.position=id*8+FATPos;
+				
+				var start:uint=nds.readUnsignedInt();
+				var stop:uint=nds.readUnsignedInt();
+				var len:uint=stop-start+1;
+				
+				file.offset=start;
+				file.size=len;
+			} finally {//no pesky read error is going to mess with the main reading
+				nds.position=readPos;
+			}
+			
+			return file;
 		}
 
 	}

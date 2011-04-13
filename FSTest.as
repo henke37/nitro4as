@@ -110,22 +110,6 @@
 
 		}
 		
-		
-		
-		private function dumpFs(dir:Directory) {
-			var o:XML=<dir name={dir.name} />;
-			
-			for each(var abf:AbstractFile in dir.files) {
-				var subDir:Directory=abf as Directory;
-				if(subDir) {
-					o.appendChild(dumpFs(subDir));
-				} else {
-					o.appendChild(<file name={abf.name} />);
-				}
-			}
-			return o;
-		}
-		
 		private var player:STRMPlayer;
 		private function playStream(streamNumber:uint):void {
 			var stream:STRM=sdat.streams[streamNumber];

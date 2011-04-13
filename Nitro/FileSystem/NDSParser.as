@@ -26,6 +26,7 @@
 		
 		public var fileSystem:FileSystem;
 		
+		public var bannerOffset:uint;		
 		public var banner:Banner;
 
 		public function NDSParser(nds:ByteArray) {
@@ -66,7 +67,7 @@
 			
 			nds.position+=4*2;//flash chip timing controll data
 			
-			var bannerOffset:uint=nds.readUnsignedInt();
+			bannerOffset=nds.readUnsignedInt();
 			
 			var romCRC:uint=nds.readUnsignedShort();
 			
