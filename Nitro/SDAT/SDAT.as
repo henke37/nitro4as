@@ -4,7 +4,7 @@
 	
 	use namespace sdatInternal;
 	
-	public class SDATReader {
+	public class SDAT {
 		
 		sdatInternal var sdat:ByteArray;
 		
@@ -24,7 +24,11 @@
 		public var player2Symbols:Vector.<String>;
 		public var streamSymbols:Vector.<String>;
 		
-		public function SDATReader(_sdat:ByteArray) {
+		public function SDAT() {
+			
+		}
+		
+		public function parse(_sdat:ByteArray):void {
 			sdat=_sdat
 			
 			streams=new Vector.<STRM>();
@@ -75,31 +79,43 @@
 				sdat.position=file.pos;
 				var fileType:String=sdat.readUTFBytes(4);
 				//trace(fileType);
+				
+				var subFile:SubFile=null;
+				var container:*;
+				
 				switch(fileType) {
 					case "STRM":
-						streams.push(new STRM(file.pos,sdat));
+						subFile=new STRM();
+						container=streams;
 					break;
 					
 					case "SBNK":
-						soundBanks.push(new SBNK(file.pos,sdat));
+						subFile=new SBNK();
+						container=soundBanks;
 					break;
 					
 					case "SWAR":
-						waveArchives.push(new SWAR(file.pos,sdat));
+						subFile=new SWAR();
+						container=waveArchives;
 					break;
 					
 					case "SSAR":
-						sequenceArchives.push(new SSAR(file.pos,sdat));
+						subFile=new SSAR();
+						container=sequenceArchives;
 					break;
 					
 					case "SSEQ":
-						sequences.push(new SSEQ(file.pos,sdat));
+						subFile=new SSEQ();
+						container=sequences;
 					break;
 					
 					default:
 						throw new Error("Unknown filetype encountered");
 					break;
 				}
+				
+				subFile.parse(file.pos,sdat);
+				container.push(subFile);
 			}
 			
 			

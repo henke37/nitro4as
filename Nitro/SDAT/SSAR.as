@@ -2,13 +2,17 @@
 	
 	import flash.utils.*;
 	
-	public class SSAR {
+	public class SSAR extends SubFile {
 		
 		private var sdat:ByteArray;
 		
 		sequenceInternal var offset:uint;
 
-		public function SSAR(ssarPos:uint,_sdat:ByteArray) {
+		public function SSAR() {
+			
+		}
+		
+		public override function parse(ssarPos:uint,_sdat:ByteArray):void {
 			
 			sdat=_sdat;
 			if(!sdat) {

@@ -14,12 +14,13 @@
 		
 		private var loader:URLLoader;
 		
-		private var nds:NDSParser;
+		private var nds:NDS;
 		
-		private var sdat:SDATReader;
+		private var sdat:SDAT;
 		
 		private var status:TextField;
 		private var title:TextField;
+		private var debug:TextField;
 		
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
@@ -41,6 +42,12 @@
 			title.height=titleHeight;
 			title.text="Nitro SDAT Stream player WIP";
 			addChild(title);
+			
+			debug=new TextField();
+			debug.y=Banner.ICON_HEIGHT*iconZoom;
+			debug.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
+			debug.width=stage.stageWidth;
+			addChild(debug);
 			
 			if(loaderInfo.url.match(/^file:/)) {
 				status.text="Loading data";
@@ -73,12 +80,14 @@
 		}
 		
 		private function frLoaded(e:Event):void {	
-			nds=new NDSParser(fr.data);
+			nds=new NDS();
+			nds.parse(fr.data);
 			setup();
 		}
 		
 		private function loaded(e:Event):void {
-			nds=new NDSParser(loader.data);
+			nds=new NDS();
+			nds.parse(loader.data);
 			setup();
 		}
 		
@@ -102,7 +111,8 @@
 			
 			if(fileRef) {
 				var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
-				sdat=new SDATReader(fileContents);
+				sdat=new SDAT();
+				sdat.parse(fileContents);
 				listStreams();
 			} else {
 				status.text="No sdat found";
@@ -114,6 +124,7 @@
 		private function playStream(streamNumber:uint):void {
 			var stream:STRM=sdat.streams[streamNumber];
 			player=new STRMPlayer(stream);
+			player.debug=debug;
 			player.play();
 		}
 		

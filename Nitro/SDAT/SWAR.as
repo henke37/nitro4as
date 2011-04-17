@@ -4,13 +4,17 @@
 	
 	//use namespace strmInternal;
 	
-	public class SWAR {
+	public class SWAR extends SubFile{
 
 		private var sdat:ByteArray;
 		
 		public var waves:Vector.<Wave>;
 
-		public function SWAR(swarPos:uint,_sdat:ByteArray) {
+		public function SWAR() {
+			
+		}
+		
+		public override function parse(swarPos:uint,_sdat:ByteArray):void {
 			sdat=_sdat;
 			if(!sdat) {
 				throw new ArgumentError("sdat can not be null!");
@@ -40,7 +44,8 @@
 			for(var i:uint;i<count;++i) {
 				sdat.position=swarPos+60+4*i;
 				var pos=sdat.readUnsignedInt()+swarPos;
-				var wave:Wave=new Wave(pos,_sdat);
+				var wave:Wave=new Wave();
+				wave.parse(pos,_sdat);
 				waves.push(wave);
 			}
 			

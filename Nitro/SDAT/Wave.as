@@ -22,7 +22,11 @@
 		public var sdat:ByteArray;
 		public var dataPos:uint;
 
-		public function Wave(wavePos:uint,_sdat:ByteArray) {
+		public function Wave() {
+			
+		}
+		
+		public function parse(wavePos:uint,_sdat:ByteArray):void {
 			sdat=_sdat;
 			if(!sdat) {
 				throw new ArgumentError("sdat can not be null!");

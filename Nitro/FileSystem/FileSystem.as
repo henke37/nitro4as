@@ -10,7 +10,11 @@
 		
 		public var rootDir:Directory;
 
-		public function FileSystem(nds:ByteArray,FNTPos:uint,FNTSize:uint,FATPos:uint,FATSize:uint) {
+		public function FileSystem() {
+			
+		}
+		
+		public function parse(nds:ByteArray,FNTPos:uint,FNTSize:uint,FATPos:uint,FATSize:uint):void {
 			this.nds=nds;
 			this.FNTPos=FNTPos;
 			this.FATPos=FATPos;

@@ -1,5 +1,6 @@
 ﻿package Nitro.SDAT {
 	import flash.utils.*;
+	import flash.text.TextField;
 	
 	use namespace strmInternal;
 	
@@ -11,6 +12,8 @@
 		private var decodeBuffers:Vector.<Vector.<Number>>;
 		
 		public var loopAllowed:Boolean=true;
+		
+		public var debug:TextField;
 
 		public function STRMDecoder(_stream:STRM) {
 			if(!_stream) {
@@ -39,6 +42,8 @@
 		}
 
 		public function render(ob:ByteArray,renderSize:uint):uint {
+			
+			if(renderSize==0) return 0;
 			
 			const adpcmHeaderLength:uint=4;
 			
@@ -91,7 +96,7 @@
 						if(blockCurrentSample==0) {
 							stream.sdat.position=blockStartOffset;
 							
-							trace("block init",blockNumber);
+							trace("block init "+blockNumber+","+position+","+blockStartOffset);
 							
 							var predictor:uint=stream.sdat.readShort();
 							var stepIndex:uint=stream.sdat.readShort();
@@ -121,8 +126,9 @@
 				position+=samplesToDecode;
 				
 				if(lastBlock && position>=stream.sampleCount && stream.loop && loopAllowed) {
-					seek(stream.loopPoint);
 					lastBlock=false;
+					seek(stream.loopPoint);
+					
 				}
 				
 			} while(samplesLeftToDecode>0 && !lastBlock);//keep repeating while we have not decoded enough samples and not(EOS flag set and not looping)
@@ -155,11 +161,11 @@
 			//position ourself at the begining of the block
 			position=uint(newPos/stream.blockSamples)*stream.blockSamples;
 			
-			trace("seeking to ",newPos);
+			trace("seeking to ",newPos,position);
 			
 			//and then rend past the stuff in the block we don't need
 			var renderSize:uint=newPos % stream.blockSamples;
-			render(new ByteArray(),renderSize);
+			//render(new ByteArray(),renderSize);
 		}
 
 	}

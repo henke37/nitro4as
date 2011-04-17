@@ -4,13 +4,17 @@
 	
 	//use namespace strmInternal;
 	
-	public class SBNK {
+	public class SBNK extends SubFile {
 
 		private var sdat:ByteArray;
 		
 		public var instruments:Vector.<Instrument>;
 
-		public function SBNK(bankPos:uint,_sdat:ByteArray) {
+		public function SBNK() {
+			
+		}
+		
+		public override function parse(bankPos:uint,_sdat:ByteArray):void {
 			
 			var magic:String;
 			
@@ -83,7 +87,9 @@
 		private function parseSimpleInstrument(offset:uint):Instrument {
 			var instrument:Instrument=new Instrument();
 			sdat.position=offset;
-			instrument.definitions.push(new InstrumentRegion(sdat));
+			var region:InstrumentRegion=new InstrumentRegion();
+			region.parse(sdat);
+			instrument.definitions.push(region);
 			return instrument;
 		}
 		
@@ -101,8 +107,10 @@
 			var range:uint=high-low;
 			
 			for(var i:uint;i<range;++i) {
-				sdat.position=offset+2+i*12+2;			
-				instrument.definitions.push(new InstrumentRegion(sdat));
+				sdat.position=offset+2+i*12+2;
+				var region:InstrumentRegion=new InstrumentRegion();
+				region.parse(sdat);
+				instrument.definitions.push(region);
 			}
 			
 			//trace(range);

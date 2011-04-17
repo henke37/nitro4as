@@ -13,9 +13,7 @@
 		
 		private var loader:URLLoader;
 		
-		private var nds:NDSParser;
-		
-		private var sdat:SDATReader;
+		private var nds:NDS;
 		
 		public var status_txt:TextField;
 		
@@ -55,12 +53,14 @@
 		}
 		
 		private function frLoaded(e:Event):void {	
-			nds=new NDSParser(fr.data);
+			nds=new NDS();
+			nds.parse(fr.data);
 			setup();
 		}
 		
 		private function loaded(e:Event):void {
-			nds=new NDSParser(loader.data);
+			nds=new NDS();
+			nds.parse(loader.data);
 			setup();
 		}
 		

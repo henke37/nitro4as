@@ -5,6 +5,7 @@
 	import flash.media.*;
 	
 	import HTools.Audio.*;
+	import flash.text.TextField;
 	
 	public class STRMPlayer {
 		
@@ -20,6 +21,10 @@
 			
 			playSound=new Sound();
 			playSound.addEventListener(SampleDataEvent.SAMPLE_DATA,onSampleRequest);
+		}
+		
+		public function set debug(t:TextField):void {
+			decoder.debug=t;
 		}
 		
 		public function play():void {

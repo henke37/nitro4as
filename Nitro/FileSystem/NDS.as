@@ -3,7 +3,7 @@
 	import flash.utils.*;
 	import Nitro.*;
 	
-	public class NDSParser {
+	public class NDS {
 		
 		public var gameName:String;
 		public var gameCode:String;
@@ -36,7 +36,11 @@
 		public var bannerOffset:uint;		
 		public var banner:Banner;
 
-		public function NDSParser(nds:ByteArray) {
+		public function NDS() {
+			
+		}
+		
+		public function parse(nds:ByteArray):void {
 			this.nds=nds;
 			
 			nds.endian=Endian.LITTLE_ENDIAN;
@@ -98,10 +102,12 @@
 			var headerCRC:uint=nds.readUnsignedShort();
 			
 			if(bannerOffset) {
-				banner=new Banner(nds,bannerOffset);
+				banner=new Banner();
+				banner.parse(nds,bannerOffset);
 			}
 			
-			fileSystem=new FileSystem(nds,fileNameTablePos,fileNameTableSize,fileAllocationTablePos,fileAllocationTableSize);
+			fileSystem=new FileSystem();
+			fileSystem.parse(nds,fileNameTablePos,fileNameTableSize,fileAllocationTablePos,fileAllocationTableSize);
 			
 			arm9Overlays=readOVT(arm9OverlayOffset,arm9OverlaySize);
 			arm7Overlays=readOVT(arm7OverlayOffset,arm7OverlaySize);

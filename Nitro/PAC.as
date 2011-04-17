@@ -7,7 +7,11 @@
 		
 		public var fileCount:uint;
 
-		public function PAC(_pac:ByteArray) {
+		public function PAC() {
+			
+		}
+		
+		public function parse(_pac:ByteArray):void {
 			
 			if(!_pac) throw new ArgumentError("pac must be a real bytearray");
 			

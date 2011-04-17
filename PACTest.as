@@ -23,7 +23,8 @@
 		
 		private function startParsing(e:Event):void {
 			
-			var nds:NDSParser=new NDSParser(loader.data);
+			var nds:NDS=new NDS();
+			nds.parse(loader.data);
 			
 			var baseDir:flash.filesystem.File=new flash.filesystem.File(loaderInfo.url);
 			baseDir=new flash.filesystem.File(baseDir.parent.nativePath+flash.filesystem.File.separator+nds.gameCode);
@@ -47,7 +48,8 @@
 				var pacDir:flash.filesystem.File=new flash.filesystem.File(baseDir.nativePath+flash.filesystem.File.separator+fileName);
 				pacDir.createDirectory();
 				
-				var pac:PAC=new PAC(pacData);
+				var pac:PAC=new PAC();
+				pac.parse(pacData);
 				
 				for(var i:uint=0;i<pac.fileCount;++i) {
 				

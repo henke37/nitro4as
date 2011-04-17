@@ -4,7 +4,7 @@
 	
 	use namespace strmInternal;
 	
-	public class STRM {
+	public class STRM extends SubFile {
 		
 		strmInternal var encoding:uint;
 		public var loop:Boolean;
@@ -22,7 +22,11 @@
 		
 		strmInternal var sdat:ByteArray;
 
-		public function STRM(strmPos:uint,_sdat:ByteArray) {
+		public function STRM() {
+			
+		}
+		
+		public override function parse(strmPos:uint,_sdat:ByteArray):void {
 			sdat=_sdat;
 			if(!sdat) {
 				throw new ArgumentError("sdat can not be null!");

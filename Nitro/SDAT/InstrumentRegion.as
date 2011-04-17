@@ -15,7 +15,11 @@
 		
 		public var pan:uint// 0..127, 64 = middle
 
-		public function InstrumentRegion(sdat:ByteArray) {
+		public function InstrumentRegion() {
+			
+		}
+		
+		public function parse(sdat:ByteArray):void {
 			swav=sdat.readUnsignedShort();
 			swar=sdat.readUnsignedShort();
 			

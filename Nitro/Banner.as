@@ -20,7 +20,11 @@
 		public static const ICON_WIDTH:uint=blockSize*blockCount;
 		public static const ICON_HEIGHT:uint=blockSize*blockCount;
 
-		public function Banner(nds:ByteArray,bannerOffset:uint) {
+		public function Banner() {
+			
+		}
+		
+		public function parse(nds:ByteArray,bannerOffset:uint):void {
 			nds.position=bannerOffset;
 			
 			var version:uint=nds.readUnsignedShort();

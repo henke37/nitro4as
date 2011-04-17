@@ -4,14 +4,18 @@
 	
 	//use namespace strmInternal;
 	
-	public class SWAV {
+	public class SWAV extends SubFile {
 
 		private var sdat:ByteArray;
 		private var type:String;
 		
 		public var wave:Wave;
 
-		public function SWAV(swavPos:uint,_sdat:ByteArray) {
+		public function SWAV() {
+			
+		}
+		
+		public override function parse(swavPos:uint,_sdat:ByteArray):void {
 			sdat=_sdat;
 			if(!sdat) {
 				throw new ArgumentError("sdat can not be null!");

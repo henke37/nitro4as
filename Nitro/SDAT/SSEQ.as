@@ -4,13 +4,17 @@
 	
 	use namespace sequenceInternal;
 	
-	public class SSEQ {
+	public class SSEQ extends SubFile {
 		
 		private var sdat:ByteArray;
 		
 		sequenceInternal var tracks;
 
-		public function SSEQ(sseqPos:uint,_sdat:ByteArray) {
+		public function SSEQ() {
+			
+		}
+		
+		public override function parse(sseqPos:uint,_sdat:ByteArray):void {
 			
 			sdat=_sdat;
 			if(!sdat) {

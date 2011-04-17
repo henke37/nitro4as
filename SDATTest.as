@@ -16,11 +16,12 @@
 		[Embed(source="sound_data.sdat", mimeType="application/octet-stream")]
 		private var sdatClass:Class;
 		
-		private var reader:SDATReader;
+		private var reader:SDAT;
 
 		
 		public function SDATTest() {
-			reader=new SDATReader(new sdatClass());
+			reader=new SDAT();
+			reader.parse(new sdatClass());
 			
 			//listWaveArchives();
 			//listStreams();
