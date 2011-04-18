@@ -34,13 +34,18 @@
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
+			var renderedTiles:DisplayObject=tiles.render(palette.colors,0);
+			addChild(renderedTiles);
+			
+			
 			var screenData:ByteArray=nds.fileSystem.openFileByName("data/BG1.NSCR");
 			var screen:NSCR=new NSCR();
 			screen.parse(screenData);
 			
 			var rendered:DisplayObject=screen.render(tiles,palette);
-			rendered.scaleX=2;
-			rendered.scaleY=2;
+			//rendered.scaleX=2;
+			//rendered.scaleY=2;
+			rendered.x=renderedTiles.width;
 			
 			
 			addChild(rendered);

@@ -42,7 +42,7 @@
 			data.position=sectionOffset+0x14;
 			var tiled:Boolean=data.readUnsignedInt()==0;
 			
-			data.position=0x20;
+			data.position=sectionOffset+0x20;
 			for(var y:uint=0;y<tilesY;++y) {
 				for(var x:uint=0;x<tilesX;++x) {
 					var tile:Tile=new Tile();
@@ -53,6 +53,24 @@
 					tiles[index]=tile;
 				}
 			}
+		}
+		
+		public function render(palette:Vector.<uint>,paletteOffset:uint=0):Sprite {
+			var spr:Sprite=new Sprite();
+			for(var y:uint=0;y<tilesY;++y) {
+				for(var x:uint=0;x<tilesX;++x) {
+					var index:uint=x+y*tilesX;
+					var tile:Tile=tiles[index];
+					
+					var bmd:BitmapData=tile.toBMD(palette,paletteOffset);
+					var bitmap:Bitmap=new Bitmap(bmd);
+					bitmap.x=x*tileWidth;
+					bitmap.y=y*tileHeight;
+					
+					spr.addChild(bitmap);
+				}
+			}
+			return spr;
 		}
 
 	}
