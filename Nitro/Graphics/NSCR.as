@@ -61,15 +61,39 @@
 		public function render(tiles:NCGR,palette:NCLR):Sprite {
 			var spr:Sprite=new Sprite();
 			
+			var tileCache:Object={};
+			
+			//var hits:uint,misses:uint;
+			
 			for(var y:uint=0;y<height;y+=tileHeight) {
 				for(var x:uint=0;x<width;x+=tileWidth) {
 					
 					var index:uint=(width/tileWidth)*(y/tileHeight)+(x/tileWidth);
 					
 					var entry:TileEntry=entries[index];
-					var tile:Tile=tiles.tiles[entry.tile];
 					
-					var bmd:BitmapData=tile.toBMD(palette.colors,(1 << palette.bitDepth) * entry.palette);
+					
+					var paletteCache:Vector.<BitmapData>=new Vector.<BitmapData>();
+					if(tileCache[entry.palette]) {
+						paletteCache=tileCache[entry.palette];
+					} else {
+						paletteCache=new Vector.<BitmapData>();
+						paletteCache.length=tiles.tilesX*tiles.tilesY;
+						paletteCache.fixed=true;
+						tileCache[entry.palette]=paletteCache;
+					}
+					
+					var bmd:BitmapData;
+					if(paletteCache[entry.tile]) {
+						bmd=paletteCache[entry.tile];
+						tile=null;
+						//hits++;
+					} else {
+						var tile:Tile=tiles.tiles[entry.tile];
+						bmd=tile.toBMD(palette.colors,(1 << palette.bitDepth) * entry.palette);
+						paletteCache[entry.tile]=bmd;
+						//misses++;
+					}
 					
 					var bitmap:Bitmap=new Bitmap(bmd);
 					bitmap.x=x;
@@ -88,6 +112,8 @@
 					spr.addChild(bitmap);
 				}
 			}
+			
+			//trace(hits,misses);
 			
 			return spr;
 		}
