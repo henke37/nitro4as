@@ -3,6 +3,8 @@
 	import flash.utils.*;
 	import flash.display.*;
 	
+	import Nitro.Graphics.*;
+	
 	public class Banner {
 		
 		public var jpTitle:String;
@@ -41,16 +43,7 @@
 			pallete.fixed=true;
 			
 			for(var i:uint;i<palleteLength;++i) {
-				var entry:uint=nds.readUnsignedShort();
-				var r:uint=entry & 0x1F;
-				var g:uint=(entry >> 5) & 0x1F;
-				var b:uint=(entry >> 10) & 0x1F;
-				
-				r=colorScale(r);
-				g=colorScale(g);
-				b=colorScale(b);
-				
-				pallete[i]=b | g << 8 | r << 16;
+				pallete[i]=read555Color(nds);
 			}
 			
 			pallete[0]=0x00FFFF00;
@@ -97,14 +90,6 @@
 			itTitle=nds.readMultiByte(256,"unicode");
 			esTitle=nds.readMultiByte(256,"unicode");
 			
-		}
-		
-		private static function colorScale(x:uint):uint {
-			var o:uint=x<<3;
-			if(x & 1) {
-				o+=7;
-			}
-			return o;
 		}
 
 	}
