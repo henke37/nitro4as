@@ -1,4 +1,4 @@
-﻿package Nitro {
+﻿package Nitro.Compression {
 	
 	import flash.utils.*;
 	
