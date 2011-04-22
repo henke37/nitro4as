@@ -8,15 +8,9 @@
 			// constructor code
 		}
 		
-		public static function decode(compressed:ByteArray):ByteArray {
+		public static function decode(compressed:ByteArray,decodedLength:uint,longLengths:Boolean):ByteArray {
 			
 			compressed.endian=Endian.LITTLE_ENDIAN;
-			
-			var flag:uint=compressed.readUnsignedByte();
-			
-			var decodedLength:uint=read3ByteUint(compressed);
-			
-			var longLengths:Boolean=Boolean(flag & 0xF);
 			
 			var decoded:ByteArray=new ByteArray();
 			
@@ -31,40 +25,65 @@
 				
 				if(flagByte & bit) {
 					
-					var length:uint=3;
+					var length:uint;
+					var distance:uint;
 					
-					var lengthByte:uint=compressed.readUnsignedByte();
+					var readByte:uint;
 					
 					if(longLengths) {
+						readByte=compressed.readUnsignedByte();
 						
-						if(lengthByte & 0xE0) {
-							length=1;
-						} else {
+						switch(readByte>>4) {
+							case 0:
+								length=readByte<<4;
+								
+								readByte=compressed.readUnsignedByte();
+								
+								length|=readByte>>4;
+								length+=0x11;
+								
+								distance=(readByte & 0x0F) << 8;
+								readByte=compressed.readUnsignedByte();
+								distance|=readByte;
+							break;
 							
-							if(lengthByte & 0x10) {
-								length=0x111;
-								length+=(lengthByte & 0xF) << 12;
-								length+=compressed.readUnsignedByte()<< 4;
-							} else {
-								length=0x11;
-								length+=(lengthByte & 0xF) << 4;
-							}
-							lengthByte=compressed.readUnsignedByte();
+							case 1:
+								length=(readByte & 0xF) << 12;
+								readByte=compressed.readUnsignedByte();
+								length|=readByte << 4;
+								readByte=compressed.readUnsignedByte();
+								length|=readByte >> 4;
+								length+=0x111;
+								distance=(readByte & 0x0F) << 8;
+								readByte=compressed.readUnsignedByte();
+								distance|=readByte;
+							break;
+							
+							default:
+								length=(readByte >> 4) + 1;
+								distance=(readByte & 0x0F) << 8;
+								readByte=compressed.readUnsignedByte();
+								distance|=readByte;
+							break;
 						}
+						
+					} else {
+						length=readByte>>4;
+						length+=3;
+						distance=(readByte & 0x0F) << 8;
+						distance|=readByte;
 					}
 					
-					length+=lengthByte >> 4;
 					
-					var distance:uint=(lengthByte & 0xF) << 8 | compressed.readUnsignedInt();
-					distance+=1;
+					if(distance>decoded.length) throw new ArgumentError("Hit seek past the start of the data");
 					
-					var offset:uint=decoded.length-distance;
+					var offset:uint=decoded.length-distance-1;
 					
 					var readPos:uint=offset;
 						
-					for(var copyIttr:uint;copyIttr<length;++copyIttr) {
+					for(var copyIttr:uint=0;copyIttr<length;++copyIttr) {
 						decoded.position=readPos++;
-						var readByte:uint=decoded.readUnsignedByte();
+						readByte=decoded.readUnsignedByte();
 						decoded.position=decoded.length;
 						decoded.writeByte(readByte);
 					}
@@ -74,16 +93,6 @@
 			}
 			
 			return decoded;
-		}
-		
-		private static function read3ByteUint(data:ByteArray):uint {
-			var o:uint;
-			
-			o=data.readUnsignedByte();
-			o|=data.readUnsignedByte() << 8;
-			o|=data.readUnsignedByte() << 16;
-			
-			return o;
 		}
 
 	}

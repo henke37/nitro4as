@@ -1,6 +1,8 @@
 ﻿package Nitro {
 	import flash.utils.*;
 	
+	import Nitro.Compression.*;
+	
 	public class GKArchive {
 		
 		private var _data:ByteArray;
@@ -45,7 +47,8 @@
 			var o:ByteArray;
 			
 			if(entry.compressed) {
-				
+				_data.position=entry.offset;
+				return Stock.decompress(_data);
 			} else {
 				o=new ByteArray();
 				o.writeBytes(_data,entry.offset,entry.size);

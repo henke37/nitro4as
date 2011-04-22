@@ -9,13 +9,13 @@
 	import Nitro.Graphics.*;
 
 	
-	public class GraphicsTest extends MovieClip {
+	public class CellTest extends MovieClip {
 		
 		private var nds:NDS;
 		
 		private var loader:URLLoader;
 		
-		public function GraphicsTest() {
+		public function CellTest() {
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,parse);
