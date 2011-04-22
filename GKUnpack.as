@@ -6,9 +6,12 @@
 	import flash.text.*;
 	import flash.utils.*;
 	
+	import flash.filesystem.*;
+	
 	import Nitro.Compression.*;
 	import Nitro.FileSystem.*;	
 	import Nitro.*;
+	import flash.filesystem.FileStream;
 	
 	public class GKUnpack extends MovieClip {
 		
@@ -90,7 +93,7 @@
 			
 			var fileCount:uint;
 			
-			for each(var archiveFile:File in binFiles) {
+			for each(var archiveFile:Nitro.FileSystem.File in binFiles) {
 				var archive:GKArchive=new GKArchive();
 				archive.parse(nds.fileSystem.openFileByReference(archiveFile));
 				var archiveXML:XML=<archive fileCount={archive.length} name={nds.fileSystem.getFullNameForFile(archiveFile)} />;
@@ -111,7 +114,7 @@
 			
 			var fileCount:uint;
 			
-			for each(var archiveFile:File in binFiles) {
+			for each(var archiveFile:Nitro.FileSystem.File in binFiles) {
 				var archive:GKArchive=new GKArchive();
 				archive.parse(nds.fileSystem.openFileByReference(archiveFile));
 				fileCount+=archive.length;
@@ -120,7 +123,20 @@
 			trace(fileCount);
 		}
 		
+		var outDir:flash.filesystem.File;
+		
 		private function extractAll():void {
+			outDir=new flash.filesystem.File();
+			outDir.addEventListener(Event.SELECT,dirSelected);
+			outDir.browseForDirectory("Output dir");
+		}
+		
+		private function dirSelected(e:Event):void {
+			initExtraction();
+		}
+			
+		private function initExtraction():void {
+			
 			binFiles=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.bin$/i,true);
 			
 			status_txt.text="Unpacking "+binFiles.length+" files...\n";
@@ -158,7 +174,7 @@
 		private function extractNextFile():Boolean {
 			
 			if(!archive) {
-				var archiveFile:File=File(binFiles[archiveFileIndex]);
+				var archiveFile:Nitro.FileSystem.File=Nitro.FileSystem.File(binFiles[archiveFileIndex]);
 				archiveFileName=nds.fileSystem.getFullNameForFile(archiveFile);
 				
 				archive=new GKArchive();
@@ -173,8 +189,10 @@
 				var subFile:ByteArray=archive.open(subId);
 				
 				subFile.position=0;
-				
 				subFileName+="."+sniffExtension(subFile);
+				
+				subFile.position=0;
+				saveFile(subFileName,subFile);
 				
 				status_txt.appendText("Extracted \""+subFileName+"\"\n");
 			} catch (e:Error) {
@@ -207,6 +225,14 @@
 			}
 			
 			return (id.charAt(3)+id.charAt(2)+id.charAt(1)+id.charAt(0)).replace(" ","").toLowerCase();
+		}
+		
+		private function saveFile(name:String,data:ByteArray):void {
+			name=name.replace("/",flash.filesystem.File.separator);
+			var outFile:flash.filesystem.File=new flash.filesystem.File(outDir.nativePath+flash.filesystem.File.separator+name);
+			var fileStream:FileStream=new FileStream();
+			fileStream.open(outFile,FileMode.WRITE);
+			fileStream.writeBytes(data,0);
 		}
 	}
 	
