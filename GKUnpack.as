@@ -170,6 +170,7 @@
 		var archive:GKArchive;
 		var subId:uint=0;
 		var errors:uint;
+		var numberSize:uint;
 		
 		private function extractNextFile():Boolean {
 			
@@ -180,10 +181,12 @@
 				archive=new GKArchive();
 				archive.parse(nds.fileSystem.openFileByReference(archiveFile));
 				
+				numberSize=archive.length.toString().length;
+				
 				subId=0;
 			}
 			
-			var subFileName:String=archiveFileName+"/"+subId;
+			var subFileName:String=archiveFileName+"/"+padNumber(subId,numberSize);
 			
 			try {
 				var subFile:ByteArray=archive.open(subId);
@@ -224,7 +227,27 @@
 				return "bin";
 			}
 			
-			return (id.charAt(3)+id.charAt(2)+id.charAt(1)+id.charAt(0)).replace(" ","").toLowerCase();
+			id=id.replace(" ","").toLowerCase();
+			
+			switch(id) {
+				case "bmd0":
+					return "nsbmd";
+				break;
+				
+				case "btx0":
+					return "nsbtx";
+				break;
+				
+				case "bca0":
+					return "nsbca";
+				break;
+				
+				default:
+					return (id.charAt(3)+id.charAt(2)+id.charAt(1)+id.charAt(0));
+				break;
+			}
+			
+			
 		}
 		
 		private function saveFile(name:String,data:ByteArray):void {
@@ -233,6 +256,14 @@
 			var fileStream:FileStream=new FileStream();
 			fileStream.open(outFile,FileMode.WRITE);
 			fileStream.writeBytes(data,0);
+		}
+		
+		private function padNumber(number:uint,size:uint):String {
+			var o:String=number.toString();
+			while(o.length<size) {
+				o="0"+o;
+			}
+			return o;
 		}
 	}
 	
