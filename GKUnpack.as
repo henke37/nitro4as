@@ -88,7 +88,9 @@
 		
 		private function blackList(item:AbstractFile, index:int, vector:Vector.<AbstractFile>):Boolean {
 			switch(item.name) {
+				case "movie.bin":
 				case "font.bin":
+				case "serial.bin":
 					return false;
 				break;
 				
@@ -101,8 +103,6 @@
 		
 		private function listAll():void {
 			var binFiles:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.bin$/i,true);
-			
-			binFiles.filter(blackList);
 			
 			var list:XML=<fileList />;
 			
@@ -153,6 +153,8 @@
 		private function initExtraction():void {
 			
 			binFiles=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.bin$/i,true);
+			
+			binFiles=binFiles.filter(blackList);
 			
 			status_txt.text="Unpacking "+binFiles.length+" files...\n";
 			
@@ -207,7 +209,7 @@
 				var subFile:ByteArray=archive.open(subId);
 								
 				subFile.position=0;
-				var type:String=sniffExtension(subFile)
+				var type:String=sniffExtension(subFile,subFileName);
 				
 				subFile.position=0;
 				
@@ -248,7 +250,7 @@
 				var subFileName:String=fileName+"/"+i;
 				
 				subData.position=0;
-				var type:String=sniffExtension(subData);
+				var type:String=sniffExtension(subData,subFileName);
 				subFileName+="."+type;
 				
 				subData.position=0;
@@ -259,7 +261,11 @@
 			status_txt.appendText("Subarchive unpacked successfully.\n");
 		}
 		
-		private function sniffExtension(data:ByteArray):String {
+		private function sniffExtension(data:ByteArray,name:String):String {
+			
+			//false positives
+			//if(name.indexOf("anmseq_chr.bin/")!=-1) return "bin";
+			//if(name.indexOf("bustanmseq_chr.bin/")!=-1 return "bin";
 			
 			if(data.length<4) return "bin";
 			
@@ -270,7 +276,8 @@
 			if(!id.match(/[ a-z0-9]{4}/i)) {
 				
 				data.position=0;
-				if(data.readUnsignedInt()==12) {
+				var firstInt:uint=data.readUnsignedInt();
+				if((firstInt%4)==0 && (firstInt/4) == 3) {
 					return "subarchive";
 				}
 				
