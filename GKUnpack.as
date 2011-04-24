@@ -86,8 +86,23 @@
 			status_txt.text="Loaded "+archive.length+" files.";
 		}
 		
+		private function blackList(item:AbstractFile, index:int, vector:Vector.<AbstractFile>):Boolean {
+			switch(item.name) {
+				case "font.bin":
+					return false;
+				break;
+				
+				default:
+					return true;
+				break;
+			}
+		}
+
+		
 		private function listAll():void {
 			var binFiles:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.bin$/i,true);
+			
+			binFiles.filter(blackList);
 			
 			var list:XML=<fileList />;
 			
@@ -190,14 +205,19 @@
 			
 			try {
 				var subFile:ByteArray=archive.open(subId);
+								
+				subFile.position=0;
+				var type:String=sniffExtension(subFile)
 				
 				subFile.position=0;
-				subFileName+="."+sniffExtension(subFile);
 				
-				subFile.position=0;
-				saveFile(subFileName,subFile);
-				
-				status_txt.appendText("Extracted \""+subFileName+"\"\n");
+				if(type=="subarchive") {
+					unpackSubArchive(subFileName,subFile);
+				} else {
+					subFileName+="."+type;
+					saveFile(subFileName,subFile);
+					status_txt.appendText("Extracted \""+subFileName+"\"\n");
+				}
 			} catch (e:Error) {
 				status_txt.appendText("Failed to extract \""+subFileName+"\"!\n");
 				++errors;
@@ -217,13 +237,43 @@
 			return true;
 		}
 		
+		private function unpackSubArchive(fileName:String,fileData):void {
+			
+			status_txt.appendText("File \""+fileName+"\" is a subarchive, unpacking...\n");
+			var subArchive:GKSubarchive=new GKSubarchive();
+			subArchive.parse(fileData);
+			
+			for(var i:uint=0;i<subArchive.length;++i) {
+				var subData:ByteArray=subArchive.open(i);
+				var subFileName:String=fileName+"/"+i;
+				
+				subData.position=0;
+				var type:String=sniffExtension(subData);
+				subFileName+="."+type;
+				
+				subData.position=0;
+				saveFile(subFileName,subData);
+				status_txt.appendText("Extracted \""+subFileName+"\"\n");
+			}
+			
+			status_txt.appendText("Subarchive unpacked successfully.\n");
+		}
+		
 		private function sniffExtension(data:ByteArray):String {
 			
 			if(data.length<4) return "bin";
 			
+			data.endian=Endian.LITTLE_ENDIAN;
+			
 			var id:String=data.readUTFBytes(4);
 			
 			if(!id.match(/[ a-z0-9]{4}/i)) {
+				
+				data.position=0;
+				if(data.readUnsignedInt()==12) {
+					return "subarchive";
+				}
+				
 				return "bin";
 			}
 			

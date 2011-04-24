@@ -48,14 +48,47 @@
 			
 			if(entry.compressed) {
 				_data.position=entry.offset;
-				return Stock.decompress(_data);
+				o=Stock.decompress(_data);
 			} else {
 				o=new ByteArray();
 				o.writeBytes(_data,entry.offset,entry.size);
 			}
 			
+			o.position=0;
+			
 			return o;
 		}
+		
+		public function build(files:Vector.<ByteArray>):void {
+			_data=new ByteArray();
+			_data.endian=Endian.LITTLE_ENDIAN;
+			
+			var offset:uint=(files.length+1)*8;
+			
+			fileList=new Vector.<FileEntry>();
+			
+			for each(var file:ByteArray in files) {
+				_data.writeUnsignedInt(offset);
+				_data.writeUnsignedInt(file.length);
+				
+				var entry:FileEntry=new FileEntry();
+				entry.offset=offset;
+				entry.size=file.length;
+				entry.compressed=false;
+				fileList.push(entry);
+				
+				offset+=file.length;
+			}
+			
+			_data.writeUnsignedInt(offset);
+			_data.writeUnsignedInt(0);
+			
+			for each(file in files) {
+				_data.writeBytes(file);
+			}
+		}
+		
+		public function get data():ByteArray { return _data; }
 
 	}
 	
