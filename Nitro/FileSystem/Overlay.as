@@ -9,6 +9,8 @@
 		public var bssStart:uint;
 		public var bssStop:uint;
 		public var fileId:uint;
+		public var size:uint;
+		public var compressed:Boolean;
 
 		public function Overlay() {
 			// constructor code

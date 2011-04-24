@@ -132,8 +132,16 @@
 				overlay.bssStart=nds.readUnsignedInt();
 				overlay.bssStop=nds.readUnsignedInt();
 				overlay.fileId=nds.readUnsignedInt();
+				
+				var flags:uint=nds.readUnsignedInt();
+				overlay.compressed=Boolean(flags & 0x1000000);
+				if(overlay.compressed) {
+					overlay.size=flags & 0xFFFFFF;
+				} else {
+					overlay.size=overlay.ramSize;
+				}
+				
 				o.push(overlay);
-				nds.position+=4;//unknown/unused
 			}
 			
 			o.fixed=true;
