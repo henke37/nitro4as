@@ -3,9 +3,9 @@
 	import flash.utils.*;
 	import flash.display.*;
 	
+	import Nitro.*;
+	
 	public class NCGR {
-		
-		private const sectionOffset:uint=0x10;
 		
 		public var tiles:Vector.<Tile>;
 		
@@ -20,35 +20,33 @@
 		}
 		
 		public function parse(data:ByteArray):void {
-			var type:String;
 			
-			data.endian=Endian.LITTLE_ENDIAN;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			type=data.readUTFBytes(4);
-			if(type!="RGCN") throw new ArgumentError("Incorrect file header, type is "+type);
+			if(sections.id!="RGCN") throw new ArgumentError("Incorrect file header, type is "+sections.id);
 			
-			data.position=sectionOffset;
-			type=data.readUTFBytes(4);
-			if(type!="RAHC") throw new ArgumentError("Incorrect file header, section type is "+type);
+			var section:ByteArray=sections.open("RAHC");
 			
-			data.position=sectionOffset+8;
-			tilesY=data.readUnsignedShort();
-			tilesX=data.readUnsignedShort();
+			section.endian=Endian.LITTLE_ENDIAN;
 			
-			bitDepth=1 << (data.readUnsignedInt()-1);
+			tilesY=section.readUnsignedShort();
+			tilesX=section.readUnsignedShort();
+			
+			bitDepth=1 << (section.readUnsignedInt()-1);
 			
 			tiles=new Vector.<Tile>();
 			tiles.length=tilesY*tilesX;
 			tiles.fixed=true;
 			
-			data.position=sectionOffset+0x14;
-			var tiled:Boolean=data.readUnsignedInt()==0;
+			section.position=0x0C;
+			var tiled:Boolean=section.readUnsignedInt()==0;
 			
-			data.position=sectionOffset+0x20;
+			section.position=0x18;
 			for(var y:uint=0;y<tilesY;++y) {
 				for(var x:uint=0;x<tilesX;++x) {
 					var tile:Tile=new Tile();
-					tile.readTile(tileWidth,tileHeight,bitDepth,data);
+					tile.readTile(tileWidth,tileHeight,bitDepth,section);
 					
 					var index:uint=x+y*tilesX;
 					

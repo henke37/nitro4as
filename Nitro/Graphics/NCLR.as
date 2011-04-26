@@ -2,11 +2,11 @@
 	
 	import flash.utils.*;
 	
+	import Nitro.*;
+	
 	public class NCLR {
 		
 		public var colors:Vector.<uint>;
-		
-		private const sectionOffset:uint=0x10;
 		
 		public var bitDepth:uint;
 
@@ -14,22 +14,20 @@
 		}
 		
 		public function parse(data:ByteArray):void {
-			var type:String;
 			
-			data.endian=Endian.LITTLE_ENDIAN;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			type=data.readUTFBytes(4);
-			if(type!="RLCN") throw new ArgumentError("Incorrect file header, type is "+type);
+			if(sections.id!="RLCN") throw new ArgumentError("Incorrect file header, type is "+sections.id);
 			
-			data.position=sectionOffset;
-			type=data.readUTFBytes(4);
-			if(type!="TTLP") throw new ArgumentError("Incorrect file header, section type is "+type);
 			
-			data.position=sectionOffset+8;
-			bitDepth=1 << (data.readUnsignedShort()-1);
+			var section:ByteArray=sections.open("TTLP");
+			section.endian=Endian.LITTLE_ENDIAN;
 			
-			data.position=sectionOffset+0x14;
-			var paletteSize:uint=data.readUnsignedInt();
+			bitDepth=1 << (section.readUnsignedShort()-1);
+			
+			section.position=0x0C;
+			var paletteSize:uint=section.readUnsignedInt();
 			
 			if(bitDepth==4) {
 				paletteSize=256;
@@ -39,7 +37,7 @@
 			colors.length=paletteSize;
 			
 			for(var i:uint=0;i<paletteSize;++i) {
-				colors[i]=RGB555.read555Color(data);
+				colors[i]=RGB555.read555Color(section);
 			}
 		}
 

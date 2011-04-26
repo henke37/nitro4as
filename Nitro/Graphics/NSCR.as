@@ -2,12 +2,12 @@
 	import flash.utils.*;
 	import flash.display.*;
 	
+	import Nitro.*;
+	
 	public class NSCR {
 		
 		public var width:uint;
 		public var height:uint;
-		
-		private const sectionOffset:uint=0x10;
 		
 		private const tileWidth:uint=8;
 		private const tileHeight:uint=8;
@@ -19,22 +19,19 @@
 		}
 		
 		public function parse(data:ByteArray):void {
-			var type:String;
 			
-			data.endian=Endian.LITTLE_ENDIAN;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			type=data.readUTFBytes(4);
-			if(type!="RCSN") throw new ArgumentError("Incorrect file header, type is "+type);
+			if(sections.id!="RCSN") throw new ArgumentError("Incorrect file header, type is "+sections.id);
 			
-			data.position=sectionOffset;
-			type=data.readUTFBytes(4);
-			if(type!="NRCS") throw new ArgumentError("Incorrect file header, section type is "+type);
+			var section:ByteArray=sections.open("NRCS");
+			section.endian=Endian.LITTLE_ENDIAN;
 			
-			data.position=sectionOffset+8;
-			height=data.readUnsignedShort();
-			width=data.readUnsignedShort();
+			height=section.readUnsignedShort();
+			width=section.readUnsignedShort();
 			
-			data.position=sectionOffset+0x14;
+			section.position=0x0C;
 			
 			entries=new Vector.<TileEntry>();
 			entries.length=(height/tileHeight)*(width/tileWidth);
@@ -42,7 +39,7 @@
 			
 			for(var y:uint=0;y<height;y+=tileHeight) {
 				for(var x:uint=0;x<width;x+=tileWidth) {
-					var value:uint=data.readUnsignedShort();
+					var value:uint=section.readUnsignedShort();
 					
 					var entry:TileEntry=new TileEntry();
 					
