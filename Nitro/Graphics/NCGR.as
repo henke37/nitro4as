@@ -11,6 +11,8 @@
 		
 		public var tilesX:uint,tilesY:uint;
 		
+		public var bitDepth:uint;
+		
 		private const tileWidth:uint=8;
 		private const tileHeight:uint=8;
 
@@ -33,7 +35,7 @@
 			tilesY=data.readUnsignedShort();
 			tilesX=data.readUnsignedShort();
 			
-			var bitDepth:uint=1 << (data.readUnsignedInt()-1);
+			bitDepth=1 << (data.readUnsignedInt()-1);
 			
 			tiles=new Vector.<Tile>();
 			tiles.length=tilesY*tilesX;
