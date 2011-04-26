@@ -43,7 +43,7 @@
 			pallete.fixed=true;
 			
 			for(var i:uint;i<palleteLength;++i) {
-				pallete[i]=read555Color(nds);
+				pallete[i]=RGB555.read555Color(nds);
 			}
 			
 			pallete[0]=0x00FFFF00;

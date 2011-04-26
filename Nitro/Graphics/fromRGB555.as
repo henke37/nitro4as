@@ -1,9 +1,5 @@
 ﻿package Nitro.Graphics {
-	
-	import flash.utils.*;
-	
-	public function read555Color(data:ByteArray):uint {
-		var entry:uint=data.readUnsignedShort();
+	public function fromRGB555(entry:uint):uint {
 		var r:uint=entry & 0x1F;
 		var g:uint=(entry >> 5) & 0x1F;
 		var b:uint=(entry >> 10) & 0x1F;

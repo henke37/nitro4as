@@ -39,7 +39,7 @@
 			colors.length=paletteSize;
 			
 			for(var i:uint=0;i<paletteSize;++i) {
-				colors[i]=read555Color(data);
+				colors[i]=RGB555.read555Color(data);
 			}
 		}
 
