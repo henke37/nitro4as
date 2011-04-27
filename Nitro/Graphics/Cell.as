@@ -32,7 +32,7 @@
 					oamR.scaleY=-1;
 				}
 				
-				spr.addChild(oamR);
+				spr.addChildAt(oamR,0);
 			}
 			
 			return spr;
