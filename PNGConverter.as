@@ -4,6 +4,7 @@
 	import flash.net.*;
 	import flash.utils.*;
 	import flash.events.*;
+	import flash.text.*;
 	
 	import Nitro.*;
 	import Nitro.Graphics.*;
@@ -16,10 +17,14 @@
 		
 		private var loader:Loader;
 		
+		public var status_txt:TextField;
+		
 		public function PNGConverter() {
 			creator=new NCGRCreator();
 			
 			fr=new FileReference();
+			
+			status_txt.text="Click to load picture";
 			
 			stage.addEventListener(MouseEvent.CLICK,selectPicture);
 		}
@@ -32,10 +37,12 @@
 		private function fileSelected(e:Event):void {
 			fr.removeEventListener(Event.SELECT,fileSelected);
 			fr.addEventListener(Event.COMPLETE,fileLoaded);
+			status_txt.text="Generating optimal palette.";
 			fr.load();
 		}
 		
 		private function fileLoaded(e:Event):void {
+			
 			loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,picLoaded);
 			loader.loadBytes(fr.data);
