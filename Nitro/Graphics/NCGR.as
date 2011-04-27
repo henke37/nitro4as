@@ -12,9 +12,6 @@
 		public var tilesX:uint,tilesY:uint;
 		
 		public var bitDepth:uint;
-		
-		private const tileWidth:uint=8;
-		private const tileHeight:uint=8;
 
 		public function NCGR() {
 		}
@@ -46,7 +43,7 @@
 			for(var y:uint=0;y<tilesY;++y) {
 				for(var x:uint=0;x<tilesX;++x) {
 					var tile:Tile=new Tile();
-					tile.readTile(tileWidth,tileHeight,bitDepth,section);
+					tile.readTile(bitDepth,section);
 					
 					var index:uint=x+y*tilesX;
 					
@@ -55,17 +52,17 @@
 			}
 		}
 		
-		public function render(palette:Vector.<uint>,paletteOffset:uint=0):Sprite {
+		public function render(palette:Vector.<uint>,paletteOffset:uint=0,useTransparency:Boolean=true):Sprite {
 			var spr:Sprite=new Sprite();
 			for(var y:uint=0;y<tilesY;++y) {
 				for(var x:uint=0;x<tilesX;++x) {
 					var index:uint=x+y*tilesX;
 					var tile:Tile=tiles[index];
 					
-					var bmd:BitmapData=tile.toBMD(palette,paletteOffset);
+					var bmd:BitmapData=tile.toBMD(palette,paletteOffset,useTransparency);
 					var bitmap:Bitmap=new Bitmap(bmd);
-					bitmap.x=x*tileWidth;
-					bitmap.y=y*tileHeight;
+					bitmap.x=x*Tile.width;
+					bitmap.y=y*Tile.height;
 					
 					spr.addChild(bitmap);
 				}

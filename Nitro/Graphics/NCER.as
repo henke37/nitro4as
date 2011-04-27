@@ -1,48 +1,62 @@
 ﻿package Nitro.Graphics {
 	
 	import flash.utils.*;
+	import flash.display.*;
+	
+	import Nitro.*;
 	
 	public class NCER {
 		
-		private const sectionOffset:uint=0x10;
-		
 		public var cells:Vector.<Cell>;
+		
+		internal var subImages:Boolean;
 
 		public function NCER() {
 		}
 		
 		public function parse(data:ByteArray):void {
-			var type:String;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			data.endian=Endian.LITTLE_ENDIAN;
 			
-			type=data.readUTFBytes(4);
-			if(type!="RECN") throw new ArgumentError("Incorrect file header, type is "+type);
+			if(sections.id!="RECN") throw new ArgumentError("Incorrect file header, type is "+sections.id);
 			
-			data.position=sectionOffset;
-			type=data.readUTFBytes(4);
-			if(type!="KBEC") throw new ArgumentError("Incorrect file header, section type is "+type);
+			var section:ByteArray=sections.open("KBEC");
+			section.endian=Endian.LITTLE_ENDIAN;
 			
-			data.position=sectionOffset+8;
-			var bankCount:uint=data.readUnsignedShort();
-			var version:uint=data.readUnsignedShort();
+			parseKBEC(section);
+			
+			try {
+				section=sections.open("LBAL");
+				section.endian=Endian.LITTLE_ENDIAN;
+				parseLBAL(section);
+			} catch (err:ArgumentError) {}
+		}
+		
+		private function parseKBEC(section:ByteArray):void {
+			
+			var cellCount:uint=section.readUnsignedShort();
+			var version:uint=section.readUnsignedShort();
 			
 			if(version>1) {
 				throw new ArgumentError("Unknown version: "+version);
 			}
 			
-			data.position=sectionOffset+0x10;
-			var blockSize:uint= 1 << data.readUnsignedInt()+4;
-			
-			data.position=sectionOffset+0x20;			
-			var cellCount:uint=data.readUnsignedShort();
-			
 			cells=new Vector.<Cell>();
 			cells.length=cellCount;
 			cells.fixed=true;
 			
-			data.position=sectionOffset+0x24;
-			var cellOffset:uint=data.readUnsignedInt()+sectionOffset+8;
+			section.position+=4;//seek past unknown constant
+			var flags:uint=section.readUnsignedInt();
+			
+			var tileIndexShift:uint=flags & 3;
+			
+			var partionOffset:uint=section.readUnsignedInt();
+			subImages=Boolean(flags & 4);
+			
+			section.position+=8;//padding
+			
+			var cellOffset:uint=section.position;
 			
 			var cellDataSize:uint=8;
 			if(version==1) {
@@ -51,37 +65,37 @@
 			
 			var oamStart:uint=cellOffset+cellDataSize*cellCount;
 			
-			var i:uint;
+			var cellItr:uint;
 			
-			for(i=0;i<cellCount;++i) {
-				data.position=cellOffset+cellDataSize*i;
+			for(cellItr=0;cellItr<cellCount;++cellItr) {
+				section.position=cellOffset+cellDataSize*cellItr;
 				
 				var cell:Cell=new Cell();
-				cells[i]=cell;
+				cells[cellItr]=cell;
 				
-				var numOAMS:uint=data.readUnsignedShort();
-				data.position+=2;
-				var oamOffset:uint=data.readUnsignedInt();
+				var numOAMS:uint=section.readUnsignedShort();
+				section.position+=2;
+				var oamOffset:uint=section.readUnsignedInt();
 				if(version==1) {
-					var xMax:int=data.readShort();
-					var yMax:int=data.readShort();
-					var xMin:int=data.readShort();
-					var yMin:int=data.readShort();
+					var xMax:int=section.readShort();
+					var yMax:int=section.readShort();
+					var xMin:int=section.readShort();
+					var yMin:int=section.readShort();
 				}
 				
 				cell.oams=new Vector.<CellOam>();
 				cell.oams.length=numOAMS;
 				cell.oams.fixed=true;
 				
-				data.position=oamStart+oamOffset;
+				section.position=oamStart+oamOffset;
 				
 				for(var j:uint=0;j<numOAMS;++j) {
 					
 					var oam:CellOam=new CellOam();
 					cell.oams[j]=oam;
 				
-					oam.x=data.readByte();
-					var atts0:uint=data.readUnsignedByte();
+					oam.y=section.readByte();
+					var atts0:uint=section.readUnsignedByte();
 					
 					var rs:Boolean=(atts0 & 1) == 1;
 					
@@ -93,29 +107,68 @@
 					
 					var shape:uint=atts0 >> 6;
 					
-					oam.y=data.readUnsignedByte();
+					var atts1:uint=section.readUnsignedShort();
 					
-					var atts1:uint=data.readUnsignedByte();
+					oam.x=atts1 & 0x1FF;
 					
-					if((atts1 & 1) == 1) {
-						oam.y-=0x200;
+					if(oam.x>=0x100) {
+						oam.x-=0x200;
 					}
 					
 					if(!rs) {
-						oam.xFlip=(atts1 & 16)==16;
-						oam.yFlip=(atts1 & 32)==32;
+						oam.xFlip=(atts1 & 0x1000)==0x1000;
+						oam.yFlip=(atts1 & 0x2000)==0x2000;
 					}
 					
-					var objSize:uint=atts1 >> 6;
+					var objSize:uint=atts1 >> 14;
 					
-					var atts2:uint=data.readUnsignedShort();
+					var atts2:uint=section.readUnsignedShort();
 					
-					oam.tileIndex=atts2 & 0x103;
+					oam.tileIndex=(atts2 & 0x3FF) << tileIndexShift;
 					oam.paletteIndex= atts2 >> 12;
+					
+					oam.setSize(objSize,shape);
 				}
 			}
 			
 			
+		}
+		
+		public function rend(cellId:uint,palette:NCLR,tiles:NCGR,useTransparency:Boolean=true):DisplayObject {
+			var cell:Cell=cells[cellId];
+			return cell.rend(palette,tiles,subImages,useTransparency);
+		}
+		
+		private function parseLBAL(section:ByteArray):void {
+			var cellId:uint=0;
+			
+			var offsets:Vector.<uint>=new Vector.<uint>();
+			
+			for(;;) {
+				var offset:uint=section.readUnsignedInt();
+				
+				if(offset+section.position>=section.length) break;
+				
+				offsets.push(offset);
+			}
+			
+			var firstLabelOffset:uint=section.position;
+			
+			for each(offset in offsets) {
+				section.position=offset+firstLabelOffset;
+				
+				cells[cellId++].label=readZeroTermString(section);
+			}
+		}
+		
+		private function readZeroTermString(d:ByteArray):String {
+			var startOffset:uint=d.position;
+			
+			for(var len:uint=0;d.readUnsignedByte()!=0;++len) {}
+			
+			d.position=startOffset;
+			
+			return d.readUTFBytes(len);
 		}
 
 	}

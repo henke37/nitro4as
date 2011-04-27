@@ -34,12 +34,41 @@
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
-			var renderedTiles:DisplayObject=tiles.render(palette.colors,0);
+			var renderedTiles:DisplayObject=tiles.render(palette.colors,0,false);
 			addChild(renderedTiles);
 			
 			var cellData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCER");
 			var cells:NCER=new NCER();
 			cells.parse(cellData);
+			
+			var dump:XML=<cells />;
+			
+			var cellItr:uint=0;
+			
+			for each(var cell:Cell in cells.cells) {
+				var cellXML:XML=<cell />;
+				var cellSpr:DisplayObject;
+				for each(var oam:CellOam in cell.oams) {
+					var oamXML:XML=<oam x={oam.x} y={oam.y} tile={oam.tileIndex} palette={oam.paletteIndex} width={oam.width} height={oam.height}
+					doubleSize={oam.doubleSize?"yes":"no"} flipX={oam.xFlip?"yes":"no"} flipY={oam.yFlip?"yes":"no"} />;
+					
+					cellXML.appendChild(oamXML);
+				}
+				
+				if(cell.label) {
+					cellXML.@label=cell.label;
+				}
+				
+				dump.appendChild(cellXML);
+				
+				cellSpr=cells.rend(cellItr,palette,tiles);
+				
+				cellSpr.x=(cellItr++)*80+100;
+				cellSpr.y=350;
+				addChild(cellSpr);
+			}
+			
+			trace(dump);
 			
 			/*
 			var screenData:ByteArray=nds.fileSystem.openFileByName("data/BG1.NSCR");

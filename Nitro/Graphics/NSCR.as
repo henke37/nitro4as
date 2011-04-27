@@ -55,7 +55,7 @@
 			}
 		}
 		
-		public function render(tiles:NCGR,palette:NCLR):Sprite {
+		public function render(tiles:NCGR,palette:NCLR,useTransparency:Boolean=true):Sprite {
 			var spr:Sprite=new Sprite();
 			
 			var tileCache:Object={};
@@ -87,7 +87,7 @@
 						//hits++;
 					} else {
 						var tile:Tile=tiles.tiles[entry.tile];
-						bmd=tile.toBMD(palette.colors,(1 << palette.bitDepth) * entry.palette);
+						bmd=tile.toBMD(palette.colors,entry.palette,useTransparency);
 						paletteCache[entry.tile]=bmd;
 						//misses++;
 					}

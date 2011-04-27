@@ -1,4 +1,5 @@
 ﻿package Nitro.Graphics {
+	import flash.display.*;
 	
 	public class CellOam {
 		
@@ -20,8 +21,56 @@
 			// constructor code
 		}
 		
-		internal function setSize(size:uint,shape:uint) {
+		internal function rend(palette:Vector.<uint>,tiles:NCGR,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
+			var spr:Sprite=new Sprite();
 			
+			if(subImages) {
+				const baseX:uint=tileIndex%tiles.tilesX;
+				const baseY:uint=tileIndex/tiles.tilesX;
+				
+				const yTiles:uint=height/Tile.height;
+				const xTiles:uint=width/Tile.width;
+				
+				for(var y:uint=0;y<yTiles;++y) {
+					for(var x:uint=0;x<xTiles;++x) {
+						
+						var subTileYIndex:uint=baseY+y;
+						var subTileXIndex:uint=baseX+x;
+						
+						var subTileIndex:uint=subTileXIndex+subTileYIndex*tiles.tilesX;
+						
+						var tile:Tile=tiles.tiles[subTileIndex];
+						var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
+						
+						tileR.x=Tile.width*x;
+						tileR.y=Tile.height*y;
+						
+						spr.addChild(tileR);
+					}
+				}
+			}
+			
+			
+			
+			return spr;
+		}
+		
+		internal function setSize(size:uint,shape:uint) {
+			switch(shape) {
+				case 0:
+					width=height=8 << size;
+				break;
+				
+				case 1:
+					width=[16,32,32,64][size];
+					height=[8,8,16,32][size];
+				break;
+				
+				case 2:
+					width=[8,8,16,32][size];
+					height=[16,32,32,64][size];
+				break;
+			}
 		}
 
 	}
