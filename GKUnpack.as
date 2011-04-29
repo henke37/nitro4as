@@ -5,13 +5,12 @@
 	import flash.events.*;
 	import flash.text.*;
 	import flash.utils.*;
-	
 	import flash.filesystem.*;
 	
 	import Nitro.Compression.*;
 	import Nitro.FileSystem.*;	
 	import Nitro.*;
-	import flash.filesystem.FileStream;
+	import Nitro.GK.*;
 	
 	public class GKUnpack extends MovieClip {
 		

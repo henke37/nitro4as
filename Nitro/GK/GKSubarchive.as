@@ -1,4 +1,4 @@
-﻿package Nitro {
+﻿package Nitro.GK {
 	import flash.utils.*;
 	
 	public class GKSubarchive {
