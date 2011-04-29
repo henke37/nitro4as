@@ -9,8 +9,8 @@
 		public var width:uint;
 		public var height:uint;
 		
-		private const tileWidth:uint=8;
-		private const tileHeight:uint=8;
+		public var dataHeight:uint;
+		public var dataWidth:uint;
 		
 		private var entries:Vector.<TileEntry>;
 
@@ -28,18 +28,29 @@
 			var section:ByteArray=sections.open("NRCS");
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			width=section.readUnsignedShort();
-			height=section.readUnsignedShort();
 			
+			height=section.readUnsignedShort();
+			width=section.readUnsignedShort();
+			
+			var size:uint=section.readUnsignedShort();
+			var mode:uint=section.readUnsignedShort();
+			
+			if(mode==0) {
+				dataHeight=[256,256,512,512][size];
+				dataWidth=[256,512,256,512][size];
+			} else {
+				dataHeight=[128,256,512,1024][size];
+				dataWidth=[128,256,512,1024][size];
+			}
 			
 			section.position=0x0C;
 			
 			entries=new Vector.<TileEntry>();
-			entries.length=(height/tileHeight)*(width/tileWidth);
+			entries.length=(height/Tile.height)*(width/Tile.width);
 			entries.fixed=true;
 			
-			for(var y:uint=0;y<height;y+=tileHeight) {
-				for(var x:uint=0;x<width;x+=tileWidth) {
+			for(var y:uint=0;y<height;y+=Tile.height) {
+				for(var x:uint=0;x<width;x+=Tile.width) {
 					var value:uint=section.readUnsignedShort();
 					
 					var entry:TileEntry=new TileEntry();
@@ -49,7 +60,7 @@
 					entry.yFlip=(value & 0x800) == 0x800;
 					entry.palette=value >> 12;
 					
-					var index:uint=(width/tileWidth)*(y/tileHeight)+(x/tileWidth);
+					var index:uint=(width/Tile.width)*(y/Tile.height)+(x/Tile.width);
 					
 					entries[index]=entry;
 				}
@@ -63,10 +74,10 @@
 			
 			//var hits:uint,misses:uint;
 			
-			for(var y:uint=0;y<height;y+=tileHeight) {
-				for(var x:uint=0;x<width;x+=tileWidth) {
+			for(var y:uint=0;y<height;y+=Tile.height) {
+				for(var x:uint=0;x<width;x+=Tile.width) {
 					
-					var index:uint=(width/tileWidth)*(y/tileHeight)+(x/tileWidth);
+					var index:uint=(width/Tile.width)*(y/Tile.height)+(x/Tile.width);
 					
 					var entry:TileEntry=entries[index];
 					
@@ -99,12 +110,12 @@
 					
 					if(entry.xFlip) {
 						bitmap.scaleX=-1;
-						bitmap.x+=tileWidth;
+						bitmap.x+=Tile.width;
 					}
 					
 					if(entry.yFlip) {
 						bitmap.scaleY=-1;
-						bitmap.y+=tileHeight;
+						bitmap.y+=Tile.height;
 					}
 					
 					spr.addChild(bitmap);
