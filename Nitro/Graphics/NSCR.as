@@ -28,8 +28,9 @@
 			var section:ByteArray=sections.open("NRCS");
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			height=section.readUnsignedShort();
 			width=section.readUnsignedShort();
+			height=section.readUnsignedShort();
+			
 			
 			section.position=0x0C;
 			

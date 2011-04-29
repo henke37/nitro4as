@@ -127,7 +127,10 @@
 					
 					var atts2:uint=section.readUnsignedShort();
 					
-					oam.tileIndex=(atts2 & 0x3FF) << (tileIndexShift-1);
+					oam.tileIndex=(atts2 & 0x3FF);
+					if(tileIndexShift) {
+						oam.tileIndex << (tileIndexShift-1);
+					}
 					oam.paletteIndex= atts2 >> 12;
 					
 					oam.setSize(objSize,shape);

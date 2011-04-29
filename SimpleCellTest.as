@@ -9,13 +9,13 @@
 	import Nitro.Graphics.*;
 
 	
-	public class CellTest extends MovieClip {
+	public class SimpleCellTest extends MovieClip {
 		
 		private var nds:NDS;
 		
 		private var loader:URLLoader;
 		
-		public function CellTest() {
+		public function SimpleCellTest() {
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,parse);
@@ -53,10 +53,6 @@
 					doubleSize={oam.doubleSize?"yes":"no"} flipX={oam.xFlip?"yes":"no"} flipY={oam.yFlip?"yes":"no"} />;
 					
 					cellXML.appendChild(oamXML);
-				}
-				
-				if(cell.label) {
-					cellXML.@label=cell.label;
 				}
 				
 				dump.appendChild(cellXML);
