@@ -32,22 +32,54 @@
 			
 			bitDepth=1 << (section.readUnsignedInt()-1);
 			
-			tiles=new Vector.<Tile>();
-			tiles.length=tilesY*tilesX;
-			tiles.fixed=true;
+			if(tilesY==0xFFFF) {
+				section.readUnsignedShort();
+			} else {
+				section.position+=2;
+			}
 			
-			section.position=0x0C;
-			var tiled:Boolean=section.readUnsignedInt()==0;
+			if(tilesX==0xFFFF) {
+				section.readUnsignedShort();
+			} else {
+				section.position+=2;
+			}
 			
-			section.position=0x18;
-			for(var y:uint=0;y<tilesY;++y) {
-				for(var x:uint=0;x<tilesX;++x) {
-					var tile:Tile=new Tile();
+			var tileType:uint=section.readUnsignedInt();
+			
+			
+			
+			var dataSize:uint=section.readUnsignedInt();
+			var dataOffset:uint=section.readUnsignedInt();
+			
+			section.position=dataOffset;
+			
+			var index:uint;
+			var tile:Tile;
+			
+			if(tilesX==0xFFFF) {
+				tiles=new Vector.<Tile>();
+				while(section.position<dataSize+dataOffset) {
+					
+					tile=new Tile();
 					tile.readTile(bitDepth,section);
 					
-					var index:uint=x+y*tilesX;
-					
-					tiles[index]=tile;
+					tiles[index++]=tile;
+				}
+			} else {
+				
+				tiles=new Vector.<Tile>();
+				tiles.length=tilesY*tilesX;
+				tiles.fixed=true;
+			
+				for(var y:uint=0;y<tilesY;++y) {
+					for(var x:uint=0;x<tilesX;++x) {
+						tile=new Tile();
+						tile.readTile(bitDepth,section);
+						
+						index=x+y*tilesX;
+						
+						tiles[index]=tile;
+					}
 				}
 			}
 		}

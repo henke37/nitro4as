@@ -8,6 +8,7 @@
 	public class NCER {
 		
 		public var cells:Vector.<Cell>;
+		public var labels:Vector.<String>;
 		
 		internal var subImages:Boolean;
 
@@ -26,11 +27,13 @@
 			
 			parseKBEC(section);
 			
-			try {
+			if(sections.hasSection("LBAL")) {
 				section=sections.open("LBAL");
 				section.endian=Endian.LITTLE_ENDIAN;
 				parseLBAL(section);
-			} catch (err:ArgumentError) {}
+			}
+				
+				
 		}
 		
 		private function parseKBEC(section:ByteArray):void {
@@ -124,7 +127,7 @@
 					
 					var atts2:uint=section.readUnsignedShort();
 					
-					oam.tileIndex=(atts2 & 0x3FF) << tileIndexShift;
+					oam.tileIndex=(atts2 & 0x3FF) << (tileIndexShift-1);
 					oam.paletteIndex= atts2 >> 12;
 					
 					oam.setSize(objSize,shape);
@@ -140,7 +143,7 @@
 		}
 		
 		private function parseLBAL(section:ByteArray):void {
-			var cellId:uint=0;
+			
 			
 			var offsets:Vector.<uint>=new Vector.<uint>();
 			
@@ -154,10 +157,16 @@
 			
 			var firstLabelOffset:uint=section.position;
 			
+			labels=new Vector.<String>();
+			labels.length=offsets.length;
+			labels.fixed=true;
+			
+			var cellId:uint=0;
+			
 			for each(offset in offsets) {
 				section.position=offset+firstLabelOffset;
 				
-				cells[cellId++].label=readZeroTermString(section);
+				labels[cellId++]=readZeroTermString(section);
 			}
 		}
 		

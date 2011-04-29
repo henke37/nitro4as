@@ -24,31 +24,36 @@
 		internal function rend(palette:Vector.<uint>,tiles:NCGR,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
 			var spr:Sprite=new Sprite();
 			
-			if(subImages) {
-				const baseX:uint=tileIndex%tiles.tilesX;
-				const baseY:uint=tileIndex/tiles.tilesX;
-				
-				const yTiles:uint=height/Tile.height;
-				const xTiles:uint=width/Tile.width;
-				
-				for(var y:uint=0;y<yTiles;++y) {
-					for(var x:uint=0;x<xTiles;++x) {
-						
+			
+			const baseX:uint=tileIndex%tiles.tilesX;
+			const baseY:uint=tileIndex/tiles.tilesX;
+			
+			const yTiles:uint=height/Tile.height;
+			const xTiles:uint=width/Tile.width;
+			
+			for(var y:uint=0;y<yTiles;++y) {
+				for(var x:uint=0;x<xTiles;++x) {
+					
+					var subTileIndex:uint;
+					
+					if(subImages) {
 						var subTileYIndex:uint=baseY+y;
 						var subTileXIndex:uint=baseX+x;
 						
-						var subTileIndex:uint=subTileXIndex+subTileYIndex*tiles.tilesX;
-						
-						var tile:Tile=tiles.tiles[subTileIndex];
-						var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
-						
-						tileR.x=Tile.width*x;
-						tileR.y=Tile.height*y;
-						
-						spr.addChild(tileR);
+						subTileIndex=subTileXIndex+subTileYIndex*tiles.tilesX;
+					} else {
+						subTileIndex=tileIndex+x+y*xTiles;
 					}
+					
+					var tile:Tile=tiles.tiles[subTileIndex];
+					var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
+					
+					tileR.x=Tile.width*x;
+					tileR.y=Tile.height*y;
+					
+					spr.addChild(tileR);
 				}
-			}
+			} 
 			
 			
 			

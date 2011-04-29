@@ -36,6 +36,8 @@
 				var len:uint=offsets[id+1]-offsets[id]-1;
 				o.writeBytes(_data,offsets[id],len);
 			}
+			
+			o.position=0;
 			return o;
 		}
 

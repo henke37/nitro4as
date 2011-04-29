@@ -1,11 +1,10 @@
 ﻿package Nitro.Graphics {
 	import flash.display.*;
+	import flash.text.*;
 	
 	public class Cell {
 		
 		public var oams:Vector.<CellOam>;
-		
-		public var label:String;
 
 		public function Cell() {
 			// constructor code
@@ -33,6 +32,29 @@
 				}
 				
 				spr.addChildAt(oamR,0);
+			}
+			
+			return spr;
+		}
+		
+		public function rendBoxes(tileNumbers:Boolean=true):DisplayObject {
+			var spr:Sprite=new Sprite();
+			
+			spr.graphics.lineStyle(1);
+			
+			for each(var oam:CellOam in oams) {
+				spr.graphics.drawRect(oam.x,oam.y,oam.width,oam.height);
+				if(tileNumbers) {
+					var tf:TextField=new TextField();
+					tf.x=oam.x;
+					tf.y=oam.y;
+					tf.text=String(oam.tileIndex);
+					
+					if(oam.xFlip) tf.appendText("XF");
+					if(oam.yFlip) tf.appendText("YF");
+					
+					spr.addChild(tf);
+				}
 			}
 			
 			return spr;

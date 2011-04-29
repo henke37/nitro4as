@@ -7,6 +7,7 @@
 	
 	import Nitro.FileSystem.*;
 	import Nitro.Graphics.*;
+	import Nitro.*;
 
 	
 	public class CellTest extends MovieClip {
@@ -19,25 +20,33 @@
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,parse);
-			loader.load(new URLRequest("korg.nds"));
+			loader.load(new URLRequest("game.nds"));
+			
+			stage.align=StageAlign.TOP_LEFT;
 		}
 		
 		private function parse(e:Event):void {
 			nds=new NDS();
 			nds.parse(loader.data);
 			
-			var paletteData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCLR");
+			var archive:GKArchive=new GKArchive();
+			archive.parse(nds.fileSystem.openFileByName("com/bustup.bin"));
+			
+			var subArchive:GKSubarchive=new GKSubarchive();
+			subArchive.parse(archive.open(1));
+			
+			var paletteData:ByteArray=archive.open(0);
 			var palette:NCLR=new NCLR();
 			palette.parse(paletteData);
 			
-			var tileData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCGR");
+			var tileData:ByteArray=subArchive.open(2);
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
-			var renderedTiles:DisplayObject=tiles.render(palette.colors,0,false);
-			addChild(renderedTiles);
+			//var renderedTiles:DisplayObject=tiles.render(palette.colors,0,false);
+			//addChild(renderedTiles);
 			
-			var cellData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCER");
+			var cellData:ByteArray=subArchive.open(0);
 			var cells:NCER=new NCER();
 			cells.parse(cellData);
 			
@@ -55,20 +64,22 @@
 					cellXML.appendChild(oamXML);
 				}
 				
-				if(cell.label) {
-					cellXML.@label=cell.label;
-				}
-				
 				dump.appendChild(cellXML);
 				
 				cellSpr=cells.rend(cellItr,palette,tiles);
 				
-				cellSpr.x=(cellItr++)*80+100;
-				cellSpr.y=350;
+				cellSpr.x=(cellItr%10)*120+100;
+				cellSpr.y=uint(cellItr/10)*120+60;
 				addChild(cellSpr);
+				
+				cellItr++;
 			}
 			
 			trace(dump);
+			
+			//addChild(cells.rend(0,palette,tiles))
+			
+			//addChild(cells.cells[0].rendBoxes());
 			
 			/*
 			var screenData:ByteArray=nds.fileSystem.openFileByName("data/BG1.NSCR");

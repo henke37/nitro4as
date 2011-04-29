@@ -71,6 +71,13 @@
 			o.position=0;
 			return o;
 		}
+		
+		public function hasSection(id:String):Boolean {
+			if(!id) throw new ArgumentError("Id can not be null!");
+			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
+			
+			return id in sections;
+		}
 
 	}
 	

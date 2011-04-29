@@ -8,6 +8,8 @@
 		
 		public var colors:Vector.<uint>;
 		
+		public var paletteCount:uint;
+		
 		public var bitDepth:uint;
 
 		public function NCLR() {
@@ -22,16 +24,27 @@
 			
 			
 			var section:ByteArray=sections.open("TTLP");
+			parseTTLP(section);
+			
+			if(sections.hasSection("PMCP")) {
+				section=sections.open("PMCP");
+				parsePCMP(section);
+			}
+		}
+		
+		private function parseTTLP(section:ByteArray):void {
 			section.endian=Endian.LITTLE_ENDIAN;
 			
 			bitDepth=1 << (section.readUnsignedShort()-1);
 			
-			section.position=0x0C;
+			section.position=0x08;
 			var paletteSize:uint=section.readUnsignedInt();
 			
-			if(bitDepth==4) {
-				paletteSize=256;
-			}
+			paletteSize/=RGB555.byteSize;
+			
+			var paletteOffset:uint=section.readUnsignedInt();
+			
+			section.position=paletteOffset;
 			
 			colors=new Vector.<uint>();
 			colors.length=paletteSize;
@@ -39,6 +52,12 @@
 			for(var i:uint=0;i<paletteSize;++i) {
 				colors[i]=RGB555.read555Color(section);
 			}
+			
+		}
+		
+		private function parsePCMP(section:ByteArray):void {
+			section.endian=Endian.LITTLE_ENDIAN;
+			paletteCount=section.readUnsignedShort();
 		}
 
 	}

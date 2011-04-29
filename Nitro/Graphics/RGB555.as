@@ -3,6 +3,8 @@
 	import flash.utils.*;
 	
 	public class RGB555 {
+		
+		public static const byteSize:uint=2;
 
 		public function RGB555() {
 			throw new Error("This is an utility class, don't instantiate it");
