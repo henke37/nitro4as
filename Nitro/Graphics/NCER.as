@@ -140,6 +140,8 @@
 			
 		}
 		
+		public function get length():uint { return cells.length; }
+		
 		public function rend(cellId:uint,palette:NCLR,tiles:NCGR,useTransparency:Boolean=true):DisplayObject {
 			var cell:Cell=cells[cellId];
 			return cell.rend(palette,tiles,subImages,useTransparency);
