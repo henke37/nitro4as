@@ -47,7 +47,17 @@
 			}
 		}
 		
+		private var rendered:BitmapData;
+		private var renderedPalette:Vector.<uint>;
+		private var renderedPaletteOffset:uint;
+		private var renderedUseTransparency:Boolean;
+		
 		public function toBMD(palette:Vector.<uint>,paletteOffset:uint=0,useTransparency:Boolean=true):BitmapData {
+			
+			if(rendered && renderedPalette==palette && renderedPaletteOffset==paletteOffset && renderedUseTransparency==useTransparency) {
+				return rendered;
+			}
+			
 			var bmd:BitmapData=new BitmapData(width,height);
 			
 			bmd.lock();
@@ -65,6 +75,11 @@
 			}
 			
 			bmd.unlock();
+			
+			rendered=bmd;
+			renderedPalette=palette;
+			renderedPaletteOffset=paletteOffset;
+			renderedUseTransparency=useTransparency;
 			
 			return bmd;
 		}
