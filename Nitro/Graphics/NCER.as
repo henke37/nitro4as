@@ -129,7 +129,7 @@
 					
 					oam.tileIndex=(atts2 & 0x3FF);
 					if(tileIndexShift) {
-						oam.tileIndex << (tileIndexShift-1);
+						oam.tileIndex <<= (tileIndexShift-1);
 					}
 					oam.paletteIndex= atts2 >> 12;
 					
