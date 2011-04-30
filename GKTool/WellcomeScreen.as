@@ -34,7 +34,7 @@
 		}
 		
 		private function fileSelected(e:Event):void {
-			stage.removeEventListener(MouseEvent.CLICK,clickLoad);
+			load_btn.removeEventListener(MouseEvent.CLICK,clickLoad);
 			
 			fr.addEventListener(Event.COMPLETE,frLoaded);
 			text_txt.text="Loading data...";

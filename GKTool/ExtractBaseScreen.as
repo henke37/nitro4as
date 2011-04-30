@@ -15,6 +15,8 @@
 		
 		protected var fileCount:uint;
 		private var _progress:uint;
+		
+		private var startTime:uint;
 
 		public function ExtractBaseScreen() {
 			realScreen=new ExtractScreen();
@@ -23,6 +25,9 @@
 		
 		protected override function init():void {
 			realScreen.selectDir_btn.addEventListener(MouseEvent.CLICK,selectDir);
+			realScreen.abort_btn.visible=false;
+			realScreen.abort_btn.addEventListener(MouseEvent.CLICK,abort);
+			realScreen.menu_btn.addEventListener(MouseEvent.CLICK,menu);
 		}
 		
 		private function selectDir(e:MouseEvent):void {
@@ -38,6 +43,11 @@
 		
 		private function initExtraction():void {
 			
+			realScreen.abort_btn.visible=true;
+			realScreen.menu_btn.visible=false;
+			
+			startTime=getTimer();
+			
 			fileCount=beginExtraction();
 			
 			realScreen.status_txt.text="";
@@ -47,15 +57,30 @@
 			}
 		}
 		
+		private function abort(e:MouseEvent):void {
+			endOperation();
+			log("Operation aborted!");
+		}
+		
+		private function menu(e:MouseEvent):void {
+			gkTool.section=new MainMenu();
+		}
+		
+		private function endOperation():void {
+			removeEventListener(Event.ENTER_FRAME,extractMoreFiles);
+			realScreen.abort_btn.visible=false;
+			realScreen.menu_btn.visible=true;
+		}
+		
 		protected function beginExtraction():uint { return 0}
 		
 		protected function processNext():Boolean {
 			return false;
 		}
 		
-			private function extractMoreFiles(e:Event):void {
+		private function extractMoreFiles(e:Event):void {
 			if(!extractSomeFiles()) {
-				removeEventListener(Event.ENTER_FRAME,extractMoreFiles);
+				endOperation();
 			}
 		}
 		
@@ -63,7 +88,7 @@
 			var stopTime:uint=getTimer()+20;
 			do {
 				if(!processNext()) {
-					log("Done, had "+errors+" errors");
+					log("Done, had "+errors+" errors and took "+Math.ceil((getTimer()-startTime)/1000)+" seconds.");
 					return false;
 				}
 			} while(getTimer()<stopTime);
