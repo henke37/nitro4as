@@ -58,6 +58,8 @@
 		
 		protected override function processNext():Boolean {
 			
+			++progress;
+			
 			if(!archive) {
 				archive=archives[archiveFileIndex];
 				archiveFileName=archiveFileNames[archiveFileIndex];

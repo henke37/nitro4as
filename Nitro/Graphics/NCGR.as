@@ -10,6 +10,7 @@
 		public var tiles:Vector.<Tile>;
 		
 		public var tilesX:uint,tilesY:uint;
+		public var gridX:uint,gridY:uint;
 		
 		public var bitDepth:uint;
 
@@ -27,22 +28,13 @@
 			
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			tilesY=section.readUnsignedShort();
 			tilesX=section.readUnsignedShort();
+			tilesY=section.readUnsignedShort();
 			
 			bitDepth=1 << (section.readUnsignedInt()-1);
 			
-			if(tilesY==0xFFFF) {
-				section.readUnsignedShort();
-			} else {
-				section.position+=2;
-			}
-			
-			if(tilesX==0xFFFF) {
-				section.readUnsignedShort();
-			} else {
-				section.position+=2;
-			}
+			gridX=section.readUnsignedShort();
+			gridY=section.readUnsignedShort();
 			
 			var tileType:uint=section.readUnsignedInt();
 			
@@ -56,7 +48,8 @@
 			var index:uint;
 			var tile:Tile;
 			
-			if(tilesX==0xFFFF) {
+			if(tileType==0) {
+				
 				tiles=new Vector.<Tile>();
 				while(section.position<dataSize+dataOffset) {
 					
@@ -65,23 +58,22 @@
 					
 					tiles[index++]=tile;
 				}
-			} else {
-				
-				tiles=new Vector.<Tile>();
-				tiles.length=tilesY*tilesX;
-				tiles.fixed=true;
-			
-				for(var y:uint=0;y<tilesY;++y) {
-					for(var x:uint=0;x<tilesX;++x) {
-						tile=new Tile();
-						tile.readTile(bitDepth,section);
-						
-						index=x+y*tilesX;
-						
-						tiles[index]=tile;
+			} else if(tileType==1) {
+				var picture:Vector.<uint>=new Vector.<uint>();
+				picture.length=dataSize*8/bitDepth;
+				picture.fixed=true;
+				index=0;
+				while(section.position<dataSize+dataOffset) {
+					var byte=section.readUnsignedByte();
+					if(bitDepth==4) {
+						picture[index++]=byte & 0xF;
+						picture[index++]=byte >> 4;
+					} else {
+						picture[index++]=byte;
 					}
 				}
 			}
+			
 		}
 		
 		public function render(palette:Vector.<uint>,paletteOffset:uint=0,useTransparency:Boolean=true):Sprite {

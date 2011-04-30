@@ -19,11 +19,15 @@
 			icon_mc.addChild(new Bitmap(gkTool.nds.banner.icon));
 			
 			extractFiles_btn.addEventListener(MouseEvent.CLICK,fileExtract);
-			
+			extractChars_btn.addEventListener(MouseEvent.CLICK,graphicsExtract);
 		}
 		
 		private function fileExtract(e:MouseEvent):void {
 			gkTool.section=new FileExtractScreen();
+		}
+		
+		private function graphicsExtract(e:MouseEvent):void {
+			gkTool.section=new GraphicsExtractScreen();
 		}
 	}
 	

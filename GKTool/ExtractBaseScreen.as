@@ -3,30 +3,26 @@
 	import flash.net.*;
 	import flash.events.*;
 	import flash.filesystem.*;
-	import flash.text.*;
 	import flash.utils.*;
 	
 	public class ExtractBaseScreen extends Screen {
-		
-		public var selectDir_btn:SimpleButton;
-		
-		public var status_txt:TextField;
 		
 		protected var outDir:File;
 		
 		public var errors:uint;
 		
-		public var progress_mc:Sprite;
+		private var realScreen:ExtractScreen;
 		
 		protected var fileCount:uint;
 		private var _progress:uint;
 
 		public function ExtractBaseScreen() {
-			// constructor code
+			realScreen=new ExtractScreen();
+			addChild(realScreen);
 		}
 		
 		protected override function init():void {
-			selectDir_btn.addEventListener(MouseEvent.CLICK,selectDir);
+			realScreen.selectDir_btn.addEventListener(MouseEvent.CLICK,selectDir);
 		}
 		
 		private function selectDir(e:MouseEvent):void {
@@ -36,7 +32,7 @@
 		}
 		
 		private function dirSelected(e:Event):void {
-			selectDir_btn.visible=false;
+			realScreen.selectDir_btn.visible=false;
 			initExtraction();
 		}
 		
@@ -44,7 +40,7 @@
 			
 			fileCount=beginExtraction();
 			
-			status_txt.text="";
+			realScreen.status_txt.text="";
 			
 			if(extractSomeFiles()) {
 				addEventListener(Event.ENTER_FRAME,extractMoreFiles);
@@ -66,7 +62,6 @@
 		private function extractSomeFiles():Boolean {
 			var stopTime:uint=getTimer()+20;
 			do {
-				++progress;
 				if(!processNext()) {
 					log("Done, had "+errors+" errors");
 					return false;
@@ -76,8 +71,8 @@
 		}
 		
 		protected function log(t:String):void {
-			status_txt.appendText(t+"\n");
-			status_txt.scrollV=status_txt.maxScrollV;
+			realScreen.status_txt.appendText(t+"\n");
+			realScreen.status_txt.scrollV=realScreen.status_txt.maxScrollV;
 		}
 		
 		protected function saveFile(name:String,data:ByteArray):void {
@@ -96,23 +91,25 @@
 			return o;
 		}
 		
-		private function get progress():uint { return _progress; }
-		private function set progress(p:uint):void {
+		protected function get progress():uint { return _progress; }
+		protected function set progress(p:uint):void {
 			
 			_progress=p;
 			
-			progress_mc.graphics.clear();
+			var g:Graphics=realScreen.progress_mc.graphics;
+			
+			g.clear();
 			
 			var pc:Number=Number(p)/fileCount;
 			
 			const w:Number=540;
 			const h:Number=40;
 			
-			progress_mc.graphics.lineStyle(1);
-			progress_mc.graphics.drawRect(0,0,w,h);
-			progress_mc.graphics.beginFill(0x0040FF);
-			progress_mc.graphics.drawRect(0,0,w*pc,h);
-			progress_mc.graphics.endFill();
+			g.lineStyle(1);
+			g.drawRect(0,0,w,h);
+			g.beginFill(0x0040FF);
+			g.drawRect(0,0,w*pc,h);
+			g.endFill();
 		}
 	}
 	

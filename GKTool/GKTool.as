@@ -11,7 +11,7 @@
 		
 		private var _section:Screen;
 		
-		public static const version:String="unreleased alpha";
+		public static const version:String="v 1.0";
 
 		public function GKTool() {
 			section=new WellcomeScreen();

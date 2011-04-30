@@ -8,7 +8,7 @@
 	import Nitro.FileSystem.*;
 	import Nitro.Graphics.*;
 	import Nitro.*;
-
+	import Nitro.GK.*;
 	
 	public class CellTest extends MovieClip {
 		
@@ -22,7 +22,7 @@
 			loader.addEventListener(Event.COMPLETE,parse);
 			loader.load(new URLRequest("game.nds"));
 			
-			stage.align=StageAlign.TOP_LEFT;
+			//stage.align=StageAlign.TOP_LEFT;
 		}
 		
 		private function parse(e:Event):void {
@@ -30,7 +30,7 @@
 			nds.parse(loader.data);
 			
 			var archive:GKArchive=new GKArchive();
-			archive.parse(nds.fileSystem.openFileByName("com/bustup.bin"));
+			archive.parse(nds.fileSystem.openFileByName("com/mapchar.bin"));
 			
 			var subArchive:GKSubarchive=new GKSubarchive();
 			subArchive.parse(archive.open(1));
@@ -50,7 +50,7 @@
 			var cells:NCER=new NCER();
 			cells.parse(cellData);
 			
-			var dump:XML=<cells />;
+			/*var dump:XML=<cells />;
 			
 			var cellItr:uint=0;
 			
@@ -75,11 +75,11 @@
 				cellItr++;
 			}
 			
-			trace(dump);
+			trace(dump);*/
 			
 			//addChild(cells.rend(0,palette,tiles))
 			
-			//addChild(cells.cells[0].rendBoxes());
+			addChild(cells.cells[0].rendBoxes());
 			
 			/*
 			var screenData:ByteArray=nds.fileSystem.openFileByName("data/BG1.NSCR");
