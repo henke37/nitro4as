@@ -9,6 +9,7 @@
 	import Nitro.Graphics.*;
 	import Nitro.*;
 	import Nitro.GK.*;
+	import flash.geom.Rectangle;
 	
 	public class CellTest extends MovieClip {
 		
@@ -50,7 +51,7 @@
 			var cells:NCER=new NCER();
 			cells.parse(cellData);
 			
-			/*var dump:XML=<cells />;
+			var dump:XML=<cells />;
 			
 			var cellItr:uint=0;
 			
@@ -66,16 +67,16 @@
 				
 				dump.appendChild(cellXML);
 				
-				cellSpr=cells.rend(cellItr,palette,tiles);
+				/*cellSpr=cells.rend(cellItr,palette,tiles);
 				
 				cellSpr.x=(cellItr%10)*120+100;
 				cellSpr.y=uint(cellItr/10)*120+60;
-				addChild(cellSpr);
+				addChild(cellSpr);*/
 				
 				cellItr++;
 			}
 			
-			trace(dump);*/
+			trace(dump);
 			
 			//addChild(cells.rend(0,palette,tiles))
 			
@@ -94,6 +95,13 @@
 			
 			addChild(rendered);*/
 			
+		}
+		
+		public override function addChild(obj:DisplayObject):DisplayObject {
+			var bounds:Rectangle=obj.getBounds(obj);
+			obj.x-=bounds.left;
+			obj.y-=bounds.top;
+			return super.addChild(obj);
 		}
 	}
 	

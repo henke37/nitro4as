@@ -7,7 +7,8 @@
 	
 	public class NCGR {
 		
-		public var tiles:Vector.<Tile>;
+		private var tiles:Vector.<Tile>;
+		private  var picture:Vector.<uint>;
 		
 		public var tilesX:uint,tilesY:uint;
 		public var gridX:uint,gridY:uint;
@@ -59,7 +60,7 @@
 					tiles[index++]=tile;
 				}
 			} else if(tileType==1) {
-				var picture:Vector.<uint>=new Vector.<uint>();
+				picture=new Vector.<uint>();
 				picture.length=dataSize*8/bitDepth;
 				picture.fixed=true;
 				index=0;
@@ -76,22 +77,38 @@
 			
 		}
 		
-		public function render(palette:Vector.<uint>,paletteOffset:uint=0,useTransparency:Boolean=true):Sprite {
-			var spr:Sprite=new Sprite();
-			for(var y:uint=0;y<tilesY;++y) {
-				for(var x:uint=0;x<tilesX;++x) {
-					var index:uint=x+y*tilesX;
-					var tile:Tile=tiles[index];
-					
-					var bmd:BitmapData=tile.toBMD(palette,paletteOffset,useTransparency);
-					var bitmap:Bitmap=new Bitmap(bmd);
-					bitmap.x=x*Tile.width;
-					bitmap.y=y*Tile.height;
-					
-					spr.addChild(bitmap);
-				}
+		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true) {
+			if(tiles) {
+				var tile:Tile=tiles[subTileIndex];
+				var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
+				return tileR;
+			} else {
+				throw new Error();
 			}
-			return spr;
+		}
+		
+		public function render(palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true):Sprite {
+			
+			if(tiles) {
+			
+				var spr:Sprite=new Sprite();
+				for(var y:uint=0;y<tilesY;++y) {
+					for(var x:uint=0;x<tilesX;++x) {
+						var index:uint=x+y*tilesX;
+						var tile:Tile=tiles[index];
+						
+						var bmd:BitmapData=tile.toBMD(palette,paletteIndex,useTransparency);
+						var bitmap:Bitmap=new Bitmap(bmd);
+						bitmap.x=x*Tile.width;
+						bitmap.y=y*Tile.height;
+						
+						spr.addChild(bitmap);
+					}
+				}
+				return spr;
+			} else {
+				throw Error("unimplemented");
+			}
 		}
 
 	}

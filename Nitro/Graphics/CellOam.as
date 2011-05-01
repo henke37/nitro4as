@@ -45,8 +45,7 @@
 						subTileIndex=tileIndex+x+y*xTiles;
 					}
 					
-					var tile:Tile=tiles.tiles[subTileIndex];
-					var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
+					var tileR:DisplayObject=tiles.renderTile(subTileIndex,palette,paletteIndex,useTransparency);
 					
 					tileR.x=Tile.width*x;
 					tileR.y=Tile.height*y;
