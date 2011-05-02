@@ -40,11 +40,7 @@
 		}
 		
 		private static function colorScaleUp(x:uint):uint {
-			var o:uint=x<<3;
-			if(x & 1) {
-				o+=7;
-			}
-			return o;
+			return x<<3 | x >>> 2;
 		}
 
 	}
