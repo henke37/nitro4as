@@ -172,7 +172,7 @@
 		}
 		
 		public function get independentRenderPossible():Boolean {
-			return tiles && xTiles!=0xFFFF && yTiles!=0xFFFF;
+			return tiles && tilesX!=0xFFFF && tilesY!=0xFFFF;
 		}
 
 	}

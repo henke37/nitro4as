@@ -89,7 +89,7 @@
 					log("loaded special palette # 112");
 				}
 				
-				subArchive=new GKSubarchive();
+				var subArchive:GKSubarchive=new GKSubarchive();
 				subArchive.parse(contents);
 				
 				tiles=new NCGR();
