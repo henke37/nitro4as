@@ -58,7 +58,7 @@
 				return rendered;
 			}
 			
-			var bmd:BitmapData=new BitmapData(width,height);
+			var bmd:BitmapData=new BitmapData(width,height,useTransparency);
 			
 			bmd.lock();
 			

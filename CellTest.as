@@ -23,7 +23,7 @@
 			loader.addEventListener(Event.COMPLETE,parse);
 			loader.load(new URLRequest("game.nds"));
 			
-			//stage.align=StageAlign.TOP_LEFT;
+			stage.align=StageAlign.TOP_LEFT;
 		}
 		
 		private function parse(e:Event):void {
@@ -67,11 +67,12 @@
 				
 				dump.appendChild(cellXML);
 				
-				/*cellSpr=cells.rend(cellItr,palette,tiles);
+				cellSpr=cells.rend(cellItr,palette,tiles);
+				//cellSpr=cell.rendBoxes();
 				
-				cellSpr.x=(cellItr%10)*120+100;
-				cellSpr.y=uint(cellItr/10)*120+60;
-				addChild(cellSpr);*/
+				cellSpr.x=(cellItr%10)*50;
+				cellSpr.y=uint(cellItr/10)*120;
+				addChild(cellSpr);
 				
 				cellItr++;
 			}
@@ -80,7 +81,7 @@
 			
 			//addChild(cells.rend(0,palette,tiles))
 			
-			addChild(cells.cells[0].rendBoxes());
+			//addChild(cells.cells[0]);
 			
 			/*
 			var screenData:ByteArray=nds.fileSystem.openFileByName("data/BG1.NSCR");

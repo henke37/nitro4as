@@ -14,6 +14,7 @@
 		private static const PRE_PAL_AND_SUB:uint=1;
 		private static const POST_PAL_AND_SUB:uint=2;
 		private static const POST_PAL_NO_SUB:uint=3;
+		private static const POST_PAL_NO_CER:uint=4;
 
 		public function GraphicsExtractScreen() {
 			// constructor code
@@ -38,7 +39,11 @@
 			queue=new Vector.<QueueEntry>();
 			
 			queue.push(new QueueEntry("com/bustup.bin",PRE_PAL_AND_SUB));
-			//queue.push(new QueueEntry("com/mapchar.bin",PRE_PAL_AND_SUB));
+			queue.push(new QueueEntry("com/mapchar.bin",PRE_PAL_AND_SUB));
+			//queue.push(new QueueEntry("com/logicbg.bin",POST_PAL_NOCER));
+			//queue.push(new QueueEntry("com/logic_keyword.bin",POST_PAL_AND_SUB));
+			//queue.push(new QueueEntry("com/cutobj.bin",POST_PAL_AND_SUB));
+			//queue.push(new QueueEntry("com/logicin.bin",POST_PAL_NO_SUB));
 			
 			var estimate:uint=0;
 			
@@ -84,7 +89,7 @@
 					log("loaded special palette # 112");
 				}
 				
-				var subArchive:GKSubarchive=new GKSubarchive();
+				subArchive=new GKSubarchive();
 				subArchive.parse(contents);
 				
 				tiles=new NCGR();
@@ -99,6 +104,15 @@
 				nextCell();
 				
 				if(inSubArchive) return true;
+			} else if(type=="ncgr") {
+				tiles=new NCGR();
+				tiles.parse(contents);
+				if(tiles.independentRenderPossible) {
+					saveBitmap(fileName,tiles.render(palette.colors));
+					log("Extracted \""+fileName+"\".");
+				} else {
+					log("Skipping \""+fileName+"\" since it can't be drawn independently.");
+				}
 			}
 			
 			
@@ -127,7 +141,7 @@
 			if(cellR.width==0 || cellR.height==0) {
 				log("Skipping cell # "+cellItr+" since it is empty");
 			} else {
-				saveBitmap(fileName+"/"+cellItr+".png",cellR);
+				saveBitmap(fileName+"/"+cellItr,cellR);
 				
 				log("Extracted cell # "+cellItr);
 			}
@@ -152,7 +166,7 @@
 			
 			var png:ByteArray=PNGEncoder.encode(bmd);
 			
-			saveFile(name,png);
+			saveFile(name+".png",png);
 		}
 
 	}

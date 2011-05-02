@@ -15,7 +15,7 @@
 			
 			for each(var oam:CellOam in oams) {
 				
-				var oamR:DisplayObject=oam.rend(palette.colors,tiles,useSubImages,useTranparency);
+				var oamR:DisplayObject=tiles.renderOam(oam,palette.colors,useSubImages,useTranparency);
 				
 				
 				oamR.x=oam.x;

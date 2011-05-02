@@ -77,14 +77,74 @@
 			
 		}
 		
-		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true) {
+		private function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean) {
+			var tile:Tile=tiles[subTileIndex];
+			var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
+			return tileR;
+		}
+		
+		public function renderOam(oam:CellOam,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
 			if(tiles) {
-				var tile:Tile=tiles[subTileIndex];
-				var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
-				return tileR;
+				return renderTileOam(oam,palette,subImages,useTransparency);
 			} else {
-				throw new Error();
+				return renderPictureOam(oam,palette,useTransparency);
 			}
+		}
+		
+		private function renderPictureOam(oam:CellOam,palette:Vector.<uint>,useTransparency:Boolean): DisplayObject {
+			var bmd:BitmapData=new BitmapData(oam.width,oam.height,useTransparency);
+			bmd.lock();
+			
+			const offset:uint=oam.tileIndex*128;
+			
+			for(var y:uint=0;y<oam.height;++y) {
+				for(var x:uint=0;x<oam.width;++x) {
+					var ci:uint=picture[x+y*oam.width+offset];
+					if(ci==0 && useTransparency) {
+						bmd.setPixel32(x,y,0x00FFF00F);
+					} else {
+						bmd.setPixel(x,y,palette[ci+oam.paletteIndex*16]);
+					}
+				}
+			}
+			bmd.unlock();
+			return new Bitmap(bmd);
+		}
+		
+		private function renderTileOam(oam:CellOam,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean):DisplayObject {
+			var spr:Sprite=new Sprite();
+			
+			
+			const baseX:uint=oam.tileIndex%tilesX;
+			const baseY:uint=oam.tileIndex/tilesX;
+			
+			const yTiles:uint=oam.height/Tile.height;
+			const xTiles:uint=oam.width/Tile.width;
+			
+			for(var y:uint=0;y<yTiles;++y) {
+				for(var x:uint=0;x<xTiles;++x) {
+					
+					var subTileIndex:uint;
+					
+					if(subImages) {
+						var subTileYIndex:uint=baseY+y;
+						var subTileXIndex:uint=baseX+x;
+						
+						subTileIndex=subTileXIndex+subTileYIndex*tilesX;
+					} else {
+						subTileIndex=oam.tileIndex+x+y*xTiles;
+					}
+					
+					var tileR:DisplayObject=renderTile(subTileIndex,palette,oam.paletteIndex,useTransparency);
+					
+					tileR.x=Tile.width*x;
+					tileR.y=Tile.height*y;
+					
+					spr.addChild(tileR);
+				}
+			}
+			
+			return spr;
 		}
 		
 		public function render(palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true):Sprite {
@@ -109,6 +169,10 @@
 			} else {
 				throw Error("unimplemented");
 			}
+		}
+		
+		public function get independentRenderPossible():Boolean {
+			return tiles && xTiles!=0xFFFF && yTiles!=0xFFFF;
 		}
 
 	}
