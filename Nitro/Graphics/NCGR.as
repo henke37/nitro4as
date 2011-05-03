@@ -77,10 +77,9 @@
 			
 		}
 		
-		private function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean) {
+		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean):BitmapData {
 			var tile:Tile=tiles[subTileIndex];
-			var tileR:DisplayObject=new Bitmap(tile.toBMD(palette,paletteIndex,useTransparency));
-			return tileR;
+			return tile.toBMD(palette,paletteIndex,useTransparency);
 		}
 		
 		public function renderOam(oam:CellOam,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
@@ -135,7 +134,7 @@
 						subTileIndex=oam.tileIndex+x+y*xTiles;
 					}
 					
-					var tileR:DisplayObject=renderTile(subTileIndex,palette,oam.paletteIndex,useTransparency);
+					var tileR:DisplayObject=new Bitmap(renderTile(subTileIndex,palette,oam.paletteIndex,useTransparency));
 					
 					tileR.x=Tile.width*x;
 					tileR.y=Tile.height*y;

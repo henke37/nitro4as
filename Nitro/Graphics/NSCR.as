@@ -95,11 +95,9 @@
 					var bmd:BitmapData;
 					if(paletteCache[entry.tile]) {
 						bmd=paletteCache[entry.tile];
-						tile=null;
 						//hits++;
 					} else {
-						var tile:Tile=tiles.tiles[entry.tile];
-						bmd=tile.toBMD(palette.colors,entry.palette,useTransparency);
+						bmd=tiles.renderTile(entry.tile,palette.colors,entry.palette,useTransparency);
 						paletteCache[entry.tile]=bmd;
 						//misses++;
 					}
