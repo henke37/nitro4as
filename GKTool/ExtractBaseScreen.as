@@ -14,11 +14,10 @@
 		private var realScreen:ExtractScreen;
 		
 		protected var fileCount:uint;
-		private var _progress:uint;
 		
 		private var startTime:uint;
 		
-		protected var checkpoints:Vector.<uint>;
+		
 
 		public function ExtractBaseScreen() {
 			realScreen=new ExtractScreen();
@@ -26,10 +25,10 @@
 		}
 		
 		protected override function init():void {
-			realScreen.selectDir_btn.addEventListener(MouseEvent.CLICK,selectDir);
-			realScreen.abort_btn.visible=false;
-			realScreen.abort_btn.addEventListener(MouseEvent.CLICK,abort);
-			realScreen.menu_btn.addEventListener(MouseEvent.CLICK,menu);
+			realScreen.selectDir_mc.addEventListener(MouseEvent.CLICK,selectDir);
+			realScreen.abort_mc.visible=false;
+			realScreen.abort_mc.addEventListener(MouseEvent.CLICK,abort);
+			realScreen.menu_mc.addEventListener(MouseEvent.CLICK,menu);
 		}
 		
 		private function selectDir(e:MouseEvent):void {
@@ -39,18 +38,18 @@
 		}
 		
 		private function dirSelected(e:Event):void {
-			realScreen.selectDir_btn.visible=false;
+			realScreen.selectDir_mc.visible=false;
 			initExtraction();
 		}
 		
 		private function initExtraction():void {
 			
-			realScreen.abort_btn.visible=true;
-			realScreen.menu_btn.visible=false;
+			realScreen.abort_mc.visible=true;
+			realScreen.menu_mc.visible=false;
 			
 			startTime=getTimer();
 			
-			fileCount=beginExtraction();
+			realScreen.progress_mc.total=beginExtraction();
 			
 			realScreen.status_txt.text="";
 			
@@ -70,8 +69,8 @@
 		
 		private function endOperation():void {
 			removeEventListener(Event.ENTER_FRAME,extractMoreFiles);
-			realScreen.abort_btn.visible=false;
-			realScreen.menu_btn.visible=true;
+			realScreen.abort_mc.visible=false;
+			realScreen.menu_mc.visible=true;
 		}
 		
 		protected function beginExtraction():uint { return 0}
@@ -118,46 +117,10 @@
 			return o;
 		}
 		
-		protected function get progress():uint { return _progress; }
-		protected function set progress(p:uint):void {
-			
-			_progress=p;
-			
-			var g:Graphics=realScreen.progress_mc.graphics;
-			
-			g.clear();
-			
-			var pc:Number=Number(p)/fileCount;
-			
-			const w:Number=540;
-			const h:Number=40;
-			
-			g.lineStyle(1);
-			
-			g.beginFill(0x0040FF);
-			g.drawRect(0,0,w*pc,h);
-			g.endFill();
-			
-			if(checkpoints) {
-				
-				for each(var checkpoint:uint in checkpoints) {
-					
-					if(checkpoint<p) {
-						g.lineStyle(1,0x00FFFF);
-					} else {
-						g.lineStyle(1,0x006060);
-					}
-					
-					var xPos:Number=Number(checkpoint)/fileCount*w;
-					g.moveTo(xPos,0);
-					g.lineTo(xPos,h);
-				}
-			}
-			
-			g.lineStyle(1);
-			
-			g.drawRect(0,0,w,h);
-		}
+		protected function get progress():uint { return realScreen.progress_mc.progress; }
+		protected function set progress(p:uint):void { realScreen.progress_mc.progress=p; }
+		protected function get checkpoints():Vector.<uint> { return realScreen.progress_mc.checkpoints; }
+		protected function set checkpoints(c:Vector.<uint>):void { realScreen.progress_mc.checkpoints=c; }
 	}
 	
 }

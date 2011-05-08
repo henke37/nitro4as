@@ -42,6 +42,29 @@
 			o.position=0;
 			return o;
 		}
+		
+		public function build(files:Vector.<ByteArray>):void {
+			_data=new ByteArray();
+			_data.endian=Endian.LITTLE_ENDIAN;
+			
+			var offset:uint=(files.length+1)*4;
+			
+			offsets=new Vector.<uint>();
+			
+			for each(var file:ByteArray in files) {
+				_data.writeUnsignedInt(offset);
+				
+				offsets.push(offset);
+				
+				offset+=file.length;
+			}
+			
+			for each(file in files) {
+				_data.writeBytes(file);
+			}
+		}
+		
+		public function get data():ByteArray { return _data; }
 
 	}
 	
