@@ -47,12 +47,20 @@
 			
 			var estimate:uint=0;
 			
+			checkpoints=new Vector.<uint>();
+			checkpoints.length=queue.length;
+			checkpoints.fixed=true;
+			
+			queuePosition=0;
+			
 			for each(queueEntry in queue) {
 				queueEntry.archive=new GKArchive();
 				queueEntry.archive.parse(gkTool.nds.fileSystem.openFileByName(queueEntry.file));
 				estimate+=queueEntry.archive.length;
+				checkpoints[queuePosition++]=estimate;
 			}
 			
+			queuePosition=0;
 			
 			return estimate;
 		}
@@ -72,13 +80,12 @@
 			
 			contents.position=0;
 			
-			if(fileName=="com/bustup.bin/112") {
-				log("Skipping special palette #"+archivePosition);
-			} else if(inSubArchive) {
+			if(inSubArchive) {
 				nextCell();
 				
 				if(inSubArchive) return true;
-				
+			} else if(fileName=="com/bustup.bin/112") {
+				log("Skipping special palette #"+archivePosition);
 			} else if(type=="nclr") {
 				loadPalette(contents);
 				log("loaded palette \""+fileName+"\".");
@@ -101,7 +108,9 @@
 				
 				cellItr=0;
 				
-				nextCell();
+				if(queueEntry.mode==PRE_PAL_AND_SUB) {				
+					nextCell();
+				}
 				
 				if(inSubArchive) return true;
 			} else if(type=="ncgr") {

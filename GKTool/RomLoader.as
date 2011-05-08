@@ -8,22 +8,17 @@
 	
 	import Nitro.FileSystem.*;
 	
-	public class WellcomeScreen extends Screen {
-		
-		public var text_txt:TextField;
+	public class RomLoader extends EventDispatcher {
 		
 		public var load_btn:SimpleButton;
 		
 		private var fr:FileReference;
 		
-		public function WellcomeScreen() {
-			// constructor code
-		}
+		private var menu:MainMenu;
 		
-		protected override function init():void {
-			text_txt.text=text_txt.text.replace("$version",GKTool.GKTool.version);
-			
-			load_btn.addEventListener(MouseEvent.CLICK,clickLoad);
+		public function RomLoader(m:MainMenu) {
+			menu=m;
+			menu.loadRom_mc.addEventListener(MouseEvent.CLICK,clickLoad);
 		}
 		
 		private function clickLoad(e:MouseEvent):void {
@@ -34,10 +29,10 @@
 		}
 		
 		private function fileSelected(e:Event):void {
-			load_btn.removeEventListener(MouseEvent.CLICK,clickLoad);
+			menu.loadRom_mc.removeEventListener(MouseEvent.CLICK,clickLoad);
 			
 			fr.addEventListener(Event.COMPLETE,frLoaded);
-			text_txt.text="Loading data...";
+			menu.status_txt.text="Loading data...";
 			fr.load();
 			
 		}
@@ -51,14 +46,21 @@
 				if(nds.gameCode!="BXOJ") {
 					throw new Error("Wrong game loaded");
 				}
+				
 			} catch(err:Error) {
-				text_txt.text="Loading failed:\n"+err.message;
+				menu.status_txt.text="Loading failed:\n"+err.message;
 				load_btn.addEventListener(MouseEvent.CLICK,clickLoad);
 				return;
 			}
 			
+			menu.status_txt.text="ROM Loaded.";
+			
 			gkTool.nds=nds;
-			gkTool.section=new MainMenu();
+			dispatchEvent(new Event(Event.COMPLETE));
+		}
+		
+		protected function get gkTool():GKTool {
+			return GKTool(menu.parent);
 		}
 	}
 	

@@ -17,6 +17,8 @@
 		private var _progress:uint;
 		
 		private var startTime:uint;
+		
+		protected var checkpoints:Vector.<uint>;
 
 		public function ExtractBaseScreen() {
 			realScreen=new ExtractScreen();
@@ -63,7 +65,7 @@
 		}
 		
 		private function menu(e:MouseEvent):void {
-			gkTool.section=new MainMenu();
+			gkTool.screen="MainMenu";
 		}
 		
 		private function endOperation():void {
@@ -131,10 +133,30 @@
 			const h:Number=40;
 			
 			g.lineStyle(1);
-			g.drawRect(0,0,w,h);
+			
 			g.beginFill(0x0040FF);
 			g.drawRect(0,0,w*pc,h);
 			g.endFill();
+			
+			if(checkpoints) {
+				
+				for each(var checkpoint:uint in checkpoints) {
+					
+					if(checkpoint<p) {
+						g.lineStyle(1,0x00FFFF);
+					} else {
+						g.lineStyle(1,0x006060);
+					}
+					
+					var xPos:Number=Number(checkpoint)/fileCount*w;
+					g.moveTo(xPos,0);
+					g.lineTo(xPos,h);
+				}
+			}
+			
+			g.lineStyle(1);
+			
+			g.drawRect(0,0,w,h);
 		}
 	}
 	

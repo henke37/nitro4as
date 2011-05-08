@@ -1,6 +1,7 @@
 ﻿package GKTool {
 	
 	import flash.display.*;
+	import flash.utils.*;
 	
 	import Nitro.FileSystem.*;
 	
@@ -9,26 +10,44 @@
 		
 		internal var nds:NDS;
 		
-		private var _section:Screen;
+		private var _screen:Screen;
+		private var _screenId:String;
+		private var screens:Object;
 		
 		public static const version:String="v 1.3";
 
-		public function GKTool() {
-			section=new WellcomeScreen();
-			
+		public function GKTool() {			
 			stage.align=StageAlign.TOP_LEFT;
+			
+			screens={};
+			
+			screen="MainMenu";
 		}
 		
-		public function set section(s:Screen):void {
+		public function set screen(s:String):void {
 			
-			if(_section) {
-				removeChild(_section);
+			if(_screen) {
+				removeChild(_screen);
 			}
 			
-			_section=s;
+			_screenId=s;
 			
-			addChild(_section);
+			if(s in screens) {
+				_screen=screens[s];
+			} else {
+				_screen=new (getDefinitionByName("GKTool."+s) as Class);
+				screens[s]=_screen;
+			}
 			
+			addChild(_screen);
+			
+		}
+		
+		private function screenList():void {
+			throw new Error();
+			FileExtractScreen;
+			GraphicsExtractScreen;
+			RepackScreen;
 		}
 
 	}

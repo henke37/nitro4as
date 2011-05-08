@@ -13,6 +13,7 @@
 		}
 		
 		private function added(e:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE,added);
 			init();
 		}
 		

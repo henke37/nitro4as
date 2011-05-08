@@ -21,7 +21,9 @@
 			offsets.push(firstFile);
 			
 			while(data.position<firstFile) {
-				offsets.push(data.readUnsignedInt());
+				var offset:uint=data.readUnsignedInt();
+				if(offset>data.length) throw new ArgumentError("Offset that points outside of the file found");
+				offsets.push(offset);
 			}
 			offsets.fixed=true;
 		}

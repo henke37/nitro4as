@@ -26,6 +26,8 @@
 				entry.offset=data.readUnsignedInt();
 				entry.size=data.readUnsignedInt();
 				
+				if(entry.offset>data.length) throw new ArgumentError("Offset that points outside of the file found");
+				
 				entry.compressed=Boolean(entry.size & 0x80000000);
 				entry.size&=0x00FFFFFF;
 				

@@ -36,6 +36,10 @@
 			archiveFileNames.length=binFiles.length;
 			archiveFileNames.fixed=true;
 			
+			checkpoints=new Vector.<uint>();
+			checkpoints.length=binFiles.length;
+			checkpoints.fixed=true;
+			
 			var i:uint=0;
 			
 			for each(var archiveFile:File in binFiles) {
@@ -47,6 +51,7 @@
 				archiveFileNames[i]=archiveFileName;
 				
 				estimate+=archive.length;
+				checkpoints[i]=estimate;
 				++i;
 			}
 			
