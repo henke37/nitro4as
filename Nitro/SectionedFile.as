@@ -9,6 +9,7 @@
 		private var mainId:String;
 		
 		private static const sectionHeaderSize:uint=8;
+		private static const headerSize:uint=0x10;
 
 		public function SectionedFile() {
 			// constructor code
@@ -77,6 +78,33 @@
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
 			
 			return id in sections;
+		}
+		
+		public function build(id:String,sectionList:Object):void {
+			_data=new ByteArray();
+			_data.endian=Endian.LITTLE_ENDIAN;
+			
+			var totalSize:uint=headerSize;
+			
+			var sectionCount:uint=0;
+			
+			for each(var sectionData:ByteArray in sectionList) {
+				totalSize+=sectionData.length;
+				++sectionCount;
+			}
+			
+			_data.writeUTFBytes(id);
+			_data.writeUnsignedInt(0x0100FEFF);
+			_data.writeUnsignedInt(totalSize);
+			_data.writeShort(headerSize);
+			_data.writeShort(sectionCount);
+			
+			for(var sectionID:String in sectionList) {
+				_data.writeUTFBytes(sectionID);
+				sectionData=sectionList[sectionID];
+				_data.writeUnsignedInt(sectionData.length);
+				_data.writeBytes(sectionData);
+			}
 		}
 
 	}

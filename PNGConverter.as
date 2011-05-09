@@ -18,6 +18,9 @@
 		private var loader:Loader;
 		
 		public var status_txt:TextField;
+		public var load_btn:SimpleButton;
+		public var palette_btn:SimpleButton;
+		public var tiles_btn:SimpleButton;
 		
 		public function PNGConverter() {
 			creator=new NCGRCreator();
@@ -26,7 +29,20 @@
 			
 			status_txt.text="Click to load picture";
 			
-			stage.addEventListener(MouseEvent.CLICK,selectPicture);
+			load_btn.addEventListener(MouseEvent.CLICK,selectPicture);
+			palette_btn.addEventListener(MouseEvent.CLICK,savePalette);
+			tiles_btn.addEventListener(MouseEvent.CLICK,saveTiles);
+		}
+		
+		private function savePalette(e:MouseEvent):void {
+			var nclr:NCLR=new NCLR();
+			nclr.colors=creator.palette;
+			fr.save(nclr.save(),"p.nclr");
+		}
+		
+		private function saveTiles(e:MouseEvent):void {
+			
+			fr.save(creator.ncgr.save(),"p.ncgr");
 		}
 		
 		private function selectPicture(e:Event):void {
@@ -37,7 +53,7 @@
 		private function fileSelected(e:Event):void {
 			fr.removeEventListener(Event.SELECT,fileSelected);
 			fr.addEventListener(Event.COMPLETE,fileLoaded);
-			status_txt.text="Generating optimal palette.";
+			status_txt.text="Picture converted.";
 			fr.load();
 		}
 		
@@ -59,9 +75,7 @@
 			
 			creator.buildTiles(true);
 			
-			var palette:Vector.<uint>=RGB555.paletteFromRGB555(creator.palette);
-			
-			var render:DisplayObject=creator.ncgr.render(palette);
+			var render:DisplayObject=creator.ncgr.render(creator.palette);
 			render.x=b.width;
 			addChild(render);
 		}

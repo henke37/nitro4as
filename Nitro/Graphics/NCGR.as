@@ -77,6 +77,10 @@
 			
 		}
 		
+		public function save():ByteArray {
+			return null;
+		}
+		
 		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean):BitmapData {
 			var tile:Tile=tiles[subTileIndex];
 			return tile.toBMD(palette,paletteIndex,useTransparency);
@@ -98,11 +102,13 @@
 			
 			for(var y:uint=0;y<oam.height;++y) {
 				for(var x:uint=0;x<oam.width;++x) {
-					var ci:uint=picture[x+y*oam.width+offset];
-					if(ci==0 && useTransparency) {
+					var color:uint=picture[x+y*oam.width+offset];
+					if(color==0 && useTransparency) {
 						bmd.setPixel32(x,y,0x00FFF00F);
 					} else {
-						bmd.setPixel(x,y,palette[ci+oam.paletteIndex*16]);
+						color=palette[color+oam.paletteIndex*16];
+						color=RGB555.fromRGB555(color);
+						bmd.setPixel(x,y,color);
 					}
 				}
 			}

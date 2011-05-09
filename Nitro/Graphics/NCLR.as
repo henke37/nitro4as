@@ -50,7 +50,7 @@
 			colors.length=paletteSize;
 			
 			for(var i:uint=0;i<paletteSize;++i) {
-				colors[i]=RGB555.read555Color(section);
+				colors[i]=section.readUnsignedShort();
 			}
 			
 		}
@@ -58,6 +58,32 @@
 		private function parsePCMP(section:ByteArray):void {
 			section.endian=Endian.LITTLE_ENDIAN;
 			paletteCount=section.readUnsignedShort();
+		}
+		
+		public function save():ByteArray {
+			var sections:SectionedFile=new SectionedFile();
+			
+			var sectionList:Object={ TTLP:writeTTLP() };
+			
+			sections.build("RLCN",sectionList);
+			return sections.data;
+		}
+		
+		private function writeTTLP():ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
+			o.writeShort(bitDepth==4?3:4);
+			o.writeShort(0);//unknown
+			o.writeUnsignedInt(0);//more unknown
+			o.writeUnsignedInt(colors.length*RGB555.byteSize);
+			o.writeUnsignedInt(o.position+4);
+			
+			for each(var color:uint in colors) {
+				o.writeShort(color);
+			}
+			
+			return o;
 		}
 
 	}
