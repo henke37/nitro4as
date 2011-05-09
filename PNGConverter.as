@@ -56,6 +56,14 @@
 			b.scaleX=4;
 			b.scaleY=b.scaleX;
 			addChild(b);
+			
+			creator.buildTiles(true);
+			
+			var palette:Vector.<uint>=RGB555.paletteFromRGB555(creator.palette);
+			
+			var render:DisplayObject=creator.ncgr.render(palette);
+			render.x=b.width;
+			addChild(render);
 		}
 	}
 	

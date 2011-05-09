@@ -39,6 +39,30 @@
 			return (b << 10) | (g << 5) | r;
 		}
 		
+		public static function paletteToRGB555(p:Vector.<uint>):Vector.<uint> {
+			var np:Vector.<uint>=new Vector.<uint>();
+			np.length=p.length;
+			np.fixed=true;
+			
+			for(var i:uint=0;i<np.length;++i) {
+				np[i]=toRGB555(p[i]);
+			}
+			
+			return np;
+		}
+		
+		public static function paletteFromRGB555(p:Vector.<uint>):Vector.<uint> {
+			var np:Vector.<uint>=new Vector.<uint>();
+			np.length=p.length;
+			np.fixed=true;
+			
+			for(var i:uint=0;i<np.length;++i) {
+				np[i]=fromRGB555(p[i]);
+			}
+			
+			return np;
+		}
+		
 		private static function colorScaleUp(x:uint):uint {
 			return x<<3 | x >>> 2;
 		}

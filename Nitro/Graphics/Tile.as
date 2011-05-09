@@ -10,16 +10,14 @@
 		public static const height:uint=8;
 
 		public function Tile() {
-			// constructor code
+			pixels=new Vector.<uint>();
+			pixels.length=width*height;
+			pixels.fixed=true;
 		}
 		
 		public function readTile(bits:uint,data:ByteArray):void {
 			
 			if(bits!=4 && bits!=8) throw new ArgumentError("Only 4 and 8 bit tiles are supported!");
-			
-			pixels=new Vector.<uint>();
-			pixels.length=width*height;
-			pixels.fixed=true;
 			
 			var x:uint,y:uint;
 			var index:uint;
@@ -82,6 +80,64 @@
 			renderedUseTransparency=useTransparency;
 			
 			return bmd;
+		}
+		
+		public static function fromBitmap(colorIndexes:Object,useTransparency:Boolean,bmd:BitmapData,xStart:uint,yStart:uint):Tile {
+			var tile:Tile=new Tile();
+			
+			for(var y:uint=0;y<height;++y) {
+				for(var x:uint=0;x<width;++x) {
+					var index:uint=x+y*width;
+					var color:uint=bmd.getPixel32(x+xStart,y+yStart);
+					
+					var alpha:uint=color >>> 24;
+					
+					if(alpha < 0x80 && useTransparency) {
+						tile.pixels[index]=0;
+						continue;
+					}
+					
+					color=RGB555.toRGB555(color);
+					
+					if(color in colorIndexes) {
+						tile.pixels[index]=colorIndexes[color];
+					} else {
+						tile.pixels[index]=0;
+					}
+				}
+			}
+			
+			return tile;
+		}
+		
+		public function writeTile(bits:uint,data:ByteArray):void {
+			if(bits!=4 && bits!=8) throw new ArgumentError("Only 4 and 8 bit tiles are supported!");
+			
+			var x:uint,y:uint;
+			var index:uint;
+			
+			if(bits==4) {
+				
+				for(y=0;y<height;++y) {
+					for(x=0;x<width;) {
+						var nibble:uint;
+						
+						index=(x++)+y*width;						
+						nibble=pixels[index] & 0xF;
+						
+						index=(x++)+y*width;						
+						nibble|=(pixels[index] & 0xF )<<4 ;
+						data.writeByte(nibble);
+					}
+				}
+			} else if(bits==8) {
+				for(y=0;y<height;++y) {
+					for(x=0;x<width;) {
+						index=(x++)+y*width;
+						data.writeByte(pixels[index]);
+					}
+				}
+			}
 		}
 	}
 	

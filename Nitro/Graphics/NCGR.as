@@ -8,7 +8,7 @@
 	public class NCGR {
 		
 		private var tiles:Vector.<Tile>;
-		private  var picture:Vector.<uint>;
+		private var picture:Vector.<uint>;
 		
 		public var tilesX:uint,tilesY:uint;
 		public var gridX:uint,gridY:uint;
@@ -172,6 +172,12 @@
 		
 		public function get independentRenderPossible():Boolean {
 			return tiles && tilesX!=0xFFFF && tilesY!=0xFFFF;
+		}
+		
+		internal function loadTiles(ts:Vector.<Tile>,tx:uint,ty:uint):void {
+			tiles=ts;
+			tilesX=tx;
+			tilesY=ty;
 		}
 
 	}

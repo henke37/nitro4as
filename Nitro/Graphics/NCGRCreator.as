@@ -10,13 +10,20 @@
 		public var palette:Vector.<uint>;
 		
 		private const paletteMaxLen:uint=256;
+		
+		public var ncgr:NCGR;
 
 		public function NCGRCreator() {
-			// constructor code
+			ncgr=new NCGR();
 		}
 		
 		//load picture
 		public function set pic(p:BitmapData):void {
+			
+			if(!p) throw new ArgumentError("Pic can not be null!");
+			if(p.width%Tile.width!=0) throw new ArgumentError("Pic must be evenly divideable with the tile width ("+Tile.width+")!");
+			if(p.height%Tile.height!=0) throw new ArgumentError("Pic must be evenly divideable with the tile height ("+Tile.height+")!");
+			
 			picture=p;
 		}
 		
@@ -58,6 +65,10 @@
 			}
 			colorOrder=colorOrder.sort(sortComp);
 			
+			if(colorOccurances[colorOrder[paletteMaxLen]]>0) throw new ArgumentError("Picture has more colors than fits in the palette!");
+			
+			
+			
 			palette=new Vector.<uint>();
 			palette.length=paletteMaxLen;
 			palette.fixed=true;
@@ -75,9 +86,36 @@
 		
 		//save palette
 		
-		
 		//build tiles
-		//save tiles
+		public function buildTiles(useTransparency:Boolean):void {
+			var colorIndexes:Object={};
+			var i:uint;
+			
+			for each(var color:uint in palette) {
+				colorIndexes[color]=i++;
+			}
+			
+			const tilesY:uint=picture.height/Tile.height;
+			const tilesX:uint=picture.width/Tile.width;
+			
+			var tiles:Vector.<Tile>=new Vector.<Tile>();
+			tiles.length=tilesX*tilesY;
+			tiles.fixed=true;
+			
+			for(var tileY:uint=0;tileY<tilesY;++tileY) {
+				for(var tileX:uint=0;tileX<tilesX;++tileX) {
+					var tile:Tile=Tile.fromBitmap(colorIndexes,useTransparency,picture,tileX*Tile.width,tileY*Tile.height);
+					var tileIndex:uint=tileY*tilesX+tileX;
+					tiles[tileIndex]=tile;
+				}
+			}
+			
+			//save tiles
+			ncgr.loadTiles(tiles,tilesX,tilesY);
+			
+		}
+		
+		
 
 		
 	}
