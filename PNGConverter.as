@@ -36,6 +36,7 @@
 		
 		private function savePalette(e:MouseEvent):void {
 			var nclr:NCLR=new NCLR();
+			nclr.bitDepth=creator.ncgr.bitDepth;
 			nclr.colors=creator.palette;
 			fr.save(nclr.save(),"p.nclr");
 		}

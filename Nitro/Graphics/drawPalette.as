@@ -22,11 +22,9 @@
 		bmd.lock();
 		
 		i=0;		
-		for(var y:uint=0;y<bmd.height;++y) {
-			for(var x:uint=0;x<bmd.width;++x) {
-				var c:uint=palette[i++];
-				bmd.setPixel(x,y,c);
-			}
+		for(i=0;i<palette.length;++i) {
+			var c:uint=palette[i];
+			bmd.setPixel(i%bmd.width,i/bmd.width,c);
 		}
 		
 		bmd.unlock();

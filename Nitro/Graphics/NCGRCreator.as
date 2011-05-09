@@ -9,8 +9,6 @@
 		
 		public var palette:Vector.<uint>;
 		
-		private const paletteMaxLen:uint=256;
-		
 		public var ncgr:NCGR;
 
 		public function NCGRCreator() {
@@ -65,9 +63,16 @@
 			}
 			colorOrder=colorOrder.sort(sortComp);
 			
+			var paletteMaxLen:uint=256;
+			
 			if(colorOccurances[colorOrder[paletteMaxLen]]>0) throw new ArgumentError("Picture has more colors than fits in the palette!");
 			
-			
+			for(i=0;i<256;++i) {
+				if(colorOccurances[colorOrder[i]]==0) {
+					paletteMaxLen=i+1;
+					break;
+				}
+			}
 			
 			palette=new Vector.<uint>();
 			palette.length=paletteMaxLen;
@@ -111,6 +116,7 @@
 			}
 			
 			//save tiles
+			ncgr.bitDepth=(palette.length<=16?4:8);
 			ncgr.loadTiles(tiles,tilesX,tilesY);
 			
 		}

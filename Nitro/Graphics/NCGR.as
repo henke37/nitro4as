@@ -27,6 +27,11 @@
 			
 			var section:ByteArray=sections.open("RAHC");
 			
+			parseRAHC(section);
+		}
+		
+		private function parseRAHC(section:ByteArray):void {
+			
 			section.endian=Endian.LITTLE_ENDIAN;
 			
 			tilesX=section.readUnsignedShort();
@@ -78,7 +83,50 @@
 		}
 		
 		public function save():ByteArray {
-			return null;
+			var sections:SectionedFile=new SectionedFile();
+			
+			var sectionList:Object={ RAHC: writeRAHC() };
+			
+			sections.build("RGCN",sectionList);
+			
+			return sections.data;
+		}
+		
+		private function writeRAHC():ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
+			o.writeShort(tilesY);
+			o.writeShort(tilesX);
+			
+			
+			o.writeUnsignedInt(bitDepth==4?3:4);
+			
+			o.writeShort(gridX);
+			o.writeShort(gridY);
+			
+			o.writeUnsignedInt(tiles?0:1);
+			
+			var dataSize:uint;
+			if(tiles) {
+				dataSize=tiles.length*Tile.height*Tile.width;
+			} else {
+				dataSize=picture.length;
+			}
+			if(bitDepth==4) dataSize>>>=1;
+			
+			o.writeUnsignedInt(dataSize);
+			o.writeUnsignedInt(o.position+4);
+			
+			if(tiles) {
+				for each(var tile:Tile in tiles) {
+					tile.writeTile(bitDepth,o);
+				}
+			} else {
+				throw new Error("Not implemented for non tiled graphics!");
+			}
+			
+			return o;
 		}
 		
 		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean):BitmapData {
