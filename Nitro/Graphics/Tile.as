@@ -68,7 +68,6 @@
 						bmd.setPixel32(x,y,0x00FFFF00);
 					} else {
 						color=palette[color+paletteOffset*16];
-						color=RGB555.fromRGB555(color);
 						bmd.setPixel(x,y,color);
 					}
 				}

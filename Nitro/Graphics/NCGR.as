@@ -34,8 +34,9 @@
 			
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			tilesX=section.readUnsignedShort();
 			tilesY=section.readUnsignedShort();
+			tilesX=section.readUnsignedShort();
+			
 			
 			bitDepth=1 << (section.readUnsignedInt()-1);
 			
@@ -116,6 +117,7 @@
 			if(bitDepth==4) dataSize>>>=1;
 			
 			o.writeUnsignedInt(dataSize);
+			
 			o.writeUnsignedInt(o.position+4);
 			
 			if(tiles) {
@@ -155,7 +157,6 @@
 						bmd.setPixel32(x,y,0x00FFF00F);
 					} else {
 						color=palette[color+oam.paletteIndex*16];
-						color=RGB555.fromRGB555(color);
 						bmd.setPixel(x,y,color);
 					}
 				}

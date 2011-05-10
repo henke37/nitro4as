@@ -27,6 +27,7 @@
 		var archivePosition:uint;
 		
 		var palette:NCLR;
+		var convertedPalette:Vector.<uint>;
 		var cells:NCER;
 		var tiles:NCGR;
 		
@@ -142,10 +143,11 @@
 		private function loadPalette(contents:ByteArray):void {
 			palette=new NCLR();
 			palette.parse(contents);
+			convertedPalette=RGB555.paletteFromRGB555(palette.colors);
 		}
 		
 		private function nextCell():void {
-			var cellR:DisplayObject=cells.rend(cellItr,palette,tiles);
+			var cellR:DisplayObject=cells.rend(cellItr,convertedPalette,tiles);
 			
 			if(cellR.width==0 || cellR.height==0) {
 				log("Skipping cell # "+cellItr+" since it is empty");

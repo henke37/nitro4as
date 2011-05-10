@@ -12,6 +12,7 @@
 		public var extractFiles_mc:Button;
 		public var extractChars_mc:Button;
 		public var rebuild_mc:Button;
+		public var convertImg_mc:Button;
 		
 		public var icon_mc:Sprite;
 		
@@ -39,6 +40,8 @@
 			extractChars_mc.enabled=false;
 			rebuild_mc.label="Rebuild archive";
 			rebuild_mc.addEventListener(MouseEvent.CLICK,rebuild);
+			convertImg_mc.label="Convert image";
+			convertImg_mc.addEventListener(MouseEvent.CLICK,convert);
 		}
 		
 		private function fileExtract(e:MouseEvent):void {
@@ -51,6 +54,10 @@
 		
 		private function rebuild(e:MouseEvent):void {
 			gkTool.screen="RepackScreen";
+		}
+		
+		private function convert(e:MouseEvent):void {
+			gkTool.screen="ImageConverter";
 		}
 		
 		private function loaded(e:Event):void {

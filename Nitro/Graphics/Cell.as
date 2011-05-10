@@ -10,12 +10,12 @@
 			// constructor code
 		}
 		
-		internal function rend(palette:NCLR,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+		internal function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
 			var spr:Sprite=new Sprite();
 			
 			for each(var oam:CellOam in oams) {
 				
-				var oamR:DisplayObject=tiles.renderOam(oam,palette.colors,useSubImages,useTranparency);
+				var oamR:DisplayObject=tiles.renderOam(oam,palette,useSubImages,useTranparency);
 				
 				
 				oamR.x=oam.x;

@@ -14,7 +14,7 @@
 		private var _screenId:String;
 		private var screens:Object;
 		
-		public static const version:String="v 2.0";
+		public static const version:String="v 2.1";
 
 		public function GKTool() {			
 			stage.align=StageAlign.TOP_LEFT;

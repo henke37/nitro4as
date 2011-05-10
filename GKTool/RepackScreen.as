@@ -2,14 +2,17 @@
 	
 	import flash.utils.*;
 	import flash.filesystem.*;
-	import Nitro.GK.*;
 	import flash.events.*;
 	import flash.net.*;
+	import flash.text.*;
+	
+	import Nitro.GK.*;
 	
 	public class RepackScreen extends Screen {
 		
 		public var selectDir_mc:Button;
 		public var menu_mc:Button;
+		public var status_txt:TextField;
 		
 		private var inDir:File;
 		
@@ -38,19 +41,21 @@
 		private function selectClick(e:MouseEvent):void {
 			inDir=new File();
 			inDir.addEventListener(Event.SELECT,selected);
-			inDir.browseForDirectory("Direactory to pack");
+			inDir.browseForDirectory("Directory to pack");
 		}
 		
 		private function selected(e:Event):void {
 			trace(inDir.name);
 			if(!inDir.name.match(/\.bin$/i)) {
-				trace("bad folder");
+				status_txt.text="Incorrect folder, it should belong to an extracted \"*.bin\" archive.";
 				return;
 			}
 			
 			buildArchive();
 			
 			saveArchive();
+			
+			status_txt.text="";
 		}
 		
 		private function buildArchive():void {

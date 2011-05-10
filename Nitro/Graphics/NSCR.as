@@ -67,7 +67,7 @@
 			}
 		}
 		
-		public function render(tiles:NCGR,palette:NCLR,useTransparency:Boolean=true):Sprite {
+		public function render(tiles:NCGR,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
 			var spr:Sprite=new Sprite();
 			
 			var tileCache:Object={};
@@ -97,7 +97,7 @@
 						bmd=paletteCache[entry.tile];
 						//hits++;
 					} else {
-						bmd=tiles.renderTile(entry.tile,palette.colors,entry.palette,useTransparency);
+						bmd=tiles.renderTile(entry.tile,convertedPalette,entry.palette,useTransparency);
 						paletteCache[entry.tile]=bmd;
 						//misses++;
 					}

@@ -34,7 +34,9 @@
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
-			var renderedTiles:DisplayObject=tiles.render(palette.colors,0);
+			var convertedPalette:Vector.<uint>=RGB555.paletteFromRGB555(palette.colors);
+			
+			var renderedTiles:DisplayObject=tiles.render(convertedPalette,0);
 			addChild(renderedTiles);
 			
 			
@@ -42,7 +44,7 @@
 			var screen:NSCR=new NSCR();
 			screen.parse(screenData);
 			
-			var rendered:DisplayObject=screen.render(tiles,palette);
+			var rendered:DisplayObject=screen.render(tiles,convertedPalette);
 			//rendered.scaleX=2;
 			//rendered.scaleY=2;
 			rendered.x=renderedTiles.width;

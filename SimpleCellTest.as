@@ -30,11 +30,13 @@
 			var palette:NCLR=new NCLR();
 			palette.parse(paletteData);
 			
+			var convertedPalette:Vector.<uint>=RGB555.paletteFromRGB555(palette.colors);
+			
 			var tileData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCGR");
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
-			var renderedTiles:DisplayObject=tiles.render(palette.colors,0,false);
+			var renderedTiles:DisplayObject=tiles.render(convertedPalette,0,false);
 			addChild(renderedTiles);
 			
 			var cellData:ByteArray=nds.fileSystem.openFileByName("data/Cell_Simple.NCER");
@@ -57,7 +59,7 @@
 				
 				dump.appendChild(cellXML);
 				
-				cellSpr=cells.rend(cellItr,palette,tiles);
+				cellSpr=cells.rend(cellItr,convertedPalette,tiles);
 				
 				cellSpr.x=(cellItr++)*80+100;
 				cellSpr.y=350;

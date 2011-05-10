@@ -44,6 +44,8 @@
 			var tiles:NCGR=new NCGR();
 			tiles.parse(tileData);
 			
+			var convertedPalette:Vector.<uint>=RGB555.paletteFromRGB555(palette.colors);
+			
 			//var renderedTiles:DisplayObject=tiles.render(palette.colors,0,false);
 			//addChild(renderedTiles);
 			
@@ -67,7 +69,7 @@
 				
 				dump.appendChild(cellXML);
 				
-				cellSpr=cells.rend(cellItr,palette,tiles);
+				cellSpr=cells.rend(cellItr,convertedPalette,tiles);
 				//cellSpr=cell.rendBoxes();
 				
 				cellSpr.x=(cellItr%10)*50;

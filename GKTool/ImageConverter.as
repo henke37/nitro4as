@@ -18,18 +18,34 @@
 		private var loader:Loader;
 		
 		public var status_txt:TextField;
-		public var load_btn:SimpleButton;
-		public var palette_btn:SimpleButton;
-		public var tiles_btn:SimpleButton;
+		public var load_mc:Button;
+		public var palette_mc:Button;
+		public var tiles_mc:Button;
+		public var menu_mc:Button;
 		
-		public function PNGConverter() {
+		private var output:Sprite;
+		
+		public function ImageConverter() {
 			creator=new NCGRCreator();
 			
-			fr=new FileReference();
+			output=new Sprite();
+			addChild(output);
 			
-			load_btn.addEventListener(MouseEvent.CLICK,selectPicture);
-			palette_btn.addEventListener(MouseEvent.CLICK,savePalette);
-			tiles_btn.addEventListener(MouseEvent.CLICK,saveTiles);
+			fr=new FileReference();
+			load_mc.label="Load image";
+			load_mc.addEventListener(MouseEvent.CLICK,selectPicture);
+			palette_mc.label="Save nclr";
+			palette_mc.enabled=false;
+			palette_mc.addEventListener(MouseEvent.CLICK,savePalette);
+			tiles_mc.label="Save ncgr";
+			tiles_mc.enabled=false;
+			tiles_mc.addEventListener(MouseEvent.CLICK,saveTiles);
+			menu_mc.label="Back to menu";
+			menu_mc.addEventListener(MouseEvent.CLICK,menuClick);
+		}
+		
+		private function menuClick(e:MouseEvent):void {
+			gkTool.screen="MainMenu";
 		}
 		
 		private function savePalette(e:MouseEvent):void {
@@ -63,19 +79,37 @@
 		}
 		
 		private function picLoaded(e:Event):void {
-			creator.pic=Bitmap(loader.content).bitmapData;
-			creator.findPalette();
 			
-			var b:Bitmap=new Bitmap(drawPalette(creator.palette,true));
-			b.scaleX=4;
-			b.scaleY=b.scaleX;
-			addChild(b);
+			while(output.numChildren) output.removeChildAt(output.numChildren-1);
 			
-			creator.buildTiles(true);
+			palette_mc.enabled=false;
+			tiles_mc.enabled=false;
 			
-			var render:DisplayObject=creator.ncgr.render(creator.palette);
-			render.x=b.width;
-			addChild(render);
+			try {
+				creator.pic=Bitmap(loader.content).bitmapData;
+				creator.findPalette();
+			
+				palette_mc.enabled=true;
+			
+				var b:Bitmap=new Bitmap(drawPalette(creator.palette,true));
+				b.scaleX=4;
+				b.scaleY=b.scaleX;
+				output.addChild(b);
+				
+				creator.buildTiles(true);
+				
+				var palette:Vector.<uint>=RGB555.paletteFromRGB555(creator.palette);
+				
+				tiles_mc.enabled=true;
+				
+				var render:DisplayObject=creator.ncgr.render(palette);
+				render.x=b.width;
+				output.addChild(render);
+				
+				status_txt.text="Image converted and ready to save.";
+			} catch(err:Error) {
+				status_txt.text=err.message;
+			}
 		}
 	}
 	
