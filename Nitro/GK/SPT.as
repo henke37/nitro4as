@@ -166,7 +166,7 @@
 				break;
 				
 				case 0xB4AD:
-					return <text speed={commandData[0]} />;
+					return <textSpeed speed={commandData[0]} />;
 				break;
 				
 				case 0xB4AE:

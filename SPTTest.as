@@ -71,7 +71,18 @@
 			
 			trace(scripts);
 			
+			var toBeSorted:Vector.<String>=new Vector.<String>();
 			for (name in frequences) {
+				toBeSorted.push(name);
+			}
+			
+			function compareFrequences(a:String,b:String) {
+				return frequences[b]-frequences[a];
+			}
+			
+			toBeSorted.sort(compareFrequences);
+			
+			for each(name in toBeSorted) {
 				trace(name,frequences[name]);
 			}
 		}
