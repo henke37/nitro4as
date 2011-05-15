@@ -29,6 +29,8 @@
 			
 			var sizeThing:uint=d.readUnsignedShort();
 			
+			//trace(sizeThing,d.length);
+			
 			var unknown:uint=d.readUnsignedShort();
 			
 			sections=new Vector.<Entry>();
@@ -167,8 +169,12 @@
 					return <text speed={commandData[0]} />;
 				break;
 				
-				case 0xb4AE:
+				case 0xB4AE:
 					return <clearTextWindow/>;
+				break;
+				
+				case 0xB4FA:
+					return <charAnim char={commandData[0]} anim={commandData[1]} />;
 				break;
 				
 				case 0xB5E8:

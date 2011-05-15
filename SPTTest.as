@@ -33,6 +33,8 @@
 			
 			var scripts:XML=<scripts file="spt.bin"/>
 			
+			var frequences:Object={};
+			
 			for(var i:uint=0;i<archive.length;++i) {
 				
 				try {
@@ -47,7 +49,17 @@
 					}*/
 					
 					for(var j:uint=0;j<spt.length;++j) {
-						scriptFile.appendChild(spt.parseSection(j));
+						var section:XML=spt.parseSection(j);
+						scriptFile.appendChild(section);
+						for each(var command:XML in section.children()) {
+							var name:String=command.name();
+							if(name=="unknownCommand") name=command.@commandType;
+							if(name in frequences) {
+								frequences[name]++;
+							} else {
+								frequences[name]=1;
+							}
+						}
 					}
 					scripts.appendChild(scriptFile);
 				} catch (err:ArgumentError) {
@@ -55,7 +67,13 @@
 				}
 			}
 			
+			
+			
 			trace(scripts);
+			
+			for (name in frequences) {
+				trace(name,frequences[name]);
+			}
 		}
 	}
 }
