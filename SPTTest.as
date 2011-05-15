@@ -31,12 +31,31 @@
 			var archive:GKArchive=new GKArchive();
 			archive.parse(nds.fileSystem.openFileByName("jpn/spt.bin"));
 			
-			var spt:SPT=new SPT();
-			spt.parse(archive.open(0));
+			var scripts:XML=<scripts file="spt.bin"/>
 			
-			for each(var ent in spt.sections)  {
-				trace(ent.offset,ent.size,ent.flag1,ent.flag2);
+			for(var i:uint=0;i<archive.length;++i) {
+				
+				try {
+			
+					var spt:SPT=new SPT();
+					spt.parse(archive.open(i));
+					
+					var scriptFile:XML=<scriptFile id={i} />;
+					
+					/*for each(var ent in spt.sections)  {
+						trace(ent.offset,ent.size,ent.flag1,ent.flag2);
+					}*/
+					
+					for(var j:uint=0;j<spt.length;++j) {
+						scriptFile.appendChild(spt.parseSection(j));
+					}
+					scripts.appendChild(scriptFile);
+				} catch (err:ArgumentError) {
+					scripts.appendChild(<unknownFile id={i} />);
+				}
 			}
+			
+			trace(scripts);
 		}
 	}
 }

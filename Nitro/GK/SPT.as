@@ -65,6 +65,8 @@
 			var cBuffPos:uint=0;
 			var inCommand:Boolean=false;
 			
+			var o:XML=<scriptSection id={id} />;
+			
 			while(section.position<section.length) {
 				var word:uint=section.readUnsignedShort();
 				
@@ -83,7 +85,7 @@
 					case 0xB5:
 					case 0xB4:
 						if(inCommand) {
-							parseCommand(cBuff);
+							o.appendChild(parseCommand(cBuff));
 							cBuff.length=0;
 							cBuffPos=0;
 						}
@@ -93,7 +95,7 @@
 					
 					default:
 						if(cBuffPos) {
-							parseCommand(cBuff);
+							o.appendChild(parseCommand(cBuff));
 							inCommand=false;
 							cBuff.length=0;
 							cBuffPos=0;
@@ -103,8 +105,10 @@
 				//trace(word.toString(16));
 			}
 			if(cBuffPos) {
-				parseCommand(cBuff);
+				o.appendChild(parseCommand(cBuff));
 			}
+			
+			return o;
 		}
 		
 		private function parseCommand(commandData:Vector.<uint>) {
@@ -120,79 +124,79 @@
 			switch(commandType) {
 				
 				case 0x55A0:
-					trace("newline");
+					return <newline/>;
 				break;
 				
 				case 0xB422:
-					trace("sound",args);
+					return <sound args={args}/>;
 				break;
 				
 				case 0xB47F:
-					trace("flash");
+					return <flash/>;
 				break;
 				
 				case 0xB4A2:
-					trace("wait",commandData[0]);
+					return <wait time={commandData[0]} />;
 				break;
 				
 				case 0xB4AA:
 					switch(commandData[0]) {
 						case 0xAA:
-							trace("show text window");
+							return <textWindow show="1"/>;
 						break;
 						
 						case 0xAB:
-							trace("hide text window");
+							return <textWindow show="0"/>;
 						break;
 						
 						default:
-							trace("unknown command",commandType.toString(16),args);
+							return <unknownCommand commandType={commandType.toString(16)} args={args} />;
 						break;
 					}
 				break;
 				
 				case 0xB4Ab:
-					trace("speaker badge",args);
+					return <speakerBadge args={args} />;
 				break;
 				
 				case 0xB4A8:
-					trace("wait for advance button");
+					return <waitForAdvanceButton/>;
 				break;
 				
 				case 0xB4AD:
-					trace("text speed="+commandData[0]);
+					return <text speed={commandData[0]} />;
 				break;
 				
 				case 0xb4AE:
-					trace("clear window");
+					return <clearTextWindow/>;
 				break;
 				
 				case 0xB5E8:
-					trace("blue text");
+					return <blueText/>;
 				break;
 				
 				case 0xB5E9:
-					trace("green text");
+					return <greenText/>;
 				break;
 				
 				case 0xB5EA:
-					trace("white text");
+					return <whiteText/>;
 				break;
 				
 				case 0xB5EB:
-					trace("orange text");
+					return <orangeText/>;
 				break;
 				
 				case 0xB7A7:
-					trace("center text");
+					return <centerText/>;
 				break;
 				
 				case 0xB7FE:
-					trace("fade",args);
+					return <fade args={args}/>;
 				break;
 			
 				default:
-					trace("unknown command",commandType.toString(16),args);
+					return <unknownCommand commandType={commandType.toString(16)} args={args} />;
 				break;
 			}
 		}
