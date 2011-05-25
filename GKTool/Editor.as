@@ -12,18 +12,18 @@
 		
 		private var tileList:Sprite;
 		
-		private var ncgr:NCGR;
-		private var ncer:NCER;
-		private var nclr:NCLR, convertedPalette:Vector.<uint>;
-		private var archive:GKArchive;
-		private var subarchive:GKSubarchive;
+		internal var ncgr:NCGR;
+		internal var ncer:NCER;
+		internal var nclr:NCLR, convertedPalette:Vector.<uint>;
+		internal var archive:GKArchive;
+		internal var subarchive:GKSubarchive;
 		
 		private var agregator:OAMCollector;
 		
 		private var _boxMode:uint=0;
 		
 		private var canvas:Sprite;
-		private var currentCell:Cell;
+		internal var currentCell:uint;
 		
 		private var editorOams:Vector.<EditorOam>;
 		
@@ -89,19 +89,22 @@
 			_boxMode=m;
 		}
 		
-		public function loadCell(frame:uint):void {
-			currentCell=ncer.cells[frame];
+		public function loadCell(cellNr:uint):void {
+			var cell:Cell=ncer.cells[cellNr];
+			currentCell=cellNr;
 			
 			editorOams=new Vector.<EditorOam>();
-			editorOams.length=currentCell.oams.length;
+			editorOams.length=cell.oams.length;
 			
 			var i:uint=0;
 			
-			for each(var original:CellOam in currentCell.oams) {
+			for each(var original:CellOam in cell.oams) {
 				editorOams[i++]=EditorOam.spawnFromTemplate(original);
 			}
 			
 			selectedOam=null;
+			
+			fileSelector_mc.updateCellNr();
 			
 			flagRender();
 		}

@@ -12,11 +12,33 @@
 		public var ncer_txt:TextField;
 		public var frame_txt:TextField;
 		
+		public var framePlus_mc:MovieClip;
+		public var frameMinus_mc:MovieClip;
+		
 		public function FileSelector() {
 			nclr_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			ncgr_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			ncer_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			frame_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
+			
+			framePlus_mc.addEventListener(MouseEvent.CLICK,nextFrame);
+			frameMinus_mc.addEventListener(MouseEvent.CLICK,prevFrame);
+		}
+		
+		public function updateCellNr():void {
+			
+			framePlus_mc.enabled=editor.currentCell+1<editor.ncer.length;			
+			frameMinus_mc.enabled=editor.currentCell!=0;
+			
+			frame_txt.text=String(editor.currentCell);
+		}
+		
+		private function nextFrame(e:MouseEvent):void {
+			editor.loadCell(editor.currentCell+1);
+		}
+		
+		private function prevFrame(e:MouseEvent):void {
+			editor.loadCell(editor.currentCell-1);
 		}
 		
 		private function checkEnter(e:KeyboardEvent):void {
