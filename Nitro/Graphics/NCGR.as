@@ -148,7 +148,7 @@
 			var bmd:BitmapData=new BitmapData(oam.width,oam.height,useTransparency);
 			bmd.lock();
 			
-			const offset:uint=oam.tileIndex*128;
+			const offset:uint=oam.tileIndex*(bitDepth==4?128:64);
 			
 			for(var y:uint=0;y<oam.height;++y) {
 				for(var x:uint=0;x<oam.width;++x) {
