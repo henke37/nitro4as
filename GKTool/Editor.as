@@ -37,6 +37,7 @@
 		internal var _selectedOam:EditorOam;
 		
 		public var oamProperties_mc:OamProperties;
+		public var fileSelector_mc:FileSelector;
 		
 		public function Editor() {
 			canvas=new Sprite();
@@ -45,25 +46,39 @@
 			addChild(canvas);
 			
 			boxMode_mc.addEventListener(Event.CHANGE,changingBoxMode);
+			
+			tileList=new Sprite();
+			addChild(tileList);
 		}
 		
 		protected override function init():void {
+			fileSelector_mc.load();
+		}
+		
+		public function loadFiles(nclrPath:String,ncgrPath:String,ncerPath:String):void {
+			
+			loadData(gkTool.openGKPath(nclrPath),gkTool.openGKPath(ncgrPath),gkTool.openGKPath(ncerPath));
+			
 			var archive:GKArchive=new GKArchive();
 			archive.parse(gkTool.nds.fileSystem.openFileByName("com/bustup.bin"));
 			
 			subarchive=new GKSubarchive();
 			subarchive.parse(archive.open(102));
+		}
+		
+		public function loadData(nclrBytes:ByteArray,ncgrBytes:ByteArray,ncerBytes:ByteArray):void {
+			
 			
 			nclr=new NCLR();
-			nclr.parse(archive.open(101));
+			nclr.parse(nclrBytes);
 			
 			convertedPalette=RGB555.paletteFromRGB555(nclr.colors);
 			
 			ncgr=new NCGR();
-			ncgr.parse(subarchive.open(2));
+			ncgr.parse(ncgrBytes);
 			
 			ncer=new NCER();
-			ncer.parse(subarchive.open(0));
+			ncer.parse(ncerBytes);
 			
 			agregator=new OAMCollector();
 			agregator.loadOams(ncer);
@@ -71,6 +86,8 @@
 			buildTileList();
 			
 			loadCellFromCell(ncer.cells[0]);
+			
+			oamProperties_mc.update();
 		}
 		
 		private function changingBoxMode(e:Event):void {
@@ -105,8 +122,7 @@
 			const lineWidth:uint=128;
 			var xPos:Number=0,yPos:Number=0,currentLineHeight:Number=0;
 			
-			tileList=new Sprite();
-			addChild(tileList);
+			while(tileList.numChildren) tileList.removeChildAt(tileList.numChildren-1);
 			
 			for each(var tile:OamTile in agregator.oams) {
 				var rend:DisplayObject=ncgr.renderOam(tile,convertedPalette,ncer.subImages);

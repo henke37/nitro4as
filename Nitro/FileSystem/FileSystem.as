@@ -67,7 +67,7 @@
 			
 		}
 		
-		public function resolvePath(path:String):AbstractFile {
+		public function resolvePath(path:String,endOnFile:Boolean=false):AbstractFile {
 			var folders:Array=path.split("/");
 			
 			var dir:Directory=rootDir;
@@ -89,6 +89,10 @@
 				
 				if(!foundFile) {
 					throw new ArgumentError("Unknown filename \""+fileName+"\" in \""+path+"\".");
+				}
+				
+				if(foundFile && entry is File && endOnFile) {
+					return entry;
 				}
 				
 				dir=entry as Directory;
