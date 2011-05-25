@@ -68,6 +68,7 @@
 			var inCommand:Boolean=false;
 			
 			var o:XML=<scriptSection id={id} />;
+			var lastCommand:XML;//used to dodge a Flash bug
 			
 			while(section.position<section.length) {
 				var word:uint=section.readUnsignedShort();
@@ -87,7 +88,8 @@
 					case 0xB5:
 					case 0xB4:
 						if(inCommand) {
-							o.appendChild(parseCommand(cBuff));
+							lastCommand=parseCommand(cBuff);
+							o.appendChild(lastCommand);
 							cBuff.length=0;
 							cBuffPos=0;
 						}
@@ -97,7 +99,8 @@
 					
 					default:
 						if(cBuffPos) {
-							o.appendChild(parseCommand(cBuff));
+							lastCommand=parseCommand(cBuff)
+							o.appendChild(lastCommand);
 							inCommand=false;
 							cBuff.length=0;
 							cBuffPos=0;
@@ -107,7 +110,8 @@
 				//trace(word.toString(16));
 			}
 			if(cBuffPos) {
-				o.appendChild(parseCommand(cBuff));
+				lastCommand=parseCommand(cBuff);
+				o.appendChild(lastCommand);
 			}
 			
 			return o;

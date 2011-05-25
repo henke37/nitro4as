@@ -51,15 +51,17 @@
 					for(var j:uint=0;j<spt.length;++j) {
 						var section:XML=spt.parseSection(j);
 						scriptFile.appendChild(section);
+						
+						/*
 						for each(var command:XML in section.children()) {
-							var name:String=command.name();
-							if(name=="unknownCommand") name=command.@commandType;
+							var name:String=command.toXMLString();
+							//if(name=="unknownCommand") name=command.@commandType;
 							if(name in frequences) {
 								frequences[name]++;
 							} else {
 								frequences[name]=1;
 							}
-						}
+						}*/
 					}
 					scripts.appendChild(scriptFile);
 				} catch (err:ArgumentError) {
@@ -71,20 +73,22 @@
 			
 			trace(scripts);
 			
+			/*
 			var toBeSorted:Vector.<String>=new Vector.<String>();
 			for (name in frequences) {
 				toBeSorted.push(name);
 			}
 			
 			function compareFrequences(a:String,b:String) {
-				return frequences[b]-frequences[a];
+				return b.localeCompare(a);
+				//return frequences[b]-frequences[a];
 			}
 			
 			toBeSorted.sort(compareFrequences);
 			
 			for each(name in toBeSorted) {
 				trace(name,frequences[name]);
-			}
+			}*/
 		}
 	}
 }
