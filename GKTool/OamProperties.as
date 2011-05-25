@@ -36,36 +36,42 @@
 		
 		private function setXFlip(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.xFlip=xFlip_mc.selected;
 			editor.flagRender();
 		}
 		
 		private function setYFlip(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.yFlip=yFlip_mc.selected;
 			editor.flagRender();
 		}
 		
 		private function setX(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.x=parseInt(x_txt.text);
 			editor.flagRender();
 		}
 		
 		private function setY(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.y=parseInt(y_txt.text);
 			editor.flagRender();
 		}
 		
 		private function setTile(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.tileIndex=parseInt(tile_txt.text);
 			editor.flagRender();
 		}
 		
 		private function setPalette(e:Event):void {
 			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
 			oam.paletteIndex=parseInt(palette_txt.text);
 			editor.flagRender();
 		}
@@ -73,6 +79,13 @@
 		internal function update():void {
 			
 			var oam:EditorOam=editor._selectedOam;
+			
+			if(!oam) {
+				mouseChildren=false;
+				oam=new EditorOam();
+			} else {
+				mouseChildren=true;
+			}			
 			
 			xFlip_mc.selected=oam.xFlip;
 			yFlip_mc.selected=oam.yFlip;
