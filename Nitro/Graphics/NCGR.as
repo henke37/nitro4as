@@ -136,7 +136,7 @@
 			return tile.toBMD(palette,paletteIndex,useTransparency);
 		}
 		
-		public function renderOam(oam:CellOam,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
+		public function renderOam(oam:OamTile,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
 			if(tiles) {
 				return renderTileOam(oam,palette,subImages,useTransparency);
 			} else {
@@ -144,7 +144,7 @@
 			}
 		}
 		
-		private function renderPictureOam(oam:CellOam,palette:Vector.<uint>,useTransparency:Boolean): DisplayObject {
+		private function renderPictureOam(oam:OamTile,palette:Vector.<uint>,useTransparency:Boolean): DisplayObject {
 			var bmd:BitmapData=new BitmapData(oam.width,oam.height,useTransparency);
 			bmd.lock();
 			
@@ -165,7 +165,7 @@
 			return new Bitmap(bmd);
 		}
 		
-		private function renderTileOam(oam:CellOam,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean):DisplayObject {
+		private function renderTileOam(oam:OamTile,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean):DisplayObject {
 			var spr:Sprite=new Sprite();
 			
 			

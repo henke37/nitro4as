@@ -21,7 +21,7 @@
 			}
 		}
 		
-		private function inOAms(oam:CellOam):Boolean {
+		private function inOams(oam:CellOam):Boolean {
 			for each(var candidate:OamTile in oams) {
 				if(candidate.tileIndex!=oam.tileIndex) continue;
 				if(candidate.paletteIndex!=oam.paletteIndex) continue;

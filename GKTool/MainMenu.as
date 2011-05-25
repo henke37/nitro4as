@@ -13,6 +13,7 @@
 		public var extractChars_mc:Button;
 		public var rebuild_mc:Button;
 		public var convertImg_mc:Button;
+		public var editor_mc:Button;
 		
 		public var icon_mc:Sprite;
 		
@@ -42,6 +43,8 @@
 			rebuild_mc.addEventListener(MouseEvent.CLICK,rebuild);
 			convertImg_mc.label="Convert image";
 			convertImg_mc.addEventListener(MouseEvent.CLICK,convert);
+			editor_mc.label="Editor";
+			editor_mc.addEventListener(MouseEvent.CLICK,editor);
 		}
 		
 		private function fileExtract(e:MouseEvent):void {
@@ -58,6 +61,10 @@
 		
 		private function convert(e:MouseEvent):void {
 			gkTool.screen="ImageConverter";
+		}
+		
+		private function editor(e:MouseEvent):void {
+			gkTool.screen="Editor";
 		}
 		
 		private function loaded(e:Event):void {

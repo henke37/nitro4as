@@ -10,7 +10,7 @@
 		public var cells:Vector.<Cell>;
 		public var labels:Vector.<String>;
 		
-		internal var subImages:Boolean;
+		public var subImages:Boolean;
 
 		public function NCER() {
 		}
