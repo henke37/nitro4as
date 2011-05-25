@@ -34,7 +34,9 @@
 		
 		public var boxMode_mc:BoxModeSelector;
 		
-		private var _selectedOam:EditorOam;
+		internal var _selectedOam:EditorOam;
+		
+		public var oamProperties_mc:OamProperties;
 		
 		public function Editor() {
 			canvas=new Sprite();
@@ -126,7 +128,7 @@
 			
 		}
 		
-		private function flagRender():void {
+		internal function flagRender():void {
 			if(stage) {
 				addEventListener(Event.RENDER,render);
 				stage.invalidate();
@@ -180,6 +182,7 @@
 		
 		private function set selectedOam(s:EditorOam):void {
 			_selectedOam=s;
+			oamProperties_mc.update();
 			flagRender();
 		}
 	}
