@@ -101,7 +101,6 @@
 					lastSubArchiveName=archiveName;
 				} else {
 					subArchive=lastSubArchive;
-					trace("cache hit");
 				}
 								
 				data=subArchive.open(parseInt(matches[1]));

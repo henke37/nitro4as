@@ -58,16 +58,10 @@
 		public function loadFiles(nclrPath:String,ncgrPath:String,ncerPath:String):void {
 			
 			loadData(gkTool.openGKPath(nclrPath),gkTool.openGKPath(ncgrPath),gkTool.openGKPath(ncerPath));
-			
-			var archive:GKArchive=new GKArchive();
-			archive.parse(gkTool.nds.fileSystem.openFileByName("com/bustup.bin"));
-			
-			subarchive=new GKSubarchive();
-			subarchive.parse(archive.open(102));
+
 		}
 		
 		public function loadData(nclrBytes:ByteArray,ncgrBytes:ByteArray,ncerBytes:ByteArray):void {
-			
 			
 			nclr=new NCLR();
 			nclr.parse(nclrBytes);
@@ -84,10 +78,6 @@
 			agregator.loadOams(ncer);
 			
 			buildTileList();
-			
-			loadCellFromCell(ncer.cells[0]);
-			
-			oamProperties_mc.update();
 		}
 		
 		private function changingBoxMode(e:Event):void {
@@ -99,17 +89,19 @@
 			_boxMode=m;
 		}
 		
-		private function loadCellFromCell(cell:Cell):void {
-			currentCell=cell;
+		public function loadCell(frame:uint):void {
+			currentCell=ncer.cells[frame];
 			
 			editorOams=new Vector.<EditorOam>();
-			editorOams.length=cell.oams.length;
+			editorOams.length=currentCell.oams.length;
 			
 			var i:uint=0;
 			
-			for each(var original:CellOam in cell.oams) {
+			for each(var original:CellOam in currentCell.oams) {
 				editorOams[i++]=EditorOam.spawnFromTemplate(original);
 			}
+			
+			selectedOam=null;
 			
 			flagRender();
 		}
@@ -182,13 +174,12 @@
 				}
 				
 				rendering.addEventListener(MouseEvent.MOUSE_DOWN,downOnRender);
-				
-				if(_selectedOam) {
-					rendering.addChild(_selectedOam.drawBox(0x0000FF,false,false));
-				}
-														
-				
-				canvas.addChild(rendering);
+
+				canvas.addChildAt(rendering,0);
+			}
+			
+			if(_selectedOam) {
+				canvas.addChild(_selectedOam.drawBox(0x0000FF,false,false));
 			}
 		}
 		
