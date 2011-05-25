@@ -55,6 +55,7 @@
 				tf.x=x;
 				tf.y=y;
 				tf.autoSize=TextFieldAutoSize.LEFT;
+				tf.selectable=false;
 				tf.text=String(tileIndex);
 				
 				if(xFlip) tf.appendText("XF");

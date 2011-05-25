@@ -45,6 +45,7 @@
 			convertImg_mc.addEventListener(MouseEvent.CLICK,convert);
 			editor_mc.label="Editor";
 			editor_mc.addEventListener(MouseEvent.CLICK,editor);
+			editor_mc.enabled=false;
 		}
 		
 		private function fileExtract(e:MouseEvent):void {
@@ -72,6 +73,7 @@
 			loadRom_mc.enabled=false;
 			extractFiles_mc.enabled=true;
 			extractChars_mc.enabled=true;
+			editor_mc.enabled=true;
 		}
 	}
 	
