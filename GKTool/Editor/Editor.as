@@ -1,4 +1,4 @@
-﻿package GKTool {
+﻿package GKTool.Editor {
 	
 	import flash.display.*;
 	import flash.events.*;
@@ -8,7 +8,9 @@
 	import Nitro.*;
 	import Nitro.Graphics.*;
 	
-	public class Editor extends Screen {
+	import GKTool.*;
+	
+	public class Editor extends GKTool.Screen {
 		
 		private var tileList:Sprite;
 		

@@ -1,8 +1,10 @@
-﻿package GKTool {
+﻿package GKTool.Editor {
 	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.text.*;
+	
+	import GKTool.*;
 	
 	public class OamProperties extends Sprite {
 		

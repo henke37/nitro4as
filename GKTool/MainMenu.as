@@ -65,7 +65,7 @@
 		}
 		
 		private function editor(e:MouseEvent):void {
-			gkTool.screen="Editor";
+			gkTool.screen="Editor.Editor";
 		}
 		
 		private function loaded(e:Event):void {

@@ -1,4 +1,4 @@
-﻿package GKTool {
+﻿package GKTool.Editor {
 	
 	import flash.display.*;
 	import flash.events.*;

@@ -1,4 +1,4 @@
-﻿package GKTool {
+﻿package GKTool.Editor {
 	import Nitro.Graphics.*;
 	
 	import flash.display.*;
