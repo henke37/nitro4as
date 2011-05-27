@@ -6,12 +6,13 @@
 	public class EditorOam extends CellOam {
 		
 		internal var rendering:EditorRendering;
+		internal var nr:uint;
 
 		public function EditorOam() {
 			rendering=new EditorRendering(this);
 		}
 		
-		public static function spawnFromTemplate(simpleTile:OamTile):EditorOam {
+		public static function spawnFromTemplate(simpleTile:OamTile,nr:uint):EditorOam {
 			var o:EditorOam=new EditorOam();
 			
 			o.width=simpleTile.width;
@@ -29,6 +30,8 @@
 				o.xFlip=complexTile.xFlip;
 				o.yFlip=complexTile.yFlip;
 			}
+			
+			o.nr=nr;
 			
 			return o;
 		}

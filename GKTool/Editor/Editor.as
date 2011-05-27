@@ -101,7 +101,7 @@
 			var i:uint=0;
 			
 			for each(var original:CellOam in cell.oams) {
-				editorOams[i++]=EditorOam.spawnFromTemplate(original);
+				editorOams[i++]=EditorOam.spawnFromTemplate(original,i);
 			}
 			
 			selectedOam=null;

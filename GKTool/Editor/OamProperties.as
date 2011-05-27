@@ -15,6 +15,9 @@
 		public var y_txt:TextField;
 		public var palette_txt:TextField;
 		public var tile_txt:TextField;
+		public var width_txt:TextField;
+		public var height_txt:TextField;
+		public var oamNr_txt:TextField;
 		
 		public function OamProperties() {
 			xFlip_mc.addEventListener(Event.CHANGE,setXFlip);
@@ -28,12 +31,10 @@
 			tile_txt.addEventListener(FocusEvent.FOCUS_OUT,numberFocusLost);
 			palette_txt.addEventListener(Event.CHANGE,setPalette);
 			palette_txt.addEventListener(FocusEvent.FOCUS_OUT,numberFocusLost);
-		}
-		
-		private function numberFocusLost(e:FocusEvent):void {
-			if(e.currentTarget.text=="") {
-				e.currentTarget.text="0";
-			}
+			width_txt.addEventListener(Event.CHANGE,setWidth);
+			width_txt.addEventListener(FocusEvent.FOCUS_OUT,numberFocusLost);
+			height_txt.addEventListener(Event.CHANGE,setHeight);
+			height_txt.addEventListener(FocusEvent.FOCUS_OUT,numberFocusLost);
 		}
 		
 		private function setXFlip(e:Event):void {
@@ -78,6 +79,20 @@
 			editor.flagRender();
 		}
 		
+		private function setHeight(e:Event):void {
+			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
+			oam.height=parseInt(height_txt.text);
+			editor.flagRender();
+		}
+		
+		private function setWidth(e:Event):void {
+			var oam:EditorOam=editor._selectedOam;
+			if(!oam) return;
+			oam.width=parseInt(width_txt.text);
+			editor.flagRender();
+		}
+		
 		internal function update():void {
 			
 			var oam:EditorOam=editor._selectedOam;
@@ -95,6 +110,9 @@
 			y_txt.text=String(oam.y);
 			tile_txt.text=String(oam.tileIndex);
 			palette_txt.text=String(oam.paletteIndex);
+			width_txt.text=String(oam.width);
+			height_txt.text=String(oam.height);
+			oamNr_txt.text="Oam nr: "+oam.nr;
 		}
 		
 		private function get editor():Editor { return Editor(parent); }

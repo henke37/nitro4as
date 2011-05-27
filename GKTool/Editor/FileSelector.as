@@ -20,6 +20,7 @@
 			ncgr_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			ncer_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			frame_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
+			frame_txt.addEventListener(FocusEvent.FOCUS_OUT,numberFocusLost);
 			
 			framePlus_mc.addEventListener(MouseEvent.CLICK,nextFrame);
 			frameMinus_mc.addEventListener(MouseEvent.CLICK,prevFrame);
