@@ -3,6 +3,7 @@
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import flash.text.*;
 	
 	import Nitro.GK.*;
 	import Nitro.*;
@@ -41,6 +42,8 @@
 		public var oamProperties_mc:OamProperties;
 		public var fileSelector_mc:FileSelector;
 		
+		public var zoom_txt:TextField;
+		
 		public function Editor() {
 			canvas=new Sprite();
 			canvas.x=CANVASWIDTH/2+CANVASLEFT;
@@ -51,6 +54,13 @@
 			
 			tileList=new Sprite();
 			addChild(tileList);
+			
+			zoom_txt.addEventListener(Event.CHANGE,setZoom);
+		}
+		
+		private function setZoom(e:Event):void {
+			var zoom:Number=parseFloat(zoom_txt.text);
+			canvas.scaleX=canvas.scaleY=zoom;
 		}
 		
 		protected override function init():void {
