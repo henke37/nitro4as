@@ -130,9 +130,9 @@
 					var atts2:uint=section.readUnsignedShort();
 					
 					oam.tileIndex=(atts2 & 0x3FF);
-					if(tileIndexShift) {
-						oam.tileIndex <<= (tileIndexShift-1);
-					}
+					
+					oam.tileIndex <<= tileIndexShift;
+					
 					oam.paletteIndex= atts2 >> 12;
 					
 					oam.priority=atts2 >> 10 & 0x3;

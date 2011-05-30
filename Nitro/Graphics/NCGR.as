@@ -148,7 +148,7 @@
 			var bmd:BitmapData=new BitmapData(oam.width,oam.height,useTransparency);
 			bmd.lock();
 			
-			const offset:uint=oam.tileIndex*(bitDepth==4?128:64);
+			const offset:uint=oam.tileIndex*(bitDepth==4?64:32);
 			
 			for(var y:uint=0;y<oam.height;++y) {
 				for(var x:uint=0;x<oam.width;++x) {
@@ -168,12 +168,20 @@
 		private function renderTileOam(oam:OamTile,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean):DisplayObject {
 			var spr:Sprite=new Sprite();
 			
+			var tileIndex:uint=(bitDepth==8)?oam.tileIndex>>1:oam.tileIndex;
 			
-			const baseX:uint=oam.tileIndex%tilesX;
-			const baseY:uint=oam.tileIndex/tilesX;
+			const baseX:uint=tileIndex%tilesX;
+			const baseY:uint=tileIndex/tilesX;
 			
 			const yTiles:uint=oam.height/Tile.height;
 			const xTiles:uint=oam.width/Tile.width;
+			
+			var subTileWidth:uint;
+			if(tilesX==0xFFFF) {
+				subTileWidth=xTiles;
+			} else {
+				subTileWidth=tilesX;
+			}
 			
 			for(var y:uint=0;y<yTiles;++y) {
 				for(var x:uint=0;x<xTiles;++x) {
@@ -184,9 +192,9 @@
 						var subTileYIndex:uint=baseY+y;
 						var subTileXIndex:uint=baseX+x;
 						
-						subTileIndex=subTileXIndex+subTileYIndex*xTiles;
+						subTileIndex=subTileXIndex+subTileYIndex*subTileWidth;
 					} else {
-						subTileIndex=oam.tileIndex+x+y*xTiles;
+						subTileIndex=tileIndex+x+y*xTiles;
 					}
 					
 					var tileR:DisplayObject=new Bitmap(renderTile(subTileIndex,palette,oam.paletteIndex,useTransparency));
