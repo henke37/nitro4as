@@ -12,6 +12,8 @@
 		public var xFlip:Boolean;
 		public var yFlip:Boolean;
 		
+		public var priority:uint;
+		
 		public function CellOam() {
 			// constructor code
 		}

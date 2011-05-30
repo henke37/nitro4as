@@ -14,6 +14,7 @@
 		public var rebuild_mc:Button;
 		public var convertImg_mc:Button;
 		public var editor_mc:Button;
+		public var spt_mc:Button;
 		
 		public var icon_mc:Sprite;
 		
@@ -43,9 +44,16 @@
 			rebuild_mc.addEventListener(MouseEvent.CLICK,rebuild);
 			convertImg_mc.label="Convert image";
 			convertImg_mc.addEventListener(MouseEvent.CLICK,convert);
-			editor_mc.label="Editor";
+			editor_mc.label="NCER Editor";
 			editor_mc.addEventListener(MouseEvent.CLICK,editor);
 			editor_mc.enabled=false;
+			spt_mc.enabled=false;
+			spt_mc.label="Decode SPT files";
+			spt_mc.addEventListener(MouseEvent.CLICK,sptExtract);
+		}
+		
+		private function sptExtract(e:MouseEvent):void {
+			gkTool.screen="SptExtractScreen";
 		}
 		
 		private function fileExtract(e:MouseEvent):void {
@@ -74,6 +82,7 @@
 			extractFiles_mc.enabled=true;
 			extractChars_mc.enabled=true;
 			editor_mc.enabled=true;
+			spt_mc.enabled=true;
 		}
 	}
 	

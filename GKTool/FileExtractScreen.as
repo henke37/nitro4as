@@ -6,6 +6,7 @@
 	import Nitro.GK.*;
 	
 	import flash.utils.*;
+	import flash.net.*;
 	
 	public class FileExtractScreen extends ExtractBaseScreen {
 		
@@ -18,7 +19,11 @@
 		var subId:uint=0;
 		var numberSize:uint;
 
+		var table:Table;
+
 		public function FileExtractScreen() {
+			table=new Table();
+			table.loadFromFile(new URLRequest("AAI2Jpn.tbl"));
 		}
 		
 		protected override function beginExtraction():uint {

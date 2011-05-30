@@ -15,7 +15,7 @@
 		private var _screenId:String;
 		private var screens:Object;
 		
-		public static const version:String="v 2.1";
+		public static const version:String="v 3.0";
 
 		public function GKTool() {			
 			stage.align=StageAlign.TOP_LEFT;
@@ -49,6 +49,7 @@
 			FileExtractScreen;
 			GraphicsExtractScreen;
 			RepackScreen;
+			SptExtractScreen;
 		}
 		
 		private var lastSubArchiveName:String,lastSubArchive:GKSubarchive;

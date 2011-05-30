@@ -184,7 +184,7 @@
 						var subTileYIndex:uint=baseY+y;
 						var subTileXIndex:uint=baseX+x;
 						
-						subTileIndex=subTileXIndex+subTileYIndex*tilesX;
+						subTileIndex=subTileXIndex+subTileYIndex*xTiles;
 					} else {
 						subTileIndex=oam.tileIndex+x+y*xTiles;
 					}

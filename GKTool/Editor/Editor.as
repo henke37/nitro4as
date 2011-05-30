@@ -44,6 +44,8 @@
 		
 		public var zoom_txt:TextField;
 		
+		public var menu_btn:SimpleButton;
+		
 		public function Editor() {
 			canvas=new Sprite();
 			canvas.x=CANVASWIDTH/2+CANVASLEFT;
@@ -56,6 +58,11 @@
 			addChild(tileList);
 			
 			zoom_txt.addEventListener(Event.CHANGE,setZoom);
+			menu_btn.addEventListener(MouseEvent.CLICK, backToMenu);
+		}
+		
+		private function backToMenu(e:MouseEvent):void {
+			gkTool.screen="MainMenu";
 		}
 		
 		private function setZoom(e:Event):void {

@@ -108,6 +108,8 @@
 						oam.hide=(atts0 & 2) ==2;
 					}
 					
+					var colorDepth:uint=atts0 >> 13 & 0x1;
+					
 					var shape:uint=atts0 >> 6;
 					
 					var atts1:uint=section.readUnsignedShort();
@@ -132,6 +134,8 @@
 						oam.tileIndex <<= (tileIndexShift-1);
 					}
 					oam.paletteIndex= atts2 >> 12;
+					
+					oam.priority=atts2 >> 10 & 0x3;
 					
 					oam.setSize(objSize,shape);
 				}
