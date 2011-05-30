@@ -15,16 +15,28 @@
 		
 		private var loader:URLLoader;
 		
+		private var table:Table;
+		
 		public function SPTTest() {
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
-			loader.addEventListener(Event.COMPLETE,parse);
+			loader.addEventListener(Event.COMPLETE,sptLoaded);
 			loader.load(new URLRequest("game.nds"));
+			
+			table=new Table();
+			table.addEventListener(Event.COMPLETE,tableLoaded);
+			table.loadFromFile(new URLRequest("C:\\Users\\Henrik\\Desktop\\ds reverse engineering\\jjjewel_AAI2Jpn.tbl"));
 			
 			stage.align=StageAlign.TOP_LEFT;
 		}
 		
-		private function parse(e:Event):void {
+		private var loadedTable:Boolean=false;
+		private var loadedSPT:Boolean=false;
+		
+		private function sptLoaded(e:Event):void { loadedSPT=true; if(loadedTable) parse(); }
+		private function tableLoaded(e:Event):void { loadedTable=true; if(loadedSPT) parse(); }
+		
+		private function parse():void {
 			nds=new NDS();
 			nds.parse(loader.data);
 			
@@ -49,7 +61,7 @@
 					}*/
 					
 					for(var j:uint=0;j<spt.length;++j) {
-						var section:XML=spt.parseSection(j);
+						var section:XML=spt.parseSection(j,table);
 						scriptFile.appendChild(section);
 						
 						/*
@@ -69,9 +81,10 @@
 				}
 			}
 			
-			
-			
-			trace(scripts);
+			var o:ByteArray=new ByteArray();
+			o.writeUTFBytes(scripts.toXMLString());
+			var fr:FileReference=new FileReference();
+			fr.save(o,"scripts.xml");
 			
 			/*
 			var toBeSorted:Vector.<String>=new Vector.<String>();

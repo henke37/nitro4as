@@ -58,7 +58,7 @@
 			return o;
 		}
 		
-		public function parseSection(id:uint) {
+		public function parseSection(id:uint,table:Table=null) {
 			
 			var section:ByteArray=readSection(id);
 			section.endian=Endian.LITTLE_ENDIAN;
@@ -105,6 +105,17 @@
 							cBuff.length=0;
 							cBuffPos=0;
 						}
+						
+						if(table) {
+							var text:String=(word & 0xFF).toString(16)+type.toString(16);//byte order swap and hex encoding
+							text=table.matchEntry(text);
+							if(lastCommand) {
+								o.insertChildAfter(lastCommand,text);
+								lastCommand=null;
+							} else {
+								o.appendChild(text);
+							}
+						}
 					break;
 				}
 				//trace(word.toString(16));
@@ -113,6 +124,8 @@
 				lastCommand=parseCommand(cBuff);
 				o.appendChild(lastCommand);
 			}
+			
+			o.normalize();
 			
 			return o;
 		}
