@@ -35,7 +35,7 @@
 			if(id+1==offsets.length) {
 				o.writeBytes(_data,offsets[id]);
 			} else {
-				var len:uint=offsets[id+1]-offsets[id]-1;
+				var len:uint=offsets[id+1]-offsets[id];
 				o.writeBytes(_data,offsets[id],len);
 			}
 			
@@ -47,7 +47,7 @@
 			_data=new ByteArray();
 			_data.endian=Endian.LITTLE_ENDIAN;
 			
-			var offset:uint=(files.length+1)*4;
+			var offset:uint=(files.length)*4;
 			
 			offsets=new Vector.<uint>();
 			
@@ -62,6 +62,7 @@
 			for each(file in files) {
 				_data.writeBytes(file);
 			}
+			_data.position=0;
 		}
 		
 		public function get data():ByteArray { return _data; }

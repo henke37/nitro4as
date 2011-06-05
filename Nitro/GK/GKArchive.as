@@ -88,6 +88,7 @@
 			for each(file in files) {
 				_data.writeBytes(file);
 			}
+			_data.position=0;
 		}
 		
 		public function get data():ByteArray { return _data; }

@@ -3,11 +3,23 @@
 
   <id>GKTool</id>
 
-  <versionNumber>3.0</versionNumber>
+  <versionNumber>3.1</versionNumber>
 
   <filename>GKTool</filename>
 
   <description>A tool to deal with the files in GK2.</description>
+
+  
+
+
+
+  
+
+
+
+  
+
+
 
   
 
@@ -1357,6 +1369,18 @@
 
 
 
+  
+
+
+
+  
+
+
+
+  
+
+
+
   <!-- To localize the name, use the following format for the name element.<name><text xml:lang="en">English App name goes here</text><text xml:lang="fr">French App name goes here</text><text xml:lang="ja">Japanese App name goes here</text></name>-->
 
   <copyright>henke37</copyright>
@@ -1436,6 +1460,12 @@
 
 
   <supportedProfiles>desktop extendedDesktop </supportedProfiles>
+
+
+
+
+
+
 
 
 

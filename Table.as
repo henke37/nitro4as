@@ -7,9 +7,11 @@
 		private var loader:URLLoader;
 		
 		private var entries:Object;
+		private var reverseEntries:Object;
 
 		public function Table() {
 			entries={};
+			reverseEntries={};
 		}
 
 		public function loadFromFile(request:URLRequest) {
@@ -33,9 +35,14 @@
 				var bytes:String=parts[0];
 				bytes=bytes.toLowerCase();
 				var replacement:String=parts[1];
-				entries[bytes]=replacement;
+				addEntry(bytes,replacement);
 			}
 			dispatchEvent(new Event(Event.COMPLETE));
+		}
+		
+		public function addEntry(bytes:String,replacement:String):void {
+			entries[bytes]=replacement;
+			reverseEntries[replacement]=bytes;
 		}
 		
 		public function matchEntry(entry:String):String {

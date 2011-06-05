@@ -31,7 +31,7 @@
 			nds.parse(loader.data);
 			
 			var archive:GKArchive=new GKArchive();
-			archive.parse(nds.fileSystem.openFileByName("com/mapchar.bin"));
+			archive.parse(nds.fileSystem.openFileByName("com/bustup.bin"));
 			
 			var subArchive:GKSubarchive=new GKSubarchive();
 			subArchive.parse(archive.open(1));
