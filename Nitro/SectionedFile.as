@@ -92,6 +92,7 @@
 				totalSize+=sectionData.length;
 				++sectionCount;
 			}
+			totalSize+=8*sectionCount;
 			
 			_data.writeUTFBytes(id);
 			_data.writeUnsignedInt(0x0100FEFF);

@@ -10,6 +10,7 @@
 	import Nitro.Graphics.*;
 	
 	import GKTool.*;
+	import flash.net.FileReference;
 	
 	public class Editor extends GKTool.Screen {
 		
@@ -97,6 +98,13 @@
 			agregator.loadOams(ncer);
 			
 			buildTileList();
+		}
+		
+		
+		var fr:FileReference;
+		public function saveNCER():void {
+			fr=new FileReference();
+			fr.save(ncer.save(),"t.ncer");
 		}
 		
 		private function changingBoxMode(e:Event):void {

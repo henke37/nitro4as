@@ -12,7 +12,7 @@
 			// constructor code
 		}
 		
-		internal function setSize(size:uint,shape:uint) {
+		internal function setSize(size:uint,shape:uint):void {
 			switch(shape) {
 				case 0:
 					width=height=8 << size;
@@ -28,6 +28,40 @@
 					height=[16,32,32,64][size];
 				break;
 			}
+		}
+		
+		internal function getSize():uint {
+			switch(width) {
+				case 8:
+					switch(height) {
+						case 8: return 0;
+						case 16: return 1;
+						case 32: return 2;
+					}
+				break;
+				case 16:
+					switch(height) {
+						case 8: return 0;
+						case 16: return 1;
+						case 32: return 2;
+					}
+				break;
+				case 32:
+					switch(height) {
+						case 32: return 2;
+						case 8: return 1;
+						case 16: return 1;
+						case 64: return 3;
+					}
+				break;
+				case 64:
+					switch(height) {
+						case 64: return 3;
+						case 32: return 3;
+					}
+				break;
+			}
+			return 0;
 		}
 		
 		public function cloneOamTile():OamTile {

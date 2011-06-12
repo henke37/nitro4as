@@ -83,6 +83,11 @@
 			var oam:EditorOam=editor._selectedOam;
 			if(!oam) return;
 			oam.height=parseInt(height_txt.text);
+			if(oam.height%8!=0) {
+				height_txt.setTextFormat(new TextFormat(null,null,0xFF0000));
+			} else {
+				height_txt.setTextFormat(new TextFormat(null,null,0x000000));
+			}
 			editor.flagRender();
 		}
 		
@@ -90,6 +95,11 @@
 			var oam:EditorOam=editor._selectedOam;
 			if(!oam) return;
 			oam.width=parseInt(width_txt.text);
+			if(oam.width%8!=0) {
+				width_txt.setTextFormat(new TextFormat(null,null,0xFF0000));
+			} else {
+				width_txt.setTextFormat(new TextFormat(null,null,0x000000));
+			}
 			editor.flagRender();
 		}
 		

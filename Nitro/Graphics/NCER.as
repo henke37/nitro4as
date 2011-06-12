@@ -164,7 +164,7 @@
 				offsets.push(offset);
 			}
 			
-			var firstLabelOffset:uint=section.position;
+			var firstLabelOffset:uint=section.position-4;
 			
 			labels=new Vector.<String>();
 			labels.length=offsets.length;
@@ -174,8 +174,9 @@
 			
 			for each(offset in offsets) {
 				section.position=offset+firstLabelOffset;
-				
-				labels[cellId++]=readZeroTermString(section);
+				var label:String=readZeroTermString(section);
+				trace(label);
+				labels[cellId++]=label;
 			}
 		}
 		
@@ -187,6 +188,162 @@
 			d.position=startOffset;
 			
 			return d.readUTFBytes(len);
+		}
+		
+		public function save(version:uint=0):ByteArray {
+			var sections:SectionedFile=new SectionedFile();
+			
+			var sectionList:Object={ KBEC: writeKBEC(version), LBAL: writeLBAL() };
+			
+			sections.build("RECN",sectionList);
+			
+			return sections.data;
+		}
+		
+		private function writeLBAL():ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
+			var offset:uint=0;
+			var textOut:ByteArray=new ByteArray();
+			var pointerOut:ByteArray=new ByteArray();
+			pointerOut.endian=Endian.LITTLE_ENDIAN;
+			
+			for each(var label:String in labels) {
+				pointerOut.writeUnsignedInt(textOut.length);
+				textOut.writeUTFBytes(label);
+				textOut.writeByte(0);
+			}
+			
+			o.writeBytes(pointerOut);
+			o.writeBytes(textOut);
+			
+			return o;
+		}
+		
+		private function writeKBEC(version:uint):ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
+			o.writeShort(cells.length);
+			
+			
+			var cellDataSize:uint=8;
+			if(version==1) {
+				cellDataSize+=8;
+			}
+			
+			o.writeShort(version);
+			
+			o.writeUnsignedInt(0x18);//start of cell data
+			
+			
+			
+			var shift:uint=bestShift();
+			
+			var flags:uint=shift;
+			if(subImages) flags |= 4;
+			o.writeUnsignedInt(flags);
+			
+			o.writeUnsignedInt(0);//partioning, not supported
+			
+			o.writeUnsignedInt(0);//padding
+			o.writeUnsignedInt(0);
+			
+			var cellOut:ByteArray=new ByteArray();
+			cellOut.endian=Endian.LITTLE_ENDIAN;
+			
+			var oamOut:ByteArray=new ByteArray();
+			oamOut.endian=Endian.LITTLE_ENDIAN;
+			
+			
+			
+			
+			
+			for each(var cell:Cell in cells) {
+				cellOut.writeShort(cell.oams.length);
+				cellOut.writeShort(0);
+				cellOut.writeUnsignedInt(oamOut.length);
+				for each(var oam:CellOam in cell.oams) {
+					oamOut.writeShort(att0(oam));
+					oamOut.writeShort(att1(oam));
+					oamOut.writeShort(att2(oam,shift));
+				}
+				
+			}
+			o.writeBytes(cellOut);
+			o.writeBytes(oamOut);
+			
+			return o;
+		}
+		
+		private function att0(oam:CellOam):uint {
+			var o:uint=0;
+			
+			o|=oam.y&0xFF;
+			if(oam.doubleSize) {
+				o|=0x30;
+			} else if(oam.hide) {
+				o|=0x20;
+			}
+			
+			if(oam.width==oam.height) {
+				o|=0;
+			} else if(oam.width<oam.height) {
+				o|=0x80;
+			} else if(oam.width>oam.height) {
+				o|=0x40;
+			} else {
+				o|=0xC0;
+			}
+			
+			return o;
+		}
+		
+		private function att1(oam:CellOam):uint {
+			var o:uint=0;
+			
+			o|=oam.x&0x1FF;
+			
+			if(oam.xFlip) {
+				o|=0x1000;
+			}
+			if(oam.yFlip) {
+				o|=0x2000;
+			}
+			
+			o|=oam.getSize()<<14;
+			
+			return o;
+		}
+		
+		private function att2(oam:CellOam,shift:uint):uint {
+			var o:uint=0;
+			
+			var shiftedTileIndex:uint=oam.tileIndex;
+			if(shift>0) {
+				shiftedTileIndex>>>(shift-1);
+			}
+			return shiftedTileIndex | oam.paletteIndex << 12;
+		}
+		
+		private function bestShift():uint {
+			var tileIndexSum:uint=0;
+			for each(var cell:Cell in cells) {
+				for each(var oam:CellOam in cell.oams) {
+					tileIndexSum|=oam.tileIndex;
+				}
+			}
+			
+			if(tileIndexSum==0) return 0;//try not to crash
+			
+			var shift:uint=0;
+			while((tileIndexSum &1)==0 && shift <3) {
+				++shift;
+				tileIndexSum>>>=1;
+			}
+			
+			return shift;
 		}
 
 	}

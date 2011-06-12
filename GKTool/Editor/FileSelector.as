@@ -15,6 +15,8 @@
 		public var framePlus_mc:MovieClip;
 		public var frameMinus_mc:MovieClip;
 		
+		public var saveNCER_btn:SimpleButton;
+		
 		public function FileSelector() {
 			nclr_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
 			ncgr_txt.addEventListener(KeyboardEvent.KEY_DOWN,checkEnter);
@@ -24,6 +26,8 @@
 			
 			framePlus_mc.addEventListener(MouseEvent.CLICK,nextFrame);
 			frameMinus_mc.addEventListener(MouseEvent.CLICK,prevFrame);
+			
+			saveNCER_btn.addEventListener(MouseEvent.CLICK,saveClick);
 		}
 		
 		public function updateCellNr():void {
@@ -51,6 +55,10 @@
 		public function load(e:Event=null):void {
 			editor.loadFiles(nclr_txt.text,ncgr_txt.text,ncer_txt.text);
 			editor.loadCell(parseInt(frame_txt.text));
+		}
+		
+		private function saveClick(e:Event=null):void {
+			editor.saveNCER();
 		}
 		
 		private function get editor():Editor { return Editor(parent); }
