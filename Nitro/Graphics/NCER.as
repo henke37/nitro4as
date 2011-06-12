@@ -108,7 +108,7 @@
 						oam.hide=(atts0 & 2) ==2;
 					}
 					
-					var colorDepth:uint=atts0 >> 5 & 0x1;
+					oam.colorDepth=atts0 >> 5 & 0x1;
 					
 					var shape:uint=atts0 >> 6;
 					
@@ -265,7 +265,8 @@
 				cellOut.writeShort(0);
 				cellOut.writeUnsignedInt(oamOut.length);
 				for each(var oam:CellOam in cell.oams) {
-					oamOut.writeShort(att0(oam));
+					oamOut.writeByte(oam.y);
+					oamOut.writeByte(att0(oam));
 					oamOut.writeShort(att1(oam));
 					oamOut.writeShort(att2(oam,shift));
 				}
@@ -280,12 +281,13 @@
 		private function att0(oam:CellOam):uint {
 			var o:uint=0;
 			
-			o|=oam.y&0xFF;
 			if(oam.doubleSize) {
 				o|=0x30;
 			} else if(oam.hide) {
 				o|=0x20;
 			}
+			
+			o|=oam.colorDepth<<5;
 			
 			if(oam.width==oam.height) {
 				o|=0;
@@ -322,7 +324,7 @@
 			
 			var shiftedTileIndex:uint=oam.tileIndex;
 			if(shift>0) {
-				shiftedTileIndex>>>(shift-1);
+				shiftedTileIndex>>>=shift;
 			}
 			return shiftedTileIndex | oam.paletteIndex << 12;
 		}

@@ -92,7 +92,7 @@
 				totalSize+=sectionData.length;
 				++sectionCount;
 			}
-			totalSize+=8*sectionCount;
+			totalSize+=sectionHeaderSize*sectionCount;
 			
 			_data.writeUTFBytes(id);
 			_data.writeUnsignedInt(0x0100FEFF);
@@ -103,7 +103,7 @@
 			for(var sectionID:String in sectionList) {
 				_data.writeUTFBytes(sectionID);
 				sectionData=sectionList[sectionID];
-				_data.writeUnsignedInt(sectionData.length);
+				_data.writeUnsignedInt(sectionData.length+sectionHeaderSize);
 				_data.writeBytes(sectionData);
 			}
 		}

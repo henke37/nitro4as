@@ -5,6 +5,8 @@
 		public var paletteIndex:uint;
 		public var tileIndex:uint;
 		
+		public var colorDepth:uint;
+		
 		public var width:uint;
 		public var height:uint;
 
@@ -35,25 +37,28 @@
 				case 8:
 					switch(height) {
 						case 8: return 0;
-						case 16: return 1;
-						case 32: return 2;
+						case 16: return 0;
+						case 32: return 1;
 					}
 				break;
+				
 				case 16:
 					switch(height) {
-						case 8: return 0;
 						case 16: return 1;
+						case 8: return 0;
 						case 32: return 2;
 					}
 				break;
+				
 				case 32:
-					switch(height) {
+				 	switch(height) {
 						case 32: return 2;
 						case 8: return 1;
-						case 16: return 1;
+						case 16: return 2;
 						case 64: return 3;
 					}
 				break;
+				
 				case 64:
 					switch(height) {
 						case 64: return 3;
@@ -61,7 +66,7 @@
 					}
 				break;
 			}
-			return 0;
+			throw new Error("invalid h/w combo");
 		}
 		
 		public function cloneOamTile():OamTile {
