@@ -175,7 +175,7 @@
 			for each(offset in offsets) {
 				section.position=offset+firstLabelOffset;
 				var label:String=readZeroTermString(section);
-				trace(label);
+				//trace(label);
 				labels[cellId++]=label;
 			}
 		}
