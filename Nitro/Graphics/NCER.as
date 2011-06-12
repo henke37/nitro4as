@@ -108,7 +108,7 @@
 						oam.hide=(atts0 & 2) ==2;
 					}
 					
-					var colorDepth:uint=atts0 >> 13 & 0x1;
+					var colorDepth:uint=atts0 >> 5 & 0x1;
 					
 					var shape:uint=atts0 >> 6;
 					
