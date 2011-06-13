@@ -103,6 +103,7 @@
 		
 		var fr:FileReference;
 		public function saveNCER():void {
+			updateCellCopy();
 			fr=new FileReference();
 			fr.save(ncer.save(),"t.ncer");
 		}
@@ -117,6 +118,10 @@
 		}
 		
 		public function loadCell(cellNr:uint):void {
+			if(editorOams) {
+				updateCellCopy();
+			}
+			
 			var cell:Cell=ncer.cells[cellNr];
 			currentCell=cellNr;
 			
@@ -136,8 +141,18 @@
 			flagRender();
 		}
 		
-		private function writeToCell(cell:Cell):void {
-			throw new Error("not implemented");
+		private function updateCellCopy():void {
+			var cell:Cell=ncer.cells[currentCell];
+			
+			cell.oams.fixed=false;
+			cell.oams.length=editorOams.length;
+			cell.oams.fixed=true;
+			
+			for (var i:uint=0; i<cell.oams.length;++i) {
+				cell.oams[i]=editorOams[i];
+			}
+			
+			
 		}
 		
 		private function buildTileList():void {

@@ -19,6 +19,7 @@
 			o.height=simpleTile.height;
 			o.tileIndex=simpleTile.tileIndex;
 			o.paletteIndex=simpleTile.paletteIndex;
+			o.colorDepth=simpleTile.colorDepth;
 			
 			var complexTile:CellOam= simpleTile as CellOam;
 			
