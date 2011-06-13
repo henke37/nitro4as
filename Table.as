@@ -50,6 +50,11 @@
 			if(!(entry in entries)) return "<$"+entry+">";
 			return entries[entry];
 		}
+		
+		public function matchReverseEntry(entry:String) {
+			if(!(entry in reverseEntries)) throw new ArgumentError("Unknown reverse entry");
+			return reverseEntries[entry];
+		}
 	}
 	
 }

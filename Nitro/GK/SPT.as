@@ -142,17 +142,13 @@
 			
 			switch(commandType) {
 				
-				case 0x55A0:
-					return <newline/>;
-				break;
+				case 0x55A0: return <newline/>;
 				
 				case 0xB422:
 					return <sound args={args}/>;
 				break;
 				
-				case 0xB47F:
-					return <flash/>;
-				break;
+				case 0xB47F: return <flash/>;
 				
 				case 0xB4A2:
 					return <wait time={commandData[0]} />;
@@ -174,45 +170,27 @@
 					}
 				break;
 				
-				case 0xB4Ab:
+				case 0xB4AB:
 					return <speakerBadge args={args} />;
 				break;
 				
-				case 0xB4A8:
-					return <waitForAdvanceButton/>;
-				break;
+				case 0xB4A8: return <ack/>;
 				
 				case 0xB4AD:
 					return <textSpeed speed={commandData[0]} />;
 				break;
 				
-				case 0xB4AE:
-					return <clearTextWindow/>;
-				break;
+				case 0xB4AE: return <clear/>;
 				
 				case 0xB4FA:
 					return <charAnim char={commandData[0]} anim={commandData[1]} />;
 				break;
 				
-				case 0xB5E8:
-					return <blueText/>;
-				break;
-				
-				case 0xB5E9:
-					return <greenText/>;
-				break;
-				
-				case 0xB5EA:
-					return <whiteText/>;
-				break;
-				
-				case 0xB5EB:
-					return <orangeText/>;
-				break;
-				
-				case 0xB7A7:
-					return <centerText/>;
-				break;
+				case 0xB5E8: return <blue/>;
+				case 0xB5E9: return <green/>;
+				case 0xB5EA: return <white/>;
+				case 0xB5EB: return <orange/>;
+				case 0xB7A7: return <center/>;
 				
 				case 0xB7FE:
 					return <fade args={args}/>;
@@ -222,6 +200,120 @@
 					return <unknownCommand commandType={commandType.toString(16)} args={args} />;
 				break;
 			}
+		}
+		
+		public function buildSection(script:XML,table:Table):ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
+			for each(var child:XML in script.children()) {
+				switch(child.nodeKind()) {
+					case "element":
+						writeCommand(o,child);
+					break;
+					
+					case "text":
+						writeText(o,table,String(child));
+					break;
+					
+					case "comment":
+					break;
+					
+					default:
+						throw new ArgumentError("Unknown nodekind:"+child.nodeKind());
+					break;
+				}
+			}
+			
+			return o;
+		}
+		
+		private function writeText(o:ByteArray,table:Table,text:String):void {
+			
+			for(var pos:uint=0;pos<text.length;++pos) {
+				var char:String=text.substr(pos,1);
+				
+				var hexString:String;
+				
+				if(char=="<") {
+					if(text.substr(pos+1,1)=="$") {
+						var endPos:int=text.indexOf(">",pos+2);
+						hexString=text.substring(pos+2,endPos);
+						pos=endPos;
+					}
+				} else {
+					hexString=table.matchReverseEntry(char);
+				}
+				
+				var toWrite:uint=parseInt(hexString,16);
+				o.writeShort(toWrite);
+			}
+		}
+		
+		private function writeCommand(o:ByteArray,command:XML):void {
+			var args:Vector.<uint>;
+			
+			if(command.@args) {
+				args=argsStringToVector(command.@args);
+			}
+			
+			//trace(String(command.name()));
+			
+			switch(String(command.name())) {//new <uint>[0x55A0]
+				case "newline": writeRawCommand(o,0x55A0); break;
+				case "sound": writeRawCommand(o,0xB422,args); break;
+				case "flash": writeRawCommand(o,0xB47F); break;
+				case "wait": writeRawCommand(o,0xB4A2,new <uint>[parseInt(command.@time)]); break;
+				case "textWindow":
+					if(command.@show=="1") {
+						writeRawCommand(o,0xB4AA,new <uint>[0xAA]);
+					} else if(command.@show=="0") {
+						writeRawCommand(o,0xB4AA,new <uint>[0xAB]);
+					} else {
+						throw new ArgumentError("Invalid show value for textWindow command");
+					}
+				break;
+				case "speakerBadge": writeRawCommand(o,0xB4A8,args); break;
+				case "ack": writeRawCommand(o,0xB4A8); break;
+				case "textSpeed": writeRawCommand(o,0xB4AD,new <uint>[parseInt(command.@speed)]); break;
+				case "clear": writeRawCommand(o,0xB4AE);
+				case "charAnim":
+					writeRawCommand(o,0xB4FA,new <uint>[parseInt(command.@char),parseInt(command.@anim)]);
+				break;
+				case "blue": writeRawCommand(o,0xB5E8); break;
+				case "green": writeRawCommand(o,0xB5E9); break;
+				case "white": writeRawCommand(o,0xB5EA); break;
+				case "orange": writeRawCommand(o,0xB5EB); break;
+				case "center": writeRawCommand(o,0xB7A7); break;
+				case "fade": writeRawCommand(o,0xB7FE,args); break;
+				case "unknownCommand":
+					writeRawCommand(o,parseInt(command.@commandType,16),args);
+				break;
+				
+				default:
+					throw new ArgumentError("Unknown command \""+command.name()+"\"!");
+				break;
+			}
+		}
+		
+		private function argsStringToVector(args:String):Vector.<uint> {
+			var pieces:Array=args.split(",");
+			var o:Vector.<uint>=new Vector.<uint>(pieces.length);
+			for(var i:uint=0;i<o.length;++i) {
+				o[i]=parseInt(pieces[i],16);
+			}
+			return o;
+		}
+		
+		private function writeRawCommand(o:ByteArray,command:uint,args:Vector.<uint>=null):void {
+			o.writeShort(command);
+			
+			if(!args) return;
+			
+			for(var i:uint=0;i<args.length;++i) {
+				o.writeShort(0x5500|args[i]);
+			}
+
 		}
 
 	}
