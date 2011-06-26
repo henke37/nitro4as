@@ -15,6 +15,7 @@
 		public var convertImg_mc:Button;
 		public var editor_mc:Button;
 		public var spt_mc:Button;
+		public var sptBuild_mc:Button;
 		
 		public var icon_mc:Sprite;
 		
@@ -50,6 +51,13 @@
 			spt_mc.enabled=false;
 			spt_mc.label="Decode SPT files";
 			spt_mc.addEventListener(MouseEvent.CLICK,sptExtract);
+			sptBuild_mc.label="Rebuild SPT files";
+			sptBuild_mc.addEventListener(MouseEvent.CLICK,sptBuild);
+			sptBuild_mc.enabled=false;
+		}
+		
+		private function sptBuild(e:MouseEvent):void {
+			gkTool.screen="SPTRebuildScreen";
 		}
 		
 		private function sptExtract(e:MouseEvent):void {

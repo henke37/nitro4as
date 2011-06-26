@@ -49,7 +49,7 @@
 			debug.width=stage.stageWidth;
 			addChild(debug);
 			
-			if(loaderInfo.url.match(/^file:/)) {
+			if(loaderInfo.url.match(/^file:/) && false) {
 				status.text="Loading data";
 				loader=new URLLoader();
 				loader.addEventListener(Event.COMPLETE,loaded);

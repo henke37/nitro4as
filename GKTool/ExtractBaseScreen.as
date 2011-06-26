@@ -11,7 +11,7 @@
 		
 		public var errors:uint;
 		
-		private var realScreen:ExtractScreen;
+		protected var realScreen:ExtractScreen;
 		
 		protected var fileCount:uint;
 		
@@ -24,20 +24,20 @@
 			addChild(realScreen);
 		}
 		
-		protected override function init():void {
+		protected final override function init():void {
 			realScreen.selectDir_mc.addEventListener(MouseEvent.CLICK,selectDir);
 			realScreen.abort_mc.visible=false;
 			realScreen.abort_mc.addEventListener(MouseEvent.CLICK,abort);
 			realScreen.menu_mc.addEventListener(MouseEvent.CLICK,menu);
 		}
 		
-		private function selectDir(e:MouseEvent):void {
+		protected function selectDir(e:MouseEvent):void {
 			outDir=new File();
 			outDir.addEventListener(Event.SELECT,dirSelected);
 			outDir.browseForDirectory("Output dir");
 		}
 		
-		private function dirSelected(e:Event):void {
+		protected final function dirSelected(e:Event):void {
 			realScreen.selectDir_mc.visible=false;
 			initExtraction();
 		}
@@ -96,12 +96,12 @@
 			return true;
 		}
 		
-		protected function log(t:String):void {
+		protected final function log(t:String):void {
 			realScreen.status_txt.appendText(t+"\n");
 			realScreen.status_txt.scrollV=realScreen.status_txt.maxScrollV;
 		}
 		
-		protected function saveFile(name:String,data:ByteArray):void {
+		protected final function saveFile(name:String,data:ByteArray):void {
 			name=name.replace("/",File.separator);
 			var outFile:flash.filesystem.File=new File(outDir.nativePath+File.separator+name);
 			var fileStream:FileStream=new FileStream();

@@ -4,6 +4,7 @@
 	
 	import flash.utils.*;
 	import flash.net.*;
+	import flash.events.*;
 	
 	public class SptExtractScreen extends ExtractBaseScreen {
 		
@@ -22,7 +23,14 @@
 
 		public function SptExtractScreen() {
 			table=new Table();
+			table.addEventListener(Event.COMPLETE,tableLoaded);
 			table.loadFromFile(new URLRequest("AAI2Jpn.tbl"));
+			
+			realScreen.selectDir_mc.enabled=false;
+		}
+		
+		private function tableLoaded(e:Event):void {
+			realScreen.selectDir_mc.enabled=true;
 		}
 		
 		protected override function beginExtraction():uint {
