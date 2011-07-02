@@ -47,15 +47,21 @@
 		protected override function processNext():Boolean {
 			
 			try {
+				
+				var subFileName:String;
+				
 				if(!subFile) {
 					++progress;
 					subFile=new SPT();
 					subFile.parse(archive.open(subFileNr));
 					subNumberSize=subFile.length.toString().length;
+					
+					subFileName=padNumber(subFileNr,numberSize)+"/header.xml";
+					saveXMLFile(subFileName,subFile.headerToXML());
 				}
 				var sectionData:XML=subFile.parseSection(sectionNr,table);
 				
-				var subFileName:String=archiveFileName+"/"+padNumber(subFileNr,numberSize)+"/"+padNumber(sectionNr,subNumberSize)+".xml";				
+				subFileName=padNumber(subFileNr,numberSize)+"/"+padNumber(sectionNr,subNumberSize)+".xml";				
 				
 				var data=new ByteArray();
 				data.writeUTFBytes(sectionData.toXMLString());

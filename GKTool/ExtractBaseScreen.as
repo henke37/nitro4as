@@ -104,9 +104,19 @@
 		protected final function saveFile(name:String,data:ByteArray):void {
 			name=name.replace("/",File.separator);
 			var outFile:flash.filesystem.File=new File(outDir.nativePath+File.separator+name);
+			saveFileByRef(outFile,data);
+		}
+		
+		protected final function saveFileByRef(outFile:File,data:ByteArray):void {
 			var fileStream:FileStream=new FileStream();
 			fileStream.open(outFile,FileMode.WRITE);
 			fileStream.writeBytes(data,0);
+		}
+		
+		protected final function saveXMLFile(name:String,data:XML):void {
+			var o:ByteArray=new ByteArray();
+			o.writeUTFBytes(data.toXMLString());
+			saveFile(name,o);
 		}
 		
 		protected static function padNumber(number:uint,size:uint):String {

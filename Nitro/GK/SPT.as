@@ -5,7 +5,11 @@
 		
 		private var _data:ByteArray;
 		
-		public var sections:Vector.<Entry>;
+		private var sections:Vector.<SPTEntry>;
+		
+		private var version:uint;
+		private var sizeThing:uint;
+		private var unknownHeader:uint;
 
 		public function SPT() {
 			// constructor code
@@ -23,22 +27,22 @@
 			var header:String=d.readUTFBytes(4);
 			if(header!=" TPS") throw new ArgumentError("File header should be \" TPS\", but is \""+header+"\"!");
 			
-			var version:uint=d.readUnsignedShort();
+			version=d.readUnsignedShort();
 			
 			var sectionCount:uint=d.readUnsignedShort();
 			
-			var sizeThing:uint=d.readUnsignedShort();
+			sizeThing=d.readUnsignedShort();
 			
 			//trace(sizeThing,d.length);
 			
-			var unknown:uint=d.readUnsignedShort();
+			unknownHeader=d.readUnsignedShort();
 			
-			sections=new Vector.<Entry>();
+			sections=new Vector.<SPTEntry>();
 			sections.length=sectionCount;
 			sections.fixed=true;
 			
 			for(var i:uint=0;i<sectionCount;++i) {
-				var entry:Entry=new Entry();
+				var entry:SPTEntry=new SPTEntry();
 				entry.offset=d.readUnsignedShort();
 				entry.size=d.readUnsignedShort();
 				entry.flag1=d.readUnsignedShort();
@@ -48,10 +52,81 @@
 			}
 		}
 		
+		public function build():void {
+			_data=new ByteArray();
+			_data.endian=Endian.LITTLE_ENDIAN;
+			
+			_data.writeUTFBytes(" TPS");
+			
+			_data.writeShort(version);
+			_data.writeShort(sections.length);
+			_data.writeShort(sizeThing);
+			_data.writeShort(unknownHeader);
+			
+			const dataStart:uint=_data.position+sections.length*SPTEntry.entryLength;
+			var dataPosition:uint=dataStart;
+			
+			for(var i:uint=0;i<sections.length;++i) {
+				var entry:SPTEntry=sections[i];
+				_data.writeShort(dataPosition);
+				_data.writeShort(bytesToSize(entry.encodedScript.length));
+				_data.writeShort(entry.flag1);
+				_data.writeShort(entry.flag2);
+				
+				dataPosition+=entry.encodedScript.length;
+			}
+			
+			for(i=0;i<sections.length;++i) {
+				entry=sections[i];
+				_data.writeBytes(entry.encodedScript);
+			}
+		}
+		
+		public function headerToXML():XML {
+			var o:XML=<SPT version={version} sizeThing={sizeThing.toString(16)} unknownHeader={unknownHeader.toString(16)} />
+			
+			for each(var entry:SPTEntry in sections) {
+				o.appendChild(<section flag1={ entry.flag1.toString(16) } flag2={ entry.flag2.toString(16) } /> );
+			}
+			
+			return o;
+		}
+		
+		public function loadHeader(header:XML):void {
+			version= parseInt(header.@version);
+			sizeThing= parseInt(header.@sizeThing,16);
+			unknownHeader = parseInt(header.@unknownHeader,16);
+			
+			var xmlSections:XMLList=header.section;
+			
+			sections=new Vector.<SPTEntry>(xmlSections.length());
+			
+			for(var i:uint=0;i<sections.length;++i) {
+				var xmlSection:XML=xmlSections[i];
+				var section:SPTEntry=new SPTEntry();
+				section.flag1=parseInt(xmlSection.@flag1,16);
+				section.flag2=parseInt(xmlSection.@flag2,16);
+				sections[i]=section;
+			}
+		}
+		
+		public function loadSection(sectionID:uint,sectionXML:XML,table:Table):void {
+			if(sectionID>=sections.length) throw new ArgumentError("SectionID is larger than the list of sections!");
+			if(!sectionXML) throw new ArgumentError("SectionXML can not be null!");
+			
+			var section:SPTEntry=sections[sectionID];
+			
+			section.loadScript(sectionXML,table);
+		}
+		
+		private static function bytesToSize(bytes:uint):uint {
+			return bytes/2-1;
+		}
+		
 		private function readSection(id:uint):ByteArray {
 			if(id>=sections.length) throw new RangeError("id is too high, max is "+sections.length+" but tried to read "+id+".");
 			var o:ByteArray=new ByteArray();
-			var entry:Entry=sections[id];
+			var entry:SPTEntry=sections[id];
 			//_data.positon=entry.offset;
 			o.writeBytes(_data,entry.offset,(entry.size+1)*2);
 			o.position=0;
@@ -202,7 +277,7 @@
 			}
 		}
 		
-		public function buildSection(script:XML,table:Table):ByteArray {
+		internal static function buildSection(script:XML,table:Table):ByteArray {
 			var o:ByteArray=new ByteArray();
 			o.endian=Endian.LITTLE_ENDIAN;
 			
@@ -228,7 +303,7 @@
 			return o;
 		}
 		
-		private function writeText(o:ByteArray,table:Table,text:String):void {
+		private static function writeText(o:ByteArray,table:Table,text:String):void {
 			
 			for(var pos:uint=0;pos<text.length;++pos) {
 				var char:String=text.substr(pos,1);
@@ -245,12 +320,14 @@
 					hexString=table.matchReverseEntry(char);
 				}
 				
+				hexString=hexString.substr(2,2)+hexString.substr(0,2);
+				
 				var toWrite:uint=parseInt(hexString,16);
 				o.writeShort(toWrite);
 			}
 		}
 		
-		private function writeCommand(o:ByteArray,command:XML):void {
+		private static function writeCommand(o:ByteArray,command:XML):void {
 			var args:Vector.<uint>;
 			
 			if(command.@args) {
@@ -296,7 +373,7 @@
 			}
 		}
 		
-		private function argsStringToVector(args:String):Vector.<uint> {
+		private static function argsStringToVector(args:String):Vector.<uint> {
 			var pieces:Array=args.split(",");
 			var o:Vector.<uint>=new Vector.<uint>(pieces.length);
 			for(var i:uint=0;i<o.length;++i) {
@@ -305,7 +382,7 @@
 			return o;
 		}
 		
-		private function writeRawCommand(o:ByteArray,command:uint,args:Vector.<uint>=null):void {
+		private static function writeRawCommand(o:ByteArray,command:uint,args:Vector.<uint>=null):void {
 			o.writeShort(command);
 			
 			if(!args) return;
@@ -318,11 +395,4 @@
 
 	}
 	
-}
-
-class Entry {
-	public var offset:uint;
-	public var size:uint;
-	public var flag1:uint;
-	public var flag2:uint;
 }

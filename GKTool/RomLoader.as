@@ -10,8 +10,6 @@
 	
 	public class RomLoader extends EventDispatcher {
 		
-		public var load_btn:SimpleButton;
-		
 		private var fr:FileReference;
 		
 		private var menu:MainMenu;
@@ -49,7 +47,7 @@
 				
 			} catch(err:Error) {
 				menu.status_txt.text="Loading failed:\n"+err.message;
-				load_btn.addEventListener(MouseEvent.CLICK,clickLoad);
+				menu.loadRom_mc.addEventListener(MouseEvent.CLICK,clickLoad);
 				return;
 			}
 			

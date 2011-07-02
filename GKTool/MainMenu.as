@@ -53,7 +53,7 @@
 			spt_mc.addEventListener(MouseEvent.CLICK,sptExtract);
 			sptBuild_mc.label="Rebuild SPT files";
 			sptBuild_mc.addEventListener(MouseEvent.CLICK,sptBuild);
-			sptBuild_mc.enabled=false;
+			//sptBuild_mc.enabled=false;
 		}
 		
 		private function sptBuild(e:MouseEvent):void {
