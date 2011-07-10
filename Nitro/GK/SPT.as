@@ -182,7 +182,8 @@
 						}
 						
 						if(table) {
-							var text:String=(word & 0xFF).toString(16)+type.toString(16);//byte order swap and hex encoding
+							var text:String=((word & 0xFF)<<8|type).toString(16);//byte order swap and hex encoding
+							text=pad(text,false,4,"0");
 							text=table.matchEntry(text);
 							if(lastCommand) {
 								o.insertChildAfter(lastCommand,text);
@@ -393,6 +394,16 @@
 
 		}
 
+		private function pad(str:String,leftSide:Boolean=false,len:uint=2,padding:String=" "):String {
+			while(str.length<len) {
+				if(leftSide) {
+					str=padding+str;
+				} else {
+					str+=padding;
+				}
+			}
+			return str;
+		}
 	}
 	
 }

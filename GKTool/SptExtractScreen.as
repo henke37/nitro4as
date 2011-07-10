@@ -41,6 +41,9 @@
 			
 			numberSize=archive.length.toString().length;
 			
+			XML.prettyPrinting=true;
+			XML.prettyIndent=2;
+			
 			return archive.length;
 		}
 		
