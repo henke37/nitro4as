@@ -38,7 +38,7 @@
 			
 			var files:Array=outDir.getDirectoryListing();
 			
-			
+			checkpoints=new Vector.<uint>();
 			
 			var totalWork:uint=0;
 			
@@ -50,17 +50,25 @@
 				if(entry.isSpt) {
 					var sections:Array=subFile.getDirectoryListing();
 					
-					sections.filter( function (file:File, index:uint, array:Array) { return file.name.match(/^([0-9]+)/); } );
+					function numberFilesOnly(file:File, index:uint, array:Array):Boolean {
+						//trace(file.name.match(/^([0-9]+)/));
+						return Boolean(file.name.match(/^([0-9]+)/));
+					}
+					
+					sections=sections.filter( numberFilesOnly );
 					
 					entry.headerFile=new File(subFile.nativePath+File.separator+"header.xml");
 					
 					entry.outFile=new File(subFile.nativePath+".spt");
+					
+					//trace(sections);
 					
 					entry.sections=sections;
 					totalWork+=entry.sections.length;
 				}
 				++totalWork;
 				sptFiles.push(entry);
+				checkpoints.push(totalWork);
 			}
 			
 			sptIndex=0;
