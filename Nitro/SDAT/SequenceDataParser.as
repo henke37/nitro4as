@@ -7,7 +7,7 @@
 	
 	public class SequenceDataParser {
 		
-		sequenceInternal static function parse(sdat:ByteArray,offset:uint) {
+		sequenceInternal static function parse(data:ByteArray) {
 			var track:SequenceTrack;
 			var tracks:Vector.<SequenceTrack>;
 			
@@ -18,142 +18,142 @@
 			
 			var trackStarts:Vector.<uint>=new Vector.<uint>();
 			
-			sdat.position=offset;
-			
 			//var offsets:Vector.<Object>=new Vector.<Object>();
 			
 			for(;;) {
 				
 				var trackOver:Boolean=false;
 				
-				var command:uint=sdat.readUnsignedByte();
+				var command:uint=data.readUnsignedByte();
 				
 				if(command<0x80) {//notes
-					track.events.push(new NoteEvent(command,sdat.readUnsignedByte(),readVarLen(sdat)));
+					track.events.push(new NoteEvent(command,data.readUnsignedByte(),readVarLen(data)));
 					continue;
 				}
 				
 				switch(command) {
 					
 					case 0x80:
-						track.events.push(new RestEvent(readVarLen(sdat)));
+						track.events.push(new RestEvent(readVarLen(data)));
 					break;
 					
 					case 0x81:
-						track.events.push(new ProgramChangeEvent(readVarLen(sdat)));
+						track.events.push(new ProgramChangeEvent(readVarLen(data)));
 					break;
 					
 					case 0x93://open track
-						sdat.position+=1;//skip past the id
-						trackStarts.push(read3ByteInt(sdat));
+						data.position+=1;//skip past the id
+						var trackPos:uint=read3ByteInt(data);
+						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
+						trackStarts.push(trackPos);
 					break;
 					
 					case 0x94:
-						track.events.push(new JumpEvent(read3ByteInt(sdat),false));
+						track.events.push(new JumpEvent(read3ByteInt(data),false));
 					break;
 					
 					case 0x95://call
-						track.events.push(new JumpEvent(read3ByteInt(sdat),true));
+						track.events.push(new JumpEvent(read3ByteInt(data),true));
 					break;
 					
 					case 0xC0:
-						track.events.push(new PanEvent(sdat.readUnsignedByte()));
+						track.events.push(new PanEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xC1:
-						track.events.push(new VolumeEvent(sdat.readUnsignedByte(),false));
+						track.events.push(new VolumeEvent(data.readUnsignedByte(),false));
 					break;
 					
 					case 0xC2:
-						track.events.push(new VolumeEvent(sdat.readUnsignedByte(),true));//master
+						track.events.push(new VolumeEvent(data.readUnsignedByte(),true));//master
 					break;
 					
 					case 0xC3:
-						track.events.push(new TransposeEvent(sdat.readUnsignedByte()));
+						track.events.push(new TransposeEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xC4:
-						track.events.push(new PitchBendEvent(sdat.readUnsignedByte(),false));
+						track.events.push(new PitchBendEvent(data.readUnsignedByte(),false));
 					break;
 					
 					case 0xC5:
-						track.events.push(new PitchBendEvent(sdat.readUnsignedByte(),true));//range
+						track.events.push(new PitchBendEvent(data.readUnsignedByte(),true));//range
 					break;
 					
 					case 0xC6:
-						track.events.push(new PriorityEvent(sdat.readUnsignedByte()));
+						track.events.push(new PriorityEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xC7:
-						track.events.push(new MonoPolyEvent(sdat.readBoolean()));
+						track.events.push(new MonoPolyEvent(data.readBoolean()));
 					break;
 					
 					case 0xCA:
-						track.events.push(new ModulationEvent("depth",sdat.readUnsignedByte()));
+						track.events.push(new ModulationEvent("depth",data.readUnsignedByte()));
 					break;
 					
 					case 0xCB:
-						track.events.push(new ModulationEvent("speed",sdat.readUnsignedByte()));
+						track.events.push(new ModulationEvent("speed",data.readUnsignedByte()));
 					break;
 					
 					case 0xCC:
-						track.events.push(new ModulationEvent("type",sdat.readUnsignedByte()));
+						track.events.push(new ModulationEvent("type",data.readUnsignedByte()));
 					break;
 					
 					case 0xCD:
-						track.events.push(new ModulationEvent("range",sdat.readUnsignedByte()));
+						track.events.push(new ModulationEvent("range",data.readUnsignedByte()));
 					break;
 					
 					case 0xCE:
-						track.events.push(new PortamentoEvent(sdat.readBoolean()));
+						track.events.push(new PortamentoEvent(data.readBoolean()));
 					break;
 					
 					case 0xCF:
-						track.events.push(new PortamentoTimeEvent(sdat.readUnsignedByte()));
+						track.events.push(new PortamentoTimeEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xD0:
-						track.events.push(new ADSREvent("A",sdat.readUnsignedByte()));
+						track.events.push(new ADSREvent("A",data.readUnsignedByte()));
 					break;
 					
 					case 0xD1:
-						track.events.push(new ADSREvent("D",sdat.readUnsignedByte()));
+						track.events.push(new ADSREvent("D",data.readUnsignedByte()));
 					break;
 					
 					case 0xD2:
-						track.events.push(new ADSREvent("S",sdat.readUnsignedByte()));
+						track.events.push(new ADSREvent("S",data.readUnsignedByte()));
 					break;
 					
 					case 0xD3:
-						track.events.push(new ADSREvent("R",sdat.readUnsignedByte()));
+						track.events.push(new ADSREvent("R",data.readUnsignedByte()));
 					break;
 					
 					case 0xE0:
-						track.events.push(new ModulationEvent("delay",sdat.readUnsignedShort()));
+						track.events.push(new ModulationEvent("delay",data.readUnsignedShort()));
 					break;
 					
 					case 0xE1:
-						track.events.push(new TempoEvent(sdat.readUnsignedShort()));
+						track.events.push(new TempoEvent(data.readUnsignedShort()));
 					break;
 					
 					case 0xE3:
-						track.events.push(new SweepPitchEvent(sdat.readUnsignedShort()));
+						track.events.push(new SweepPitchEvent(data.readUnsignedShort()));
 					break;
 					
 					case 0xD4:
-						track.events.push(new LoopStartEvent(sdat.readUnsignedByte()));
+						track.events.push(new LoopStartEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xD5://Expression
-						track.events.push(new ExpressionEvent(sdat.readUnsignedByte()));
+						track.events.push(new ExpressionEvent(data.readUnsignedByte()));
 					break;
 					
 					case 0xD6://print var
-						sdat.position+=1;
+						data.position+=1;
 					break;					
 					
 					case 0xFE://Multitrack marker op
-						sdat.position+=2;//unknown data
+						data.position+=2;//unknown data
 					break;
 					
 					case 0xFC:
@@ -177,7 +177,7 @@
 					if(trackStarts.length==0) {
 						break;
 					} else {
-						sdat.position=offset+trackStarts.shift();
+						data.position=trackStarts.shift();
 						trackOver=false;
 						
 						track=new SequenceTrack();
@@ -189,10 +189,10 @@
 			return tracks;
 		}
 		
-		private static function readVarLen(sdat:ByteArray):uint {
+		private static function readVarLen(data:ByteArray):uint {
 			var value:uint=0;
 			do {
-				var byte:uint=sdat.readUnsignedByte();
+				var byte:uint=data.readUnsignedByte();
 				
 				value<<=7;
 				value|=byte&0x7F;
@@ -200,9 +200,9 @@
 			return 0;
 		}
 		
-		private static function read3ByteInt(sdat:ByteArray):uint {
-			var value:uint=sdat.readUnsignedByte();
-			value+=sdat.readUnsignedShort()<<8;
+		private static function read3ByteInt(data:ByteArray):uint {
+			var value:uint=data.readUnsignedByte();
+			value+=data.readUnsignedShort()<<8;
 			return value;
 		}
 	}

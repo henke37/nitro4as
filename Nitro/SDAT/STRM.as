@@ -2,6 +2,8 @@
 	
 	import flash.utils.*;
 	
+	import Nitro.*;
+	
 	use namespace strmInternal;
 	
 	public class STRM extends SubFile {
@@ -20,57 +22,52 @@
 		
 		strmInternal var dataPos:uint;
 		
-		strmInternal var sdat:ByteArray;
+		strmInternal var sampleData:ByteArray;
 
 		public function STRM() {
 			
 		}
 		
-		public override function parse(strmPos:uint,_sdat:ByteArray):void {
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
-			}
-			sdat.position=strmPos;
-			
-			var type:String;
-			
-			type=sdat.readUTFBytes(4);
-			if(type!="STRM") {
-				throw new ArgumentError("Invalid STRM block, wrong type id "+type);
+		public override function parse(data:ByteArray):void {
+			if(!data) {
+				throw new ArgumentError("data can not be null!");
 			}
 			
-			sdat.position=strmPos+16;
-			type=sdat.readUTFBytes(4);
-			if(type!="HEAD") {
-				throw new ArgumentError("Invalid STRM block, wrong head id "+type);
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
+			
+			if(sections.id!="STRM") {
+				throw new ArgumentError("Invalid STRM block, wrong type id "+sections.id);
 			}
-			sdat.position+=4;
-			encoding=sdat.readUnsignedByte();
-			loop=sdat.readBoolean();
-			channels=sdat.readUnsignedByte();
-			sdat.position+=1;
-			sampleRate=sdat.readUnsignedShort();
-			sdat.position+=2;
-			loopPoint=sdat.readUnsignedInt();
-			sampleCount=sdat.readUnsignedInt();
-			dataPos=sdat.readUnsignedInt()+strmPos;
-			nBlock=sdat.readUnsignedInt();
-			blockLength=sdat.readUnsignedInt();
-			blockSamples=sdat.readUnsignedInt();
-			lastBlockLength=sdat.readUnsignedInt();
-			lastBlockSamples=sdat.readUnsignedInt();
+
+			readHEAD(sections.open("HEAD"));
+
+			sampleData=sections.open("DATA");
+		}
+		
+		private function readHEAD(section:ByteArray):void {
+			
+			section.endian=Endian.LITTLE_ENDIAN;
+			
+			encoding=section.readUnsignedByte();
+			loop=section.readBoolean();
+			channels=section.readUnsignedByte();
+			section.position+=1;
+			sampleRate=section.readUnsignedShort();
+			section.position+=2;
+			loopPoint=section.readUnsignedInt();
+			sampleCount=section.readUnsignedInt();
+			dataPos=section.readUnsignedInt();
+			nBlock=section.readUnsignedInt();
+			blockLength=section.readUnsignedInt();
+			blockSamples=section.readUnsignedInt();
+			lastBlockLength=section.readUnsignedInt();
+			lastBlockSamples=section.readUnsignedInt();
 			
 			if(loop) {
 				if(loopPoint>sampleCount) {
 					throw new ArgumentError("Invalid STRM, loopPoint>sampleCount");
 				}
-			}
-			
-			sdat.position=dataPos-8;//header before raw data
-			type=sdat.readUTFBytes(4);
-			if(type!="DATA") {
-				throw new ArgumentError("Invalid STRM block, incorrect DATA header type "+type);
 			}
 		}
 		

@@ -1,12 +1,13 @@
 ﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
+	import Nitro.SectionedFile;
 	
 	//use namespace strmInternal;
 	
 	public class SWAR extends SubFile{
 
-		private var sdat:ByteArray;
+		private var data:ByteArray;
 		
 		public var waves:Vector.<Wave>;
 
@@ -14,41 +15,44 @@
 			
 		}
 		
-		public override function parse(swarPos:uint,_sdat:ByteArray):void {
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
+		public override function parse(data:ByteArray):void {
+			this.data=data;
+			if(!data) {
+				throw new ArgumentError("data can not be null!");
 			}
-			sdat.position=swarPos;
+			data.position=0;
 			
-			var type:String;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			type=sdat.readUTFBytes(4);
-			if(type!="SWAR") {
+			if(sections.id!="SWAR") {
 				throw new ArgumentError("Invalid SWAR block, wrong type id");
 			}
 			
-			sdat.position=swarPos+16;
-			type=sdat.readUTFBytes(4);
-			if(type!="DATA") {
-				throw new ArgumentError("Invalid SWAR block, wrong head id " + type);
-			}
+			parseDATA(sections.open("DATA"));
 			
-			sdat.position=swarPos+56;
-			var count:uint=sdat.readUnsignedInt();
+			
+		}
+		
+		private function parseDATA(section:ByteArray):void {
+			
+			section.endian=Endian.LITTLE_ENDIAN;
+			
+			const padding:uint=8*4;//pointless padding
+			section.position=padding;
+			var count:uint=section.readUnsignedInt();
 			
 			//trace(count);
 			
 			waves=new Vector.<Wave>();
 			
 			for(var i:uint;i<count;++i) {
-				sdat.position=swarPos+60+4*i;
-				var pos=sdat.readUnsignedInt()+swarPos;
+				section.position=padding+4+4*i;
+				var pos=section.readUnsignedInt();
 				var wave:Wave=new Wave();
-				wave.parse(pos,_sdat);
+				wave.parse(pos,section);
 				waves.push(wave);
 			}
-			
 		}
 
 	}

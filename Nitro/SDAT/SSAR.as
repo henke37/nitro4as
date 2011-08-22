@@ -1,6 +1,7 @@
 ﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
+	import Nitro.SectionedFile;
 	
 	public class SSAR extends SubFile {
 		
@@ -12,28 +13,20 @@
 			
 		}
 		
-		public override function parse(ssarPos:uint,_sdat:ByteArray):void {
+		public override function parse(data:ByteArray):void {
 			
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
-			}
-			sdat.position=ssarPos;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			var type:String
-			
-			type=sdat.readUTFBytes(4);
-			if(type!="SSAR") {
+			if(sections.id!="SSAR") {
 				throw new ArgumentError("Invalid SSAR block, wrong type id");
 			}
 			
-			sdat.position=ssarPos+16;
-			type=sdat.readUTFBytes(4);
-			if(type!="DATA") {
-				throw new ArgumentError("Invalid SSAR block, wrong head id " + type);
-			}
+			readDATA(sections.open("DATA"));
+		}
+		
+		private function readDATA(section:ByteArray):void {
 			
-			//trace(ssarPos);
 		}
 
 	}

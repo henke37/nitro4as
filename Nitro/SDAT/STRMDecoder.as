@@ -37,6 +37,8 @@
 		
 		private var position:uint=0;//measured in samples
 		
+		public function get playbackPosition():uint { return position; }
+		
 		public function reset():void {
 			position=0;
 		}
@@ -50,7 +52,7 @@
 			//init the decode count as zero
 			var samplesLeftToDecode:uint=renderSize;
 			
-			stream.sdat.endian=Endian.LITTLE_ENDIAN;
+			stream.sampleData.endian=Endian.LITTLE_ENDIAN;
 			
 			var lastBlock:Boolean=false;
 			
@@ -85,7 +87,7 @@
 				//decode the blocks for each channel
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
 
-					var blockStartOffset:uint=stream.dataPos+(blockNumber*stream.channels)*stream.blockLength;					
+					var blockStartOffset:uint=(blockNumber*stream.channels)*stream.blockLength;					
 					blockStartOffset += currentChannel*blockLen;
 					
 					if(stream.encoding==Wave.ADPCM) {
@@ -94,19 +96,19 @@
 						
 						//init the decoder if the offset is zero
 						if(blockCurrentSample==0) {
-							stream.sdat.position=blockStartOffset;
+							stream.sampleData.position=blockStartOffset;
 							
 							trace("block init "+blockNumber+","+position+","+blockStartOffset);
 							
-							var predictor:uint=stream.sdat.readShort();
-							var stepIndex:uint=stream.sdat.readShort();
+							var predictor:uint=stream.sampleData.readShort();
+							var stepIndex:uint=stream.sampleData.readShort();
 							decoder.init(predictor,stepIndex);
 						}
 						
-						stream.sdat.position=blockStartOffset+adpcmHeaderLength+blockCurrentSample/2;
-						decoder.decodeBlock(stream.sdat,samplesToDecode,decodeBuffers[currentChannel]);
+						stream.sampleData.position=blockStartOffset+adpcmHeaderLength+blockCurrentSample/2;
+						decoder.decodeBlock(stream.sampleData,samplesToDecode,decodeBuffers[currentChannel]);
 					} else {
-						stream.sdat.position=blockStartOffset+blockCurrentSample/2;
+						stream.sampleData.position=blockStartOffset+blockCurrentSample/2;
 						
 						decodePCM(samplesToDecode,decodeBuffers[currentChannel]);
 					}
@@ -149,9 +151,9 @@
 			var i:uint;
 			for(i=0;i<blockSamples;++i) {
 				if(stream.encoding==1) {
-					sample=shortToNumber(stream.sdat.readUnsignedShort());
+					sample=shortToNumber(stream.sampleData.readUnsignedShort());
 				} else {
-					sample=byteToNumber(stream.sdat.readByte());
+					sample=byteToNumber(stream.sampleData.readByte());
 				}				
 				outBuf[i]=sample;
 			}
@@ -165,7 +167,7 @@
 			
 			//and then rend past the stuff in the block we don't need
 			var renderSize:uint=newPos % stream.blockSamples;
-			//render(new ByteArray(),renderSize);
+			render(new ByteArray(),renderSize);
 		}
 
 	}

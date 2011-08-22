@@ -58,6 +58,17 @@
 		
 		public function get data():ByteArray { return _data; }
 		
+		public function getDataOffsetForId(id:String):uint {
+			if(!id) throw new ArgumentError("Id can not be null!");
+			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
+			
+			if(!id in sections) throw new ArgumentError("Section id \""+id+"\" does not exist.");
+			
+			var section:Section=sections[id];
+			return section.offset+sectionHeaderSize;
+		}
+																				
+		
 		public function open(id:String):ByteArray {
 			
 			if(!id) throw new ArgumentError("Id can not be null!");

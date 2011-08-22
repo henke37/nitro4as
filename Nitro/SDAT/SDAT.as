@@ -76,9 +76,13 @@
 			
 			files=parseFat(fatPos);
 			for each(var file:FATRecord in files) {
-				sdat.position=file.pos;
-				var fileType:String=sdat.readUTFBytes(4);
-				//trace(fileType);
+				
+				var subFileData:ByteArray=new ByteArray();
+				subFileData.writeBytes(sdat,file.pos,file.size);
+				subFileData.position=0;
+				
+				var fileType:String=subFileData.readUTFBytes(4);
+				subFileData.position=0;
 				
 				var subFile:SubFile=null;
 				var container:*;
@@ -110,11 +114,12 @@
 					break;
 					
 					default:
+					break;
 						throw new Error("Unknown filetype encountered");
 					break;
 				}
 				
-				subFile.parse(file.pos,sdat);
+				subFile.parse(subFileData);
 				container.push(subFile);
 			}
 			

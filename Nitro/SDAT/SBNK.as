@@ -1,41 +1,35 @@
 ﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
+	import Nitro.SectionedFile;
 	
 	//use namespace strmInternal;
 	
 	public class SBNK extends SubFile {
 
-		private var sdat:ByteArray;
-		
 		public var instruments:Vector.<Instrument>;
 
 		public function SBNK() {
 			
 		}
 		
-		public override function parse(bankPos:uint,_sdat:ByteArray):void {
+		public override function parse(data:ByteArray):void {
 			
-			var magic:String;
-			
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
-			}
-			sdat.position=bankPos;
-			magic=sdat.readUTFBytes(4);
-			if(magic!="SBNK") {
-				throw new ArgumentError("Invalid SBNK block, wrong type id "+magic);
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
+
+			if(sections.id!="SBNK") {
+				throw new ArgumentError("Invalid SBNK block, wrong type id "+sections.id);
 			}
 			
-			sdat.position=bankPos+16;
-			magic=sdat.readUTFBytes(4);
-			if(magic!="DATA") {
-				throw new ArgumentError("Invalid SBNK block, wrong data header id "+magic);
-			}
+			readDATA(sections.open("DATA"));
 			
-			sdat.position=bankPos+16+4+4+8*4;
-			var numInstruments:uint=sdat.readUnsignedInt();
+		}
+		
+		private function readDATA(section:ByteArray):void {
+			const padding:uint=8*4;
+			section.position=padding;
+			var numInstruments:uint=section.readUnsignedInt();
 			
 			return;
 			
@@ -43,10 +37,9 @@
 			
 			var realInstruments:uint;
 			for(var i:uint;i<numInstruments;++i) {
-				var type:uint=sdat.readUnsignedByte();
-				var offset:uint=sdat.readUnsignedShort();
-				offset+=bankPos;
-				var instrument:Instrument=makeInstrument(type,offset);
+				var type:uint=section.readUnsignedByte();
+				var offset:uint=section.readUnsignedShort();
+				var instrument:Instrument=makeInstrument(section,type,offset);
 				
 				if(instrument) {
 					++realInstruments;
@@ -58,7 +51,7 @@
 			//trace(numInstruments,realInstruments);
 		}
 		
-		private function makeInstrument(type:uint,offset:uint):Instrument {
+		private function makeInstrument(section:ByteArray,type:uint,offset:uint):Instrument {
 			switch(type) {
 				case 0:
 					return null;
@@ -67,11 +60,11 @@
 				case 1:
 				case 2:
 				case 3:
-					return parseSimpleInstrument(offset);
+					return parseSimpleInstrument(section,offset);
 				break;
 				
 				case 16:
-					return parseDrumInstrument(offset);
+					return parseDrumInstrument(section,offset);
 				break;
 				
 				case 17:
@@ -84,21 +77,21 @@
 			}
 		}
 		
-		private function parseSimpleInstrument(offset:uint):Instrument {
+		private function parseSimpleInstrument(section:ByteArray,offset:uint):Instrument {
 			var instrument:Instrument=new Instrument();
-			sdat.position=offset;
+			section.position=offset;
 			var region:InstrumentRegion=new InstrumentRegion();
-			region.parse(sdat);
+			region.parse(section);
 			instrument.definitions.push(region);
 			return instrument;
 		}
 		
-		private function parseDrumInstrument(offset:uint):Instrument {
+		private function parseDrumInstrument(section:ByteArray,offset:uint):Instrument {
 			var instrument:Instrument=new Instrument();
-			sdat.position=offset;
+			section.position=offset;
 			
-			var low:uint=sdat.readUnsignedByte();
-			var high:uint=sdat.readUnsignedByte();
+			var low:uint=section.readUnsignedByte();
+			var high:uint=section.readUnsignedByte();
 			
 			if(high<low) {
 				throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
@@ -107,9 +100,9 @@
 			var range:uint=high-low;
 			
 			for(var i:uint;i<range;++i) {
-				sdat.position=offset+2+i*12+2;
+				section.position=offset+2+i*12+2;
 				var region:InstrumentRegion=new InstrumentRegion();
-				region.parse(sdat);
+				region.parse(section);
 				instrument.definitions.push(region);
 			}
 			

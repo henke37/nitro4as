@@ -1,47 +1,39 @@
 ﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
+	import Nitro.*;
 	
 	use namespace sequenceInternal;
 	
 	public class SSEQ extends SubFile {
-		
-		private var sdat:ByteArray;
-		
+				
 		sequenceInternal var tracks;
 
 		public function SSEQ() {
 			
 		}
 		
-		public override function parse(sseqPos:uint,_sdat:ByteArray):void {
+		public override function parse(data:ByteArray):void {
 			
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
-			}
-			sdat.position=sseqPos;
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
 			
-			var type:String
-			
-			type=sdat.readUTFBytes(4);
-			if(type!="SSEQ") {
+			if(sections.id!="SSEQ") {
 				throw new ArgumentError("Invalid SSEQ block, wrong type id");
 			}
 			
-			sdat.position=sseqPos+16;
-			type=sdat.readUTFBytes(4);
-			if(type!="DATA") {
-				throw new ArgumentError("Invalid SSEQ block, wrong head id " + type);
-			}
+			var section:ByteArray=sections.open("DATA");			
+			section.endian=Endian.LITTLE_ENDIAN;
 			
-			var offset:uint;
+			//This has to be one of the most complicated things to do "right", yet simple to do "wrong".
+			var offset:uint=section.readUnsignedInt();
+			offset-=sections.getDataOffsetForId("DATA");
+			var sequenceData:ByteArray=new ByteArray();
+			sequenceData.writeBytes(section,offset);
+			sequenceData.position=0;
+			sequenceData.endian=Endian.LITTLE_ENDIAN;
 			
-			sdat.position=sseqPos+24;
-			offset=sdat.readUnsignedInt();
-			offset+=sseqPos;
-			
-			tracks=SequenceDataParser.parse(sdat,offset);
+			tracks=SequenceDataParser.parse(sequenceData);
 		}
 
 	}
