@@ -12,7 +12,7 @@
 	public class PACTest extends MovieClip {
 		
 		
-		var loader:URLLoader;
+		private var loader:URLLoader;
 		
 		public function PACTest() {
 			loader=new URLLoader();

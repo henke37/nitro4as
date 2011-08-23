@@ -61,7 +61,7 @@
 			}
 		}
 		
-		var streamPlayer:STRMPlayer;
+		private var streamPlayer:STRMPlayer;
 		private function streamTest(streamNumber:uint,dump:Boolean):void {
 			var stream:STRM=reader.streams[streamNumber];
 			
@@ -75,7 +75,7 @@
 			}
 		}
 		
-		var wave:WaveWriter;
+		private var wave:WaveWriter;
 		private function dumpWave(stream:STRM):void {
 			wave=new WaveWriter(true,32,stream.sampleRate);
 			var buff:ByteArray=new ByteArray();
@@ -106,8 +106,8 @@
 			fr.save(wave.outBuffer,"strm.wav");
 		}
 		
-		var wavePlayer:WavePlayer;
-		private function swarTest(swar:uint,sub:uint) {
+		private var wavePlayer:WavePlayer;
+		private function swarTest(swar:uint,sub:uint):void {
 			var wave:Wave=reader.waveArchives[swar].waves[sub];
 			wavePlayer=new WavePlayer(wave);
 			wavePlayer.play();

@@ -4,7 +4,7 @@
 		
 		public var files:Vector.<AbstractFile>;
 
-		public function Directory(name,parent) {
+		public function Directory(name:String,parent:Directory) {
 			super(name,parent);
 			
 			files=new Vector.<AbstractFile>();

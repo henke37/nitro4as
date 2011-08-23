@@ -2,7 +2,7 @@
 	
 	public class RestEvent extends SequenceEvent {
 
-		public var rest;
+		public var rest:uint;
 
 		public function RestEvent(_rest:uint) {
 			rest=_rest;

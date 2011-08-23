@@ -38,6 +38,14 @@
 			playChannel.stop();
 		}
 		
+		public function get position():uint {
+			return decoder.playbackPosition;
+		}
+		
+		public function set position(p:uint):void {
+			decoder.seek(p);
+		}
+		
 		private function onSampleRequest(e:SampleDataEvent):void {
 			const renderSize:uint=8000;
 			resampler.generate(e.data,renderSize);

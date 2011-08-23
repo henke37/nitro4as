@@ -41,7 +41,7 @@
 			for(var animIttr:uint=0;animIttr<animCount;++animIttr) {
 				
 				section.position=animOffset+animIttr*animSize;
-				var anim=new NANRAnim();
+				var anim:NANRAnim=new NANRAnim();
 				var frameCount:uint=section.readUnsignedInt();
 				var dataType:uint=section.readUnsignedShort();
 				section.position+=6;//unknown
@@ -110,7 +110,7 @@
 				var animXML:XML=<animation />;
 				
 				for each(var frame:NANRFrame in animation.frames) {
-					var frameXML=<frame time={frame.frameTime} cell={frame.position.cellIndex} />;
+					var frameXML:XML=<frame time={frame.frameTime} cell={frame.position.cellIndex} />;
 					animXML.appendChild(frameXML);
 				}
 				

@@ -71,7 +71,7 @@
 				picture.fixed=true;
 				index=0;
 				while(section.position<dataSize+dataOffset) {
-					var byte=section.readUnsignedByte();
+					var byte:uint=section.readUnsignedByte();
 					if(bitDepth==4) {
 						picture[index++]=byte & 0xF;
 						picture[index++]=byte >> 4;

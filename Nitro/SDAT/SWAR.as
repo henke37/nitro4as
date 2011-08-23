@@ -48,7 +48,7 @@
 			
 			for(var i:uint;i<count;++i) {
 				section.position=padding+4+4*i;
-				var pos=section.readUnsignedInt();
+				var pos:uint=section.readUnsignedInt();
 				var wave:Wave=new Wave();
 				wave.parse(pos,section);
 				waves.push(wave);

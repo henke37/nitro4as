@@ -7,13 +7,7 @@
 		var palette:Vector.<uint>;
 		
 		if(isRGB555) {
-			palette=new Vector.<uint>();
-			palette.length=inPalette.length;
-			palette.fixed=true;
-			
-			for(i=0;i<palette.length;++i) {
-				palette[i]=RGB555.fromRGB555(inPalette[i]);
-			}
+			palette=RGB555.paletteFromRGB555(inPalette);
 		} else {
 			palette=inPalette;
 		}

@@ -13,7 +13,7 @@
 			oams=new Vector.<OamTile>();
 			
 			for each (var cell:Cell in cells.cells) {
-				for each(var oam in cell.oams) {
+				for each(var oam:CellOam in cell.oams) {
 					if(!inOams(oam)) {
 						oams.push(oam.cloneOamTile());
 					}

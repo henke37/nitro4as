@@ -133,7 +133,7 @@
 			return o;
 		}
 		
-		public function parseSection(id:uint,table:Table=null) {
+		public function parseSection(id:uint,table:Table=null):XML {
 			
 			var section:ByteArray=readSection(id);
 			section.endian=Endian.LITTLE_ENDIAN;
@@ -206,7 +206,7 @@
 			return o;
 		}
 		
-		private function parseCommand(commandData:Vector.<uint>) {
+		private function parseCommand(commandData:Vector.<uint>):XML {
 			var commandType:uint=commandData.shift();
 			
 			var args:String="";

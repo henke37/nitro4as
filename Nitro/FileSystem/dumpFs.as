@@ -1,5 +1,5 @@
 ﻿package Nitro.FileSystem {
-	public function dumpFs(dir:Directory) {
+	public function dumpFs(dir:Directory):XML {
 		var o:XML=<dir name={dir.name} />;
 		
 		for each(var abf:AbstractFile in dir.files) {

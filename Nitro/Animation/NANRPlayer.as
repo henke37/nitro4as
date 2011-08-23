@@ -13,6 +13,8 @@
 		private var palette:NCLR;
 		private var cells:NCER;
 		
+		private var convertedPalette:Vector.<uint>;
+		
 		private var cellCache:Object;
 		
 		private var nextFrame:uint;
@@ -28,6 +30,8 @@
 			cells=c;
 			tiles=t;
 			palette=p;
+			
+			convertedPalette=RGB555.paletteFromRGB555(p.colors);
 			
 			cellCache={};
 		}
@@ -71,7 +75,7 @@
 			if(ci in cellCache) {
 				currentCell=cellCache[ci];
 			} else {
-				currentCell=cells.rend(ci,palette,tiles);
+				currentCell=cells.rend(ci,convertedPalette,tiles);
 				cellCache[ci]=currentCell;
 			}
 			

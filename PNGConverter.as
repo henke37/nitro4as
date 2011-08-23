@@ -76,7 +76,9 @@
 			
 			creator.buildTiles(true);
 			
-			var render:DisplayObject=creator.ncgr.render(creator.palette);
+			var convertedPalette:Vector.<uint>=RGB555.paletteFromRGB555(creator.palette);
+			
+			var render:DisplayObject=creator.ncgr.render(convertedPalette);
 			render.x=b.width;
 			addChild(render);
 		}

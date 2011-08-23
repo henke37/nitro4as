@@ -4,6 +4,8 @@
 	
 	//use namespace strmInternal;
 	
+	import Nitro.*;
+	
 	public class SWAV extends SubFile {
 
 		private var sdat:ByteArray;
@@ -15,24 +17,19 @@
 			
 		}
 		
-		public override function parse(swavPos:uint,_sdat:ByteArray):void {
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
-			}
-			sdat.position=swavPos;
-			type=sdat.readUTFBytes(4);
-			if(type!="SWAV") {
+		public override function parse(data:ByteArray):void {
+			
+			var sections:SectionedFile=new SectionedFile();
+			sections.parse(data);
+
+			if(sections.id!="SWAV") {
 				throw new ArgumentError("Invalid SWAV block, wrong type id");
 			}
 			
-			sdat.position=swavPos+16;
-			var headType:String=sdat.readUTFBytes(4);
-			if(headType!="DATA") {
-				throw new ArgumentError("Invalid SWAV block, wrong head id " + headType);
-			}
+			var section:ByteArray=sections.open("DATA");
 			
-			wave=new Wave(swavPos+24,_sdat);
+			wave=new Wave();
+			wave.parse(0,section);
 			
 		}
 

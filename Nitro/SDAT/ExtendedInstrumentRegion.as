@@ -9,12 +9,6 @@
 		public function ExtendedInstrumentRegion() {
 			
 		}
-		
-		public function parse(sdat:ByteArray,low:uint,high:uint):void {
-			super.parse(sdat);
-			lowEnd=low;
-			highEnd=high;
-		}
 
 	}
 	

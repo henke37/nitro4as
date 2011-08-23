@@ -9,6 +9,9 @@
 	import Nitro.FileSystem.*;	
 	import Nitro.SDAT.*;
 	import Nitro.*;
+	import fl.controls.Slider;
+	
+	use namespace strmInternal;
 	
 	public class FSTest extends MovieClip {
 		
@@ -24,6 +27,11 @@
 		
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
+		
+		private var stream:STRM;
+		private var player:STRMPlayer;
+		
+		public var progress_mc:Slider;
 		
 		public function FSTest() {			
 			status=new TextField();
@@ -47,7 +55,7 @@
 			debug.y=Banner.ICON_HEIGHT*iconZoom;
 			debug.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
 			debug.width=stage.stageWidth;
-			addChild(debug);
+			//addChild(debug);
 			
 			if(loaderInfo.url.match(/^file:/) && false) {
 				status.text="Loading data";
@@ -59,9 +67,19 @@
 				status.text="Click to load game from disk";
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
+			
+			addEventListener(Event.ENTER_FRAME,updatePosition);
 		}
 		
-		var fr:FileReference;
+		private function updatePosition(e:Event):void {
+			if(!player) return;
+			progress_mc.liveDragging=false;
+			progress_mc.minimum=0;
+			progress_mc.maximum=stream.sampleCount;
+			progress_mc.value=player.position;
+		}
+		
+		private var fr:FileReference;
 		
 		private function stageClick(e:MouseEvent):void {
 			
@@ -120,9 +138,8 @@
 
 		}
 		
-		private var player:STRMPlayer;
 		private function playStream(streamNumber:uint):void {
-			var stream:STRM=sdat.streams[streamNumber];
+			stream=sdat.streams[streamNumber];
 			player=new STRMPlayer(stream);
 			player.debug=debug;
 			player.play();
@@ -132,7 +149,7 @@
 			
 			status.text="";
 			
-			for(var streamIndex in sdat.streams) {
+			for(var streamIndex:String in sdat.streams) {
 				var streamName:String;
 				if(streamIndex in sdat.streamSymbols) {
 					streamName=sdat.streamSymbols[streamIndex];

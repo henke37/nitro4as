@@ -7,7 +7,7 @@
 	
 	public class SSEQ extends SubFile {
 				
-		sequenceInternal var tracks;
+		sequenceInternal var tracks:Vector.<SequenceTrack>;
 
 		public function SSEQ() {
 			

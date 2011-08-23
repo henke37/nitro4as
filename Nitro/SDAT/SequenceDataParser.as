@@ -7,7 +7,7 @@
 	
 	public class SequenceDataParser {
 		
-		sequenceInternal static function parse(data:ByteArray) {
+		sequenceInternal static function parse(data:ByteArray):Vector.<SequenceTrack> {
 			var track:SequenceTrack;
 			var tracks:Vector.<SequenceTrack>;
 			

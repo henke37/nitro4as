@@ -34,7 +34,7 @@
 			}
 		}
 		
-		var fr:FileReference;
+		private var fr:FileReference;
 		
 		private function stageClick(e:MouseEvent):void {
 			

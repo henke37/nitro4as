@@ -14,7 +14,7 @@
 			reverseEntries={};
 		}
 
-		public function loadFromFile(request:URLRequest) {
+		public function loadFromFile(request:URLRequest):void {
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.TEXT;
 			loader.addEventListener(Event.COMPLETE,parseLoadedFile);
@@ -51,7 +51,7 @@
 			return entries[entry];
 		}
 		
-		public function matchReverseEntry(entry:String) {
+		public function matchReverseEntry(entry:String):String {
 			if(!(entry in reverseEntries)) throw new ArgumentError("Unknown reverse entry");
 			return reverseEntries[entry];
 		}

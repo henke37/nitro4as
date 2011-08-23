@@ -10,7 +10,7 @@
 	
 	public class PackerTest extends MovieClip {
 		
-		var loader:URLLoader;
+		private var loader:URLLoader;
 		
 		public function PackerTest() {
 			loader=new URLLoader();

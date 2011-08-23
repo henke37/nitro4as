@@ -98,7 +98,7 @@
 						if(blockCurrentSample==0) {
 							stream.sampleData.position=blockStartOffset;
 							
-							trace("block init "+blockNumber+","+position+","+blockStartOffset);
+							//trace("block init "+blockNumber+","+position+","+blockStartOffset);
 							
 							var predictor:uint=stream.sampleData.readShort();
 							var stepIndex:uint=stream.sampleData.readShort();

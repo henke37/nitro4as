@@ -124,7 +124,7 @@
 			nds.position=offset;
 			
 			for(var i:uint=0;i<size;i+=entrySize) {
-				var overlay=new Overlay();
+				var overlay:Overlay=new Overlay();
 				overlay.id=nds.readUnsignedInt();
 				overlay.ramAddress=nds.readUnsignedInt();
 				overlay.ramSize=nds.readUnsignedInt();
