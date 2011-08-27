@@ -13,7 +13,11 @@
 		
 		public var loopAllowed:Boolean=true;
 		
+		private var lastInitedBlock:uint;
+		
 		public var debug:TextField;
+		
+		private var position:uint=0;//measured in samples
 
 		public function STRMDecoder(_stream:STRM) {
 			if(!_stream) {
@@ -35,7 +39,6 @@
 			
 		}
 		
-		private var position:uint=0;//measured in samples
 		
 		public function get playbackPosition():uint { return position; }
 		
@@ -49,7 +52,6 @@
 			
 			const adpcmHeaderLength:uint=4;
 			
-			//init the decode count as zero
 			var samplesLeftToDecode:uint=renderSize;
 			
 			stream.sampleData.endian=Endian.LITTLE_ENDIAN;
@@ -65,7 +67,7 @@
 				var blockLen:uint;
 				var blockSamples:uint;
 				
-				if(blockNumber+(stream.channels-1)>=stream.nBlock) {
+				if(blockNumber+1>=stream.nBlock) {
 					blockLen=stream.lastBlockLength;
 					blockSamples=stream.lastBlockSamples;
 					lastBlock=true;
@@ -103,6 +105,10 @@
 							var predictor:uint=stream.sampleData.readShort();
 							var stepIndex:uint=stream.sampleData.readShort();
 							decoder.init(predictor,stepIndex);
+							
+							lastInitedBlock=blockNumber;
+						} else if (lastInitedBlock!=blockNumber) {
+							throw new Error("somehow a block begun playback in the middle!");
 						}
 						
 						stream.sampleData.position=blockStartOffset+adpcmHeaderLength+blockCurrentSample/2;
@@ -161,13 +167,19 @@
 		
 		public function seek(newPos:uint):void {
 			//position ourself at the begining of the block
-			position=uint(newPos/stream.blockSamples)*stream.blockSamples;
+			const blockSize:uint=stream.blockSamples
+			var blockNum:uint=newPos/blockSize;
+			position=blockNum*stream.blockSamples;
 			
 			trace("seeking to ",newPos,position);
 			
 			//and then rend past the stuff in the block we don't need
-			var renderSize:uint=newPos % stream.blockSamples;
-			render(new ByteArray(),renderSize);
+			var renderSize:uint=newPos % blockSize;
+			if(renderSize>0) {
+				var scratch:ByteArray=new ByteArray();
+				render(scratch,renderSize);
+				scratch.clear();
+			}
 		}
 
 	}
