@@ -48,9 +48,12 @@
 			//rendered.scaleX=2;
 			//rendered.scaleY=2;
 			rendered.x=renderedTiles.width;
-			
-			
 			addChild(rendered);
+			
+			var palR:DisplayObject=new Bitmap(drawPalette(convertedPalette,false));
+			palR.y=renderedTiles.height;
+			palR.scaleY=palR.scaleX=8;
+			addChild(palR);
 			
 		}
 	}
