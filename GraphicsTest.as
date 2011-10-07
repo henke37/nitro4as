@@ -23,11 +23,11 @@
 			loader.load(new URLRequest("korg.nds"));
 		}
 		
-		var renderedTiles:DisplayObject;
-		var tilesPalette:uint=0;
+		private var renderedTiles:DisplayObject;
+		private var tilesPalette:uint=0;
 		
-		var tiles:NCGR;
-		var convertedPalette:Vector.<uint>;
+		private var tiles:NCGR;
+		private var convertedPalette:Vector.<uint>;
 		
 		private function parse(e:Event):void {
 			nds=new NDS();
@@ -65,13 +65,13 @@
 			stage.addEventListener(KeyboardEvent.KEY_DOWN,kDown);
 		}
 		
-		function rendTiles():void {
+		private function rendTiles():void {
 			if(renderedTiles) removeChild(renderedTiles);
 			renderedTiles=tiles.render(convertedPalette,tilesPalette);
 			addChild(renderedTiles);
 		}
 		
-		function kDown(e:KeyboardEvent):void {
+		private function kDown(e:KeyboardEvent):void {
 			if(e.keyCode==Keyboard.UP && tilesPalette<15) {
 				tilesPalette++;
 				rendTiles();

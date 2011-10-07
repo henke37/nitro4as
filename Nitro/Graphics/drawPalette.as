@@ -2,6 +2,11 @@
 	
 	import flash.display.*;
 	
+	/** Draws a palette to a BitmapData for easy display.
+	@param inPalette The palette to draw
+	@param isRGB555 If the palette is in RGB555 format
+	@return A new BitmapData with the palette drawn on it*/
+	
 	public function drawPalette(inPalette:Vector.<uint>,isRGB555:Boolean=true):BitmapData {
 		var i:uint;
 		var palette:Vector.<uint>;

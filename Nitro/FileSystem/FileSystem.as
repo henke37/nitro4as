@@ -2,18 +2,28 @@
 	
 	import flash.utils.*;
 	
+	/** The filesystem contained in a NDS file. */
+	
 	public class FileSystem {
 		
 		private var nds:ByteArray;
 		private var FNTPos:uint;
 		private var FATPos:uint;
 		
+		/** The root directory of the filesystem. */
 		public var rootDir:Directory;
 
 		public function FileSystem() {
 			
 		}
 		
+		/** Loads a filesystem from a ByteArray
+		@param nds The ByteArray to load from
+		@param FNTPos The position of the file name table
+		@param FATPos The position of the file allocation table
+		@param FNTSize The size of the file name table
+		@param FATSize The size of the file allocation table
+		*/
 		public function parse(nds:ByteArray,FNTPos:uint,FNTSize:uint,FATPos:uint,FATSize:uint):void {
 			this.nds=nds;
 			this.FNTPos=FNTPos;
@@ -66,7 +76,12 @@
 			}
 			
 		}
-		
+		/**
+		Resolves a path in the filesystem into an openable file.
+		@param path The path to resolve
+		@param endOnFile Ignore trailing filenames so that files in archive files can be opened.
+		@return A new AbstractFile that can be opened.
+		*/
 		public function resolvePath(path:String,endOnFile:Boolean=false):AbstractFile {
 			var folders:Array=path.split("/");
 			
@@ -101,6 +116,13 @@
 			return entry;
 		}
 		
+		/** Searches for a filename in the filesystem
+		@param baseDir The directory to start searching in
+		@param filter The filename to search for
+		@param allowRecursion Search in subfolders too
+		@param justFirst Stop after the first match
+		@return A new vector containing the found matches
+		*/
 		public function searchForFile(baseDir:Directory,filter:RegExp,allowRecursion:Boolean=false,justFirst:Boolean=false):Vector.<AbstractFile> {
 			
 			var out:Vector.<AbstractFile>=new Vector.<AbstractFile>();
@@ -125,6 +147,9 @@
 			return out;
 		}
 		
+		/** Returns the full filename for a file
+		@param file The file
+		@return The full filename for the file*/
 		public function getFullNameForFile(file:AbstractFile):String {
 			var o:String;
 			
@@ -140,12 +165,20 @@
 			return o;
 		}
 		
+		/** Opens a file by name.
+		@param path The file name to open
+		@return A new ByteArray holding the contents of the file
+		*/
 		public function openFileByName(path:String):ByteArray {
 			var file:File=File(resolvePath(path));
 			
 			return openFileByReference(file);
 		}
 		
+		/** Opens a file by refernce
+		@param file The reference to the file
+		@return A new ByteArray holding the contents of the file
+		*/
 		public function openFileByReference(file:File):ByteArray {
 			var out:ByteArray=new ByteArray();
 			
@@ -155,6 +188,10 @@
 			return out;
 		}
 		
+		/** Opens a file by a FAT index
+		@param id The fat index
+		@return A new ByteArray holding the contents of the file
+		*/
 		public function openFileById(id:uint):ByteArray {
 			
 			nds.position=id*8+FATPos;

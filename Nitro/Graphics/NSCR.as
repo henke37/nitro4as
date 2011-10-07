@@ -4,20 +4,33 @@
 	
 	import Nitro.*;
 	
+	/** NSCR File reader and writer
+	
+	<p>NSCR files defines screens of tiled graphics</p>
+	*/
+	
 	public class NSCR {
 		
+		/** The width of the screen data, measured in pixels. */
 		public var width:uint;
+		/** The height of the screen data, measured in pixels. */
 		public var height:uint;
 		
+		/** The height of the viewport for the screen, measured in pixels. */
 		public var dataHeight:uint;
+		/** The width of the viewport for the screen, measured in pixels. */
 		public var dataWidth:uint;
 		
+		/** The tiles that composes the screen. */
 		private var entries:Vector.<TileEntry>;
 
 		public function NSCR() {
 			// constructor code
 		}
 		
+		/** Loads a NSCR file from a ByteArray
+		@param data The ByteArray to load from
+		*/
 		public function parse(data:ByteArray):void {
 			
 			var sections:SectionedFile=new SectionedFile();
@@ -67,6 +80,12 @@
 			}
 		}
 		
+		/** Renders the screen to a new Sprite
+		@param tiles The NCGR from which to read the tiles
+		@param convertedPalette The palette to use when rendering the tiles, in RGB888 format
+		@param useTransparency If the screen should be rendered using transparency
+		@return A new Sprite with the tiles of the screen correctly laid out
+		*/
 		public function render(tiles:NCGR,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
 			var spr:Sprite=new Sprite();
 			

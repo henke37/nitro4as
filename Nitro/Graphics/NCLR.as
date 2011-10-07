@@ -4,17 +4,26 @@
 	
 	import Nitro.*;
 	
+	/** NCLR file parser and writer
+	
+	<p>NCLR files contain palette data</p>*/
+	
 	public class NCLR {
 		
+		/** The palette data, in RGB 555 format. */
 		public var colors:Vector.<uint>;
 		
+		/** The number of palettes in the palette data. */
 		public var paletteCount:uint;
 		
+		/** The intended length of a pixel for usage with this palette. */
 		public var bitDepth:uint;
 
 		public function NCLR() {
 		}
 		
+		/** Loads a file
+		@param data The file to load*/
 		public function parse(data:ByteArray):void {
 			
 			var sections:SectionedFile=new SectionedFile();
@@ -60,6 +69,8 @@
 			paletteCount=section.readUnsignedShort();
 		}
 		
+		/** Writes the palette data of the file to a new ByteArray
+		@return The new ByteArray*/
 		public function save():ByteArray {
 			var sections:SectionedFile=new SectionedFile();
 			

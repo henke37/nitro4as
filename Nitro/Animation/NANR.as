@@ -5,8 +5,15 @@
 	import flash.utils.*;
 	import flash.geom.*;
 	
+	/**
+	NANR file parser and writer.
+	
+	<p>NANR files are animation instructions and depend on a NCER file for the cells to show during the animation.</p>
+	*/
+	
 	public class NANR {
 		
+		/** The animations in the file. */
 		public var anims:Vector.<NANRAnim>;
 		
 		private static const animSize:uint=16;
@@ -16,6 +23,8 @@
 			// constructor code
 		}
 		
+		/** Loads an existing file.
+		@param data The file to load. */
 		public function parse(data:ByteArray):void {
 			
 			var sections:SectionedFile=new SectionedFile();
@@ -103,6 +112,8 @@
 			
 		}
 		
+		/** Outputs the content of the NANR as XML.
+		@return The XML for the NANR */
 		public function toXML():XML {
 			var root:XML=<animations />;
 			

@@ -6,6 +6,8 @@
 	import flash.events.*;
 	import flash.utils.*;
 	
+	/** Displays a NANR animation. */
+	
 	public class NANRPlayer extends Sprite {
 
 		private var anim:NANRAnim;
@@ -22,6 +24,12 @@
 		
 		private var currentCell:DisplayObject;
 
+		/** Creates a new NANRPlayer.
+		@param p The palette to use.
+		@param t The tiles to use.
+		@param c The cell definitions to use.
+		@param a The animation to play.
+		*/
 		public function NANRPlayer(p:NCLR,t:NCGR,c:NCER,a:NANRAnim) {
 			
 			if(!p || !t || !c || !a) throw new ArgumentError();
@@ -36,10 +44,12 @@
 			cellCache={};
 		}
 		
+		/** Starts playback. */
 		public function play():void {
 			addEventListener(Event.ENTER_FRAME,runAnim);
 		}
 		
+		/** Stops playback */
 		public function stop():void {
 			removeEventListener(Event.ENTER_FRAME,runAnim);
 		}

@@ -3,11 +3,18 @@
 	import flash.utils.*;
 	import Nitro.*;
 	
+	/** A NDS file
+	
+	<p>The NDS file contains a full game in one file.</p> */
+	
 	public class NDS {
 		
 		public var gameName:String;
+		
+		/** Four character long code that names the game. */
 		public var gameCode:String;
 		
+		/** An ASCII encoded number that maps to the maker of the game. */
 		public var makerCode:String;
 		
 		public var cardSize:uint;
@@ -26,14 +33,20 @@
 		public var arm9OverlaySize:uint;
 		public var arm7OverlayOffset:uint;
 		public var arm7OverlaySize:uint;
+		
+		/** The overlays for the ARM9 */
 		public var arm9Overlays:Vector.<Overlay>;
+		/** The overlays for the ARM7 */
 		public var arm7Overlays:Vector.<Overlay>;
 		
 		private var nds:ByteArray;
 		
+		/** The embeded filesystem. */
 		public var fileSystem:FileSystem;
 		
-		public var bannerOffset:uint;		
+		public var bannerOffset:uint;
+		
+		/** The banner data for the game. */
 		public var banner:Banner;
 
 		public function NDS() {

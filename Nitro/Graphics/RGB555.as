@@ -2,19 +2,29 @@
 	
 	import flash.utils.*;
 	
+	/** Utility class to convert between the RGB555 format the Nitro uses and the RGB888 format that Flash uses. */
+	
 	public class RGB555 {
 		
+		/** The size of a single color entry in bytes. */
 		public static const byteSize:uint=2;
 
+		/** @private */
 		public function RGB555() {
 			throw new Error("This is an utility class, don't instantiate it");
 		}
 		
+		/** Reads a single color entry from a ByteArray
+		@param data The ByteArray to read from.
+		@return The transformed color value. */
 		public static function read555Color(data:ByteArray):uint {
 			var entry:uint=data.readUnsignedShort();
 			return fromRGB555(entry);
 		}
 		
+		/** Transforms a color from RGB555 to RGB888
+		@param entry The RGB555 color
+		@return The RGB888 color*/
 		public static function fromRGB555(entry:uint):uint {
 			var r:uint=entry & 0x1F;
 			var g:uint=(entry >> 5) & 0x1F;
@@ -27,6 +37,9 @@
 			return b | g << 8 | r << 16;
 		}
 		
+		/** Transforms a color from RGB888 to RGB555
+		@param entry The RGB888 color
+		@return The RGB555 color*/
 		public static function toRGB555(c:uint):uint {
 			var r:uint=(c>> 16) & 0xFF;
 			var g:uint=(c>>8) & 0xFF;
@@ -39,6 +52,9 @@
 			return (b << 10) | (g << 5) | r;
 		}
 		
+		/** Converts a full palette to RGB555 from RGB888
+		@param The palette to convert.
+		@return A new Vector holding the converted palette*/
 		public static function paletteToRGB555(p:Vector.<uint>):Vector.<uint> {
 			var np:Vector.<uint>=new Vector.<uint>();
 			np.length=p.length;
@@ -51,6 +67,9 @@
 			return np;
 		}
 		
+		/** Converts a full palette to RGB888 from RGB555
+		@param The palette to convert.
+		@return A new Vector holding the converted palette*/
 		public static function paletteFromRGB555(p:Vector.<uint>):Vector.<uint> {
 			var np:Vector.<uint>=new Vector.<uint>();
 			np.length=p.length;

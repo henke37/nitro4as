@@ -1,7 +1,13 @@
 ﻿package Nitro.Compression {
 	import flash.utils.ByteArray;
 	
+	/** Processor for DS SDK stock compression blocks.
+	
+	<p>It will detect the compression type based on the block header.</p>*/
+	
 	public class Stock {
+
+		/** @private */
 
 		public function Stock() {
 			// constructor code

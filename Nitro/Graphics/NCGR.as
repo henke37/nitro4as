@@ -5,19 +5,35 @@
 	
 	import Nitro.*;
 	
+	/** NCGR File reader and writer
+	
+	<p>NCGR files contain pixel data for tiles</p>*/
+	
 	public class NCGR {
 		
+		/** The tiles the picture is composed of, if any
+		@see picture*/
 		private var tiles:Vector.<Tile>;
+		/** The pixels the picture is composed of, if any
+		@see tiles*/
 		private var picture:Vector.<uint>;
 		
-		public var tilesX:uint,tilesY:uint;
+		/** The number of tiles along the x axis */
+		public var tilesX:uint;
+		/** The number of tiles along the y axis */
+		public var tilesY:uint;
+		
 		public var gridX:uint,gridY:uint;
+		
 		
 		public var bitDepth:uint;
 
 		public function NCGR() {
 		}
 		
+		/** Loads a NCGR file from a ByteArray
+		@param data The ByteArray to load from
+		*/
 		public function parse(data:ByteArray):void {
 			
 			var sections:SectionedFile=new SectionedFile();
@@ -79,10 +95,14 @@
 						picture[index++]=byte;
 					}
 				}
+			} else {
+				throw new Error("Unsupported tileType encounterd!");
 			}
 			
 		}
 		
+		/** Writes the contents of the file to a new ByteArray
+		@return A new ByteArray*/
 		public function save():ByteArray {
 			var sections:SectionedFile=new SectionedFile();
 			
@@ -131,11 +151,24 @@
 			return o;
 		}
 		
+		/** Renders a specific tile to a BitmapData
+		@param subTileIndex The number of the tile to render
+		@param palette The palette to use when rendering the tile, in RGB888 format
+		@param paletteIndex The subpalette index to use
+		@param useTransparency If the tile should be rendered using transparency
+		@return A BitmapData for the tile*/
 		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean):BitmapData {
 			var tile:Tile=tiles[subTileIndex];
 			return tile.toBMD(palette,paletteIndex,useTransparency);
 		}
 		
+		/** Renders an oam entry
+		@param oam The oam entry to render
+		@param palette The palette to use when rendering, in RGB888 format
+		@param subImages True if the tiles are aranged in a big grid or false if they are aranged in one grid per oam
+		@param useTransparency If the tiles should be rendered using transparency
+		@return A DisplayObject that represents the oam entry
+		*/
 		public function renderOam(oam:OamTile,palette:Vector.<uint>,subImages:Boolean,useTransparency:Boolean=true):DisplayObject {
 			if(tiles) {
 				return renderTileOam(oam,palette,subImages,useTransparency);
@@ -209,6 +242,11 @@
 			return spr;
 		}
 		
+		/** Renders the full NCGR as one big picture
+		@param palette The palette to use when rendering, in RGB888 format
+		@param paletteIndex The subpalette index to use
+		@param useTransparency If the tiles should be rendered using transparency
+		*/
 		public function render(palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true):Sprite {
 			
 			if(tiles) {
@@ -233,6 +271,7 @@
 			}
 		}
 		
+		/** If the NCGR file can be renderd without a NCER file */
 		public function get independentRenderPossible():Boolean {
 			return tiles && tilesX!=0xFFFF && tilesY!=0xFFFF;
 		}

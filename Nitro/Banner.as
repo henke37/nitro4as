@@ -5,15 +5,24 @@
 	
 	import Nitro.Graphics.*;
 	
+	/** Banner data for a Nitro game. */
+	
 	public class Banner {
 		
+		/** The Japanese title of the game. */
 		public var jpTitle:String;
+		/** The English title of the game. */
 		public var enTitle:String;
+		/** The French title of the game. */
 		public var frTitle:String;
+		/** The Deutch title of the game. */
 		public var deTitle:String;
+		/** The Italian title of the game. */
 		public var itTitle:String;
+		/** The Spanish title of the game. */
 		public var esTitle:String;
 		
+		/** The icon for the game. */
 		public var icon:BitmapData;
 		
 		private static const blockSize:uint=8;
@@ -26,6 +35,10 @@
 			
 		}
 		
+		/** Loads banner data from a ByteArray
+		@param nds The ByteArray to load from
+		@param bannerOffset The position in the ByteArray to load from
+		*/
 		public function parse(nds:ByteArray,bannerOffset:uint):void {
 			nds.position=bannerOffset;
 			

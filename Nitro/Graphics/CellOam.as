@@ -38,6 +38,11 @@
 			return oamR;
 		}
 		
+		/** Draws a rectangle that represents the OAM
+		@param boxColor The stroke color for the rectangle
+		@param useFill If the rectangle should be filled
+		@param tileNumbers If the tile number should be displayed
+		@return A DisplayObject that contains the drawn rectangle*/
 		public function drawBox(boxColor:uint=0,useFill:Boolean=true,tileNumbers:Boolean=true):DisplayObject {
 			
 			var spr:Sprite=new Sprite();

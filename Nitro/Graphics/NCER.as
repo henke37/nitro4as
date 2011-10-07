@@ -5,16 +5,27 @@
 	
 	import Nitro.*;
 	
+	/** Reader and writer of NCER files 
+	
+	<p>A NCER file contains a sequence of Cells</p>*/
+	
 	public class NCER {
 		
+		/** The cells in the file */
 		public var cells:Vector.<Cell>;
+		
+		/** The labels for the cells */
 		public var labels:Vector.<String>;
 		
+		/** The tile layout mode for the individual oams */
 		public var subImages:Boolean;
 
 		public function NCER() {
 		}
 		
+		/** Loads a NCER file from a ByteArray
+		@param data The ByteArray to load from
+		*/
 		public function parse(data:ByteArray):void {
 			var sections:SectionedFile=new SectionedFile();
 			sections.parse(data);
@@ -144,8 +155,15 @@
 			
 		}
 		
+		/** The number of cells in the file */
 		public function get length():uint { return cells.length; }
 		
+		/** Rends a single cell
+		@param cellId The id of the cell to rend
+		@param palette The pallete to use when rendering the tiles, in RGB888 format
+		@param tiles The NCGR where the tiles are stored
+		@param useTransparence If the tiles should be rendered using transparency
+		@return A DisplayObject that represents the cell */
 		public function rend(cellId:uint,palette:Vector.<uint>,tiles:NCGR,useTransparency:Boolean=true):DisplayObject {
 			var cell:Cell=cells[cellId];
 			return cell.rend(palette,tiles,subImages,useTransparency);
@@ -190,6 +208,10 @@
 			return d.readUTFBytes(len);
 		}
 		
+		/** Writes the file to a new ByteArray
+		@return The new ByteArray
+		@param version The version to use when writing
+		*/
 		public function save(version:uint=0):ByteArray {
 			var sections:SectionedFile=new SectionedFile();
 			

@@ -2,12 +2,21 @@
 	
 	import flash.utils.*;
 	
+	/** Decodes Nitro style LZ77 compressed data. */
+	
 	public class ExtendedLZ77decoder {
 
+
+		/** @private */
 		public function ExtendedLZ77decoder() {
 			// constructor code
 		}
 		
+		/** Decodes a chunk of data that has been LZ77 encoded.
+		@param compressed The compressed data
+		@param decodedLength How much data to decompress.
+		@param longLengths If the long lengths variant is used or not.
+		@return The decompressed data.*/
 		public static function decode(compressed:ByteArray,decodedLength:uint,longLengths:Boolean):ByteArray {
 			
 			compressed.endian=Endian.LITTLE_ENDIAN;

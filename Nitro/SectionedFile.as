@@ -1,6 +1,8 @@
 ﻿package Nitro {
 	import flash.utils.*;
 	
+	/** A Nitro SDK standard sectioned file. */
+	
 	public class SectionedFile {
 		
 		private var sections:Object;
@@ -15,6 +17,8 @@
 			// constructor code
 		}
 		
+		/** Loads a file from a ByteArray
+		@param d The ByteArray to load from*/
 		public function parse(d:ByteArray):void {
 			if(!d) throw new ArgumentError("Data can not be null");
 			
@@ -54,10 +58,12 @@
 			
 		}
 		
+		/** The main id of the file. */
 		public function get id():String { return mainId; }
 		
 		public function get data():ByteArray { return _data; }
 		
+		/** Returns the position in the raw data where a section is located. */
 		public function getDataOffsetForId(id:String):uint {
 			if(!id) throw new ArgumentError("Id can not be null!");
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
@@ -68,7 +74,10 @@
 			return section.offset+sectionHeaderSize;
 		}
 																				
-		
+		/** Opens a named section
+		@param id The four letter id of the section
+		@return The contents of the section
+		@throw ArgumentError The id was bad*/
 		public function open(id:String):ByteArray {
 			
 			if(!id) throw new ArgumentError("Id can not be null!");
@@ -84,6 +93,9 @@
 			return o;
 		}
 		
+		/** Checks if the file has a section with a given name.
+		@param id The section name
+		@return If the section exists or not*/
 		public function hasSection(id:String):Boolean {
 			if(!id) throw new ArgumentError("Id can not be null!");
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
@@ -91,6 +103,9 @@
 			return id in sections;
 		}
 		
+		/** Builds a file from the given
+		@param id The new main id of the file
+		@param sectionList An Object containing ByteArrays for the sections in the file. */
 		public function build(id:String,sectionList:Object):void {
 			_data=new ByteArray();
 			_data.endian=Endian.LITTLE_ENDIAN;
@@ -123,8 +138,12 @@
 	
 }
 
+/** A section in the file */
 class Section {
+	/** The size of the section. */
 	public var size:uint;
+	/** The position of the section in the file. */
 	public var offset:uint;
+	/** The four character id of the section.*/
 	public var id:String;
 }

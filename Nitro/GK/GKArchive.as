@@ -3,16 +3,22 @@
 	
 	import Nitro.Compression.*;
 	
+	/** Parser and writer for the archive file format used in Gyakutten Kenji 2 */
+	
 	public class GKArchive {
 		
 		private var _data:ByteArray;
 		
+		/** The files in the archive. */
 		public var fileList:Vector.<FileEntry>;
 
 		public function GKArchive() {
 			// constructor code
 		}
 		
+		/** Parsers an archive file
+		@param data The ByteArray that the archive is stored in
+		*/
 		public function parse(data:ByteArray):void {
 			
 			_data=data;
@@ -39,8 +45,12 @@
 			fileList.fixed=true;
 		}
 		
+		/** The number of subfiles in the archive. */
 		public function get length():uint {	return fileList.length; }
 
+		/** Opens a subfile at a specific index
+		@param id The index in the archive of the subfile
+		@return A new ByteArray containing the contents of the subfile. */
 		public function open(id:uint):ByteArray {
 			if(id>=fileList.length) throw new ArgumentError("ID is higher than the filecount");
 			
@@ -61,6 +71,9 @@
 			return o;
 		}
 		
+		/** Rebuilds the archive from a set of files.
+		@param files The files to be included in the archive
+		*/
 		public function build(files:Vector.<ByteArray>):void {
 			_data=new ByteArray();
 			_data.endian=Endian.LITTLE_ENDIAN;
