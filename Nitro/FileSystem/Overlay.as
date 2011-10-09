@@ -6,7 +6,9 @@
 		/** The numerical id of the overlay. */
 		public var id:uint;
 	
+		/** Where to load the overlay in memory */
 		public var ramAddress:uint;
+		/** The size of the overlay in ram */
 		public var ramSize:uint;
 		public var bssSize:uint;
 		public var bssStart:uint;
@@ -16,6 +18,7 @@
 		public var fileId:uint;
 		/** The size of the overlay data. */
 		public var size:uint;
+		/** If the overlay is compressed or not */
 		public var compressed:Boolean;
 
 		public function Overlay() {

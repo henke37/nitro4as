@@ -71,13 +71,10 @@
 		
 		private function saveDump(e:MouseEvent):void {
 			fr=new FileReference();
-			var xml:XML=<nds>
-				<arm7 offset={nds.arm7Offset} size={nds.arm7Len} mirror={nds.arm7Mirror} start={nds.arm7ExecuteStart} />
-				<arm9 offset={nds.arm9Offset} size={nds.arm9Len} mirror={nds.arm9Mirror} start={nds.arm9ExecuteStart}  />
-			</nds>;
+			var xml:XML=<nds></nds>;
 			
 			if(nds.banner) {
-				xml.appendChild(<banner offset={nds.bannerOffset}>
+				xml.appendChild(<banner>
 					<title lang="jp">{nds.banner.jpTitle}</title>
 					<title lang="en">{nds.banner.enTitle}</title>
 					<title lang="it">{nds.banner.itTitle}</title>
@@ -90,13 +87,13 @@
 			xml.appendChild(dumpFs(nds.fileSystem.rootDir));
 			
 			if(nds.arm7Overlays) {
-				var overlay:XML=<overlays cpu="arm7" offset={nds.arm7OverlayOffset} size={nds.arm7OverlaySize}/>;
+				var overlay:XML=<overlays cpu="arm7"/>;
 				addOverlays(overlay,nds.arm7Overlays);
 				xml.appendChild(overlay);
 			}
 			
 			if(nds.arm9Overlays) {
-				overlay=<overlays cpu="arm9" offset={nds.arm9OverlayOffset} size={nds.arm9OverlaySize}/>;
+				overlay=<overlays cpu="arm9"/>;
 				addOverlays(overlay,nds.arm9Overlays);
 				xml.appendChild(overlay);
 			}

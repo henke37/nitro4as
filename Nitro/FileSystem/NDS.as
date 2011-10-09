@@ -9,6 +9,7 @@
 	
 	public class NDS {
 		
+		/** The game title */
 		public var gameName:String;
 		
 		/** Four character long code that names the game. */
@@ -19,20 +20,23 @@
 		
 		public var cardSize:uint;
 		
+		/** The position of the ARM9 executable in ROM */
 		public var arm9Offset:uint;
+		/** The position in memory where the ARM9 executable will be loaded before execution. */
 		public var arm9Mirror:uint;
+		/** The entrypoint for the ARM9 executable. */
 		public var arm9ExecuteStart:uint;
+		/** The length of the ARM9 executable*/
 		public var arm9Len:uint;
 		
+		/** The position of the ARM7 executable in ROM */
 		public var arm7Offset:uint;
+		/** The position in memory where the ARM7 executable will be loaded before execution. */
 		public var arm7Mirror:uint;
+		/** The entrypoint for the ARM7 executable. */
 		public var arm7ExecuteStart:uint;
+		/** The length of the ARM7 executable*/
 		public var arm7Len:uint;
-		
-		public var arm9OverlayOffset:uint;
-		public var arm9OverlaySize:uint;
-		public var arm7OverlayOffset:uint;
-		public var arm7OverlaySize:uint;
 		
 		/** The overlays for the ARM9 */
 		public var arm9Overlays:Vector.<Overlay>;
@@ -44,8 +48,6 @@
 		/** The embeded filesystem. */
 		public var fileSystem:FileSystem;
 		
-		public var bannerOffset:uint;
-		
 		/** The banner data for the game. */
 		public var banner:Banner;
 
@@ -53,6 +55,8 @@
 			
 		}
 		
+		/** Loads a NDS file from a ByteArray
+		@param nds The ByteArray to load from*/
 		public function parse(nds:ByteArray):void {
 			this.nds=nds;
 			
@@ -88,14 +92,14 @@
 			var fileAllocationTableSize:uint=nds.readUnsignedInt();
 			
 			//nds.position+=4*4;//overlays
-			arm9OverlayOffset=nds.readUnsignedInt();
-			arm9OverlaySize=nds.readUnsignedInt();
-			arm7OverlayOffset=nds.readUnsignedInt();
-			arm7OverlaySize=nds.readUnsignedInt();
+			var arm9OverlayOffset:uint=nds.readUnsignedInt();
+			var arm9OverlaySize:uint=nds.readUnsignedInt();
+			var arm7OverlayOffset:uint=nds.readUnsignedInt();
+			var arm7OverlaySize:uint=nds.readUnsignedInt();
 			
 			nds.position+=4*2;//flash chip timing controll data
 			
-			bannerOffset=nds.readUnsignedInt();
+			var bannerOffset:uint=nds.readUnsignedInt();
 			
 			var romCRC:uint=nds.readUnsignedShort();
 			
@@ -124,6 +128,20 @@
 			
 			arm9Overlays=readOVT(arm9OverlayOffset,arm9OverlaySize);
 			arm7Overlays=readOVT(arm7OverlayOffset,arm7OverlaySize);
+		}
+		
+		/** The ARM9 executable */
+		public function get arm9Executable():ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.writeBytes(nds,arm9Offset,arm9Len);
+			return o;
+		}
+		
+		/** The ARM7 executable */
+		public function get arm7Executable():ByteArray {
+			var o:ByteArray=new ByteArray();
+			o.writeBytes(nds,arm7Offset,arm7Len);
+			return o;
 		}
 		
 		private function readOVT(offset:uint,size:uint):Vector.<Overlay> {

@@ -1,6 +1,7 @@
 ﻿package Nitro.GK {
 	import flash.utils.*;
 	
+	/** Reader and writer for GK2 script files */
 	public class SPT {
 		
 		private var _data:ByteArray;
@@ -16,8 +17,12 @@
 		}
 		
 		public function get data():ByteArray { return _data; }
+		/** The number of sections in the file */
 		public function get length():uint { return sections.length; }
 		
+		/** Loads a script file from a ByteArray
+		@param d The ByteArray to load from
+		*/
 		public function parse(d:ByteArray):void {
 			if(!d) throw new ArgumentError("Data can not be null!");
 			
@@ -82,6 +87,8 @@
 			}
 		}
 		
+		/** Generates an XML document that lists all the sections in the file
+		@return The XML document */
 		public function headerToXML():XML {
 			var o:XML=<SPT version={version} sizeThing={sizeThing.toString(16)} unknownHeader={unknownHeader.toString(16)} />
 			
@@ -92,6 +99,12 @@
 			return o;
 		}
 		
+		/** Loads a section list from an XML document
+		
+		<p>Note: The contents of the sections are not loaded.</p>
+		
+		@param header The XML document to load from
+		*/
 		public function loadHeader(header:XML):void {
 			version= parseInt(header.@version);
 			sizeThing= parseInt(header.@sizeThing,16);

@@ -1,5 +1,7 @@
 ﻿package Nitro.FileSystem {
-	/** Dumps a directory tree to XML */
+	/** Dumps a directory tree to XML
+	@param dir The directory to start dumping from
+	@return A new XML document describing the directory tree*/
 	public function dumpFs(dir:Directory):XML {
 		var o:XML=<dir name={dir.name} />;
 		
