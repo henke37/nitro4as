@@ -149,20 +149,25 @@
 			
 			status.text="";
 			
+			if(sdat.streams.length==0) {
+				status.text="No Streams";
+				return;
+			}
+						
 			for(var streamIndex:String in sdat.streams) {
 				var streamName:String;
-				if(streamIndex in sdat.streamSymbols) {
+				if(!sdat.streamSymbols) {
+					streamName="STREAM #"+streamIndex;
+				} else if(streamIndex in sdat.streamSymbols) {
 					streamName=sdat.streamSymbols[streamIndex];
 				} else {
-					streamName=" NO NAME";
+					streamName="UNLISTED STREAM #"+streamIndex;
 				}
 				
 				status.htmlText+="<a href=\"event:stream/"+streamIndex+"\">"+streamIndex+" "+streamName+"</a><br>";
 			}
 			
-			if(sdat.streams.length==0) {
-				status.text="No Streams";
-			}
+			
 			
 			status.addEventListener(TextEvent.LINK,streamClick);
 		}

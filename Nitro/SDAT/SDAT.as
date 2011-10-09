@@ -4,6 +4,10 @@
 	
 	use namespace sdatInternal;
 	
+	/** Reader for SDAT files
+	
+	<p>SDAT files are used by the Nintendo composer library that Nitro games practically always uses for their music and sound effects. They contain a variety of subfiles.</p> */
+	
 	public class SDAT {
 		
 		sdatInternal var sdat:ByteArray;
@@ -28,6 +32,9 @@
 			
 		}
 		
+		/** Loads a SDAT file from a ByteArray
+		@param _sdat The ByteArray to read from
+		*/
 		public function parse(_sdat:ByteArray):void {
 			sdat=_sdat
 			
@@ -52,15 +59,11 @@
 			
 			sdat.position=14;
 			var numBlocks:uint=sdat.readUnsignedShort();
-			var hasSymb:Boolean=numBlocks==4;
 			
-			
-			sdat.position=16;
 			var symbSize:uint,symbPos:uint;
-			if(hasSymb) {				
-				symbPos=sdat.readUnsignedInt();
-				symbSize=sdat.readUnsignedInt();
-			}
+			symbPos=sdat.readUnsignedInt();
+			symbSize=sdat.readUnsignedInt();
+			var hasSymb:Boolean=symbPos!=0;
 			
 			var infoSize:uint,infoPos:uint;
 			infoPos=sdat.readUnsignedInt();
@@ -70,11 +73,19 @@
 			fatPos=sdat.readUnsignedInt();
 			fatSize=sdat.readUnsignedInt();
 			
+			files=parseFat(fatPos);
+			
 			if(hasSymb) {			
 				parseSymb(symbPos,symbSize);
 			}
 			
-			files=parseFat(fatPos);
+			loadFiles();
+			
+		}
+		
+		private function loadFiles():void {
+			
+			
 			for each(var file:FATRecord in files) {
 				
 				var subFileData:ByteArray=new ByteArray();
@@ -233,6 +244,10 @@
 			return(value);
 		}
 		
+		/** Finds a stream by it's symbol name
+		@param name The symbol name
+		@return The stream
+		@throw ArgumentError There is no stream with that symbol name */
 		public function getStreamByName(name:String):STRM {
 			var i:uint;
 			for each(var symbName:String in streamSymbols) {
