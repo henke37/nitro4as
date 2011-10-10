@@ -9,7 +9,8 @@
 	import Nitro.FileSystem.*;	
 	import Nitro.SDAT.*;
 	import Nitro.*;
-	import fl.controls.Slider;
+	
+	import fl.controls.*;
 	
 	use namespace strmInternal;
 	
@@ -23,7 +24,7 @@
 		
 		private var status:TextField;
 		private var title:TextField;
-		private var debug:TextField;
+		private var playback:TextField;
 		
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
@@ -32,8 +33,12 @@
 		private var player:STRMPlayer;
 		
 		public var progress_mc:Slider;
+		public var list_mc:List;
 		
-		public function FSTest() {			
+		public function FSTest() {
+			
+			stage.align=StageAlign.TOP_LEFT;
+			
 			status=new TextField();
 			status.x=Banner.ICON_WIDTH*iconZoom;
 			status.y=titleHeight;
@@ -51,11 +56,12 @@
 			title.text="Nitro SDAT Stream player WIP";
 			addChild(title);
 			
-			debug=new TextField();
-			debug.y=Banner.ICON_HEIGHT*iconZoom;
-			debug.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
-			debug.width=stage.stageWidth;
-			//addChild(debug);
+			playback=new TextField();
+			playback.y=Banner.ICON_HEIGHT*iconZoom;
+			playback.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
+			playback.width=Banner.ICON_WIDTH*iconZoom;
+			playback.selectable=false;
+			addChild(playback);
 			
 			if(loaderInfo.url.match(/^file:/) && false) {
 				status.text="Loading data";
@@ -68,6 +74,12 @@
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
 			
+			list_mc.visible=false;
+			list_mc.addEventListener(Event.CHANGE,listSelect);
+			list_mc.x=Banner.ICON_WIDTH*iconZoom;
+			list_mc.y=title.y+title.height;
+			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,380-(title.y+title.height));
+			
 			addEventListener(Event.ENTER_FRAME,updatePosition);
 		}
 		
@@ -77,6 +89,27 @@
 			progress_mc.minimum=0;
 			progress_mc.maximum=stream.sampleCount;
 			progress_mc.value=player.position;
+			
+			playback.text=formatTime(player.position/stream.sampleRate)+"/"+formatTime(stream.sampleCount/stream.sampleRate);
+		}
+		
+		private static function formatTime(t:Number):String {
+			var o:String="";
+			o=pad(Math.floor(t/60).toString(),2,"0",true);
+			o+=":";
+			o+=pad(Math.floor(t%60).toString(),2,"0",true);;
+			return o;
+		}
+		
+		private static function pad(str:String,minLen:uint,padding:String=" ",fromLeft:Boolean=false):String {
+			while(str.length<minLen) {
+				if(fromLeft) {
+					str=padding+str;
+				} else {
+					str+=padding;
+				}
+			}
+			return str;
 		}
 		
 		private var fr:FileReference;
@@ -141,7 +174,6 @@
 		private function playStream(streamNumber:uint):void {
 			stream=sdat.streams[streamNumber];
 			player=new STRMPlayer(stream);
-			player.debug=debug;
 			player.play();
 		}
 		
@@ -153,6 +185,10 @@
 				status.text="No Streams";
 				return;
 			}
+			
+			status.visible=false;
+			list_mc.visible=true;
+			list_mc.dataProvider.removeAll();
 						
 			for(var streamIndex:String in sdat.streams) {
 				var streamName:String;
@@ -164,14 +200,28 @@
 					streamName="UNLISTED STREAM #"+streamIndex;
 				}
 				
-				status.htmlText+="<a href=\"event:stream/"+streamIndex+"\">"+streamIndex+" "+streamName+"</a><br>";
+				list_mc.addItem({ label: streamName, index: streamIndex, type: "stream" });
+				
+				//status.htmlText+="<a href=\"event:stream/"+streamIndex+"\">"+streamIndex+" "+streamName+"</a><br>";
 			}
 			
 			
 			
-			status.addEventListener(TextEvent.LINK,streamClick);
+			//status.addEventListener(TextEvent.LINK,streamClick);
 		}
 		
+		private function listSelect(e:Event):void {
+			if(player) {
+				player.stop();
+			}
+			
+			var obj:Object=list_mc.selectedItem;
+			if(obj.type=="stream") {
+				playStream(obj.index);
+			}
+		}
+		
+		/*
 		private function streamClick(e:TextEvent):void {
 			if(player) {
 				player.stop();
@@ -184,7 +234,7 @@
 				var streamNumber:uint=parseInt(parts[1]);
 				playStream(streamNumber);
 			}
-		}
+		}*/
 	}
 	
 }
