@@ -21,25 +21,19 @@
 			loader.load(new URLRequest("mariokart.nds"));
 		}
 		
-		private var fr:FileReference;
-		var archiveData:ByteArray;
-		
 		private function loadDone(e:Event):void {
 			var nds:NDS=new NDS();
 			nds.parse(loader.data);
 			
-			archiveData=nds.fileSystem.openFileByName("data/CharacterKartSelect.carc");
+			var archiveData:ByteArray=nds.fileSystem.openFileByName("data/CharacterKartSelect.carc");
 			
 			archiveData=Stock.decompress(archiveData);
 			archiveData.position=0;
 			
-			//fr=new FileReference();
-			//fr.save(archiveData,"CharacterKartSelect.carc");
-			
 			var archive:NARC=new NARC();
 			archive.parse(archiveData);
 			
-			trace(dumpFs(archive.fileSystem.rootDir));
+			//trace(dumpFs(archive.fileSystem.rootDir));
 			
 			var nclr:NCLR=new NCLR();
 			nclr.parse(archive.fileSystem.openFileByName("select_kart_s_b.NCLR"));
