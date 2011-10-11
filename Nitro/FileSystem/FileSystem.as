@@ -9,6 +9,7 @@
 		private var nds:ByteArray;
 		private var FNTPos:uint;
 		private var FATPos:uint;
+		private var dataPos:uint;
 		
 		/** The root directory of the filesystem. */
 		public var rootDir:Directory;
@@ -24,10 +25,17 @@
 		@param FNTSize The size of the file name table
 		@param FATSize The size of the file allocation table
 		*/
-		public function parse(nds:ByteArray,FNTPos:uint,FNTSize:uint,FATPos:uint,FATSize:uint):void {
+		public function parse(nds:ByteArray,FNTPos:uint,FNTSize:uint,FATPos:uint,FATSize:uint,dataPos:uint=0):void {
+			
+			if(!nds) throw new ArgumentError("Can't parse nothing!");
+			if(FNTPos == FATPos) throw new ArgumentError("FNTPos can't be the same as FATPos!");
+			if(FNTPos < FATPos && FNTPos+FNTSize > FATPos) throw new ArgumentError("The FNT can't overlap the FAT!");
+			if(FATPos < FNTPos && FATPos+FATSize > FNTPos) throw new ArgumentError("The FAT can't overlap the FNT!");
+			
 			this.nds=nds;
 			this.FNTPos=FNTPos;
 			this.FATPos=FATPos;
+			this.dataPos=dataPos;
 			
 			nds.position=FNTPos;
 			
@@ -182,7 +190,7 @@
 		public function openFileByReference(file:File):ByteArray {
 			var out:ByteArray=new ByteArray();
 			
-			nds.position=file.offset;
+			nds.position=file.offset+dataPos;
 			nds.readBytes(out,0,file.size);
 			
 			return out;
@@ -202,7 +210,7 @@
 			
 			var out:ByteArray=new ByteArray();
 			
-			nds.position=start;
+			nds.position=start+dataPos;
 			nds.readBytes(out,0,len);
 			
 			return out;
@@ -218,7 +226,7 @@
 				
 				var start:uint=nds.readUnsignedInt();
 				var stop:uint=nds.readUnsignedInt();
-				var len:uint=stop-start+1;
+				var len:uint=stop-start;
 				
 				file.offset=start;
 				file.size=len;

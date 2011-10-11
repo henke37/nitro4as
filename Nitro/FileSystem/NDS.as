@@ -119,8 +119,12 @@
 			var headerCRC:uint=nds.readUnsignedShort();
 			
 			if(bannerOffset) {
-				banner=new Banner();
-				banner.parse(nds,bannerOffset);
+				try {
+					banner=new Banner();
+					banner.parse(nds,bannerOffset);
+				} catch (err:Error) {
+					banner=null;
+				}
 			}
 			
 			fileSystem=new FileSystem();

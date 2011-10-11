@@ -10,7 +10,7 @@
 		
 		private var mainId:String;
 		
-		private static const sectionHeaderSize:uint=8;
+		public static const sectionHeaderSize:uint=8;
 		private static const headerSize:uint=0x10;
 
 		public function SectionedFile() {
@@ -63,29 +63,34 @@
 		
 		public function get data():ByteArray { return _data; }
 		
-		/** Returns the position in the raw data where a section is located. */
+		/** Returns the position in the raw data where a section is located.
+		@param id The id of the section
+		*/
 		public function getDataOffsetForId(id:String):uint {
+			var section:Section=findSection(id);
+			return section.offset+sectionHeaderSize;
+		}
+		
+		/** Locates the section data for a given section
+		@param id The id of the section
+		@return The section entry for the section
+		*/
+		public function findSection(id:String):Section {
 			if(!id) throw new ArgumentError("Id can not be null!");
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
 			
 			if(!id in sections) throw new ArgumentError("Section id \""+id+"\" does not exist.");
 			
 			var section:Section=sections[id];
-			return section.offset+sectionHeaderSize;
+			return section;
 		}
 																				
 		/** Opens a named section
 		@param id The four letter id of the section
 		@return The contents of the section
 		@throw ArgumentError The id was bad*/
-		public function open(id:String):ByteArray {
-			
-			if(!id) throw new ArgumentError("Id can not be null!");
-			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
-			
-			if(!id in sections) throw new ArgumentError("Section id \""+id+"\" does not exist.");
-			
-			var section:Section=sections[id];
+		public function open(id:String):ByteArray {			
+			var section:Section=findSection(id);
 			
 			var o:ByteArray=new ByteArray();
 			o.writeBytes(_data,section.offset+sectionHeaderSize,section.size-sectionHeaderSize);

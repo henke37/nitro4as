@@ -36,11 +36,11 @@
 					
 					var length:uint;
 					var distance:uint;
-					
 					var readByte:uint;
 					
 					if(longLengths) {
-						readByte=compressed.readUnsignedByte();
+						
+						readByte=compressed.readUnsignedByte();;
 						
 						switch(readByte>>4) {
 							case 0:
@@ -77,10 +77,11 @@
 						}
 						
 					} else {
-						length=readByte>>4;
-						length+=3;
-						distance=(readByte & 0x0F) << 8;
-						distance|=readByte;
+						readByte = compressed.readUnsignedByte();
+						length = readByte >> 4;
+						distance = (readByte & 0x0F) << 8;
+						distance |= compressed.readUnsignedByte();
+						length += 3;
 					}
 					
 					
