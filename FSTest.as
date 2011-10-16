@@ -35,6 +35,8 @@
 		public var progress_mc:Slider;
 		public var list_mc:List;
 		
+		private var loopMark:Shape;
+		
 		public function FSTest() {
 			
 			stage.align=StageAlign.TOP_LEFT;
@@ -80,6 +82,12 @@
 			list_mc.y=title.y+title.height;
 			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,380-(title.y+title.height));
 			
+			loopMark=new Shape();
+			loopMark.graphics.lineStyle(1,0xFF0000);
+			loopMark.graphics.moveTo(0,-10);
+			loopMark.graphics.lineTo(0,2);
+			loopMark.visible=false;
+			
 			addEventListener(Event.ENTER_FRAME,updatePosition);
 		}
 		
@@ -90,7 +98,14 @@
 			progress_mc.maximum=stream.sampleCount;
 			progress_mc.value=player.position;
 			
-			playback.text=formatTime(player.position/stream.sampleRate)+"/"+formatTime(stream.sampleCount/stream.sampleRate);
+			var ptext:String=formatTime(player.position/stream.sampleRate)+"/"+formatTime(stream.sampleCount/stream.sampleRate);
+			
+			ptext+=" "+stream.sampleRate+"Hz "+(stream.stereo?"stereo":"mono")+" "+Wave.encodingAsString(stream.encoding);
+			if(stream.loop) {
+				ptext+=" Loop:"+formatTime(stream.loopPoint/stream.sampleRate);
+			}
+			
+			playback.text=ptext;
 		}
 		
 		private static function formatTime(t:Number):String {

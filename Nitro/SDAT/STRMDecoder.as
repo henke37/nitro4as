@@ -4,6 +4,8 @@
 	
 	use namespace strmInternal;
 	
+	/** A decoder for the samples in a STRM file */
+	
 	public class STRMDecoder {
 		
 		strmInternal var stream:STRM;
@@ -11,14 +13,13 @@
 		private var decoders:Vector.<ADPCMDecoder>;
 		private var decodeBuffers:Vector.<Vector.<Number>>;
 		
+		/** If looping streams should loop */
 		public var loopAllowed:Boolean=true;
-		
-		private var lastInitedBlock:uint;
-		
-		public var debug:TextField;
-		
-		private var position:uint=0;//measured in samples
 
+		private const adpcmHeaderLength:uint=4;
+
+		/** Creates a new STRMDecoder
+		@param _stream The stream to decode */
 		public function STRMDecoder(_stream:STRM) {
 			if(!_stream) {
 				throw new ArgumentError("The stream can not be null!");
@@ -27,68 +28,107 @@
 			
 			if(stream.encoding==Wave.ADPCM) {
 				decoders=new Vector.<ADPCMDecoder>();
-				decodeBuffers=new Vector.<Vector.<Number>>();
-				
-				for(var i:uint;i<stream.channels;++i) {
+			}
+			
+			decodeBuffers=new Vector.<Vector.<Number>>();
+			
+			for(var i:uint;i<stream.channels;++i) {
+				if(stream.encoding==Wave.ADPCM) {
 					decoders.push(new ADPCMDecoder());
-					decodeBuffers.push(new Vector.<Number>());
 				}
-				decoders.fixed=true;
+				var buf:Vector.<Number>=new Vector.<Number>();
+				buf.length=stream.blockSamples;
+				buf.fixed=true;
+				decodeBuffers.push(buf);
+			}
+			decoders.fixed=true;
+			if(stream.encoding==Wave.ADPCM) {
 				decodeBuffers.fixed=true;
 			}
 			
 		}
 		
-		
-		public function get playbackPosition():uint { return position; }
-		
-		public function reset():void {
-			position=0;
+		/** The playback position, measured in samples */
+		public function get playbackPosition():uint {
+			return blockNumber*stream.blockSamples+lastBlockSamplesUsed;
 		}
-
+		
+		/** Resets decoding to the initial state */
+		public function reset():void {
+			blockNumber=0;
+			lastBlockSamplesTotal=0;
+			lastBlockSamplesUsed=0;
+		}
+				
+		private var lastBlockSamplesTotal:uint, lastBlockSamplesUsed:uint;
+		private var blockNumber:uint;
+		
+		/** Decodes samples
+		@param ob The ByteArray to write the decoded samples to
+		@param renderSize How many samples to decode
+		*/
 		public function render(ob:ByteArray,renderSize:uint):uint {
 			
 			if(renderSize==0) return 0;
 			
-			const adpcmHeaderLength:uint=4;
+			stream.sampleData.endian=Endian.LITTLE_ENDIAN;
 			
 			var samplesLeftToDecode:uint=renderSize;
 			
-			stream.sampleData.endian=Endian.LITTLE_ENDIAN;
-			
-			var lastBlock:Boolean=false;
-			
-			//repeat at least once:
-			do {
+			while(true) {
+	
+				//write leftovers from last call
+				var samplesLeftOver:uint=lastBlockSamplesTotal-lastBlockSamplesUsed;
 				
-				//find offset into current block and the current block
-				var blockCurrentSample:uint=position%stream.blockSamples;
-				var blockNumber:uint=position/stream.blockSamples;
-				var blockLen:uint;
-				var blockSamples:uint;
+				var samplesToOutput:uint=samplesLeftOver;
+				if(samplesToOutput>samplesLeftToDecode) samplesToOutput=samplesLeftToDecode;
 				
-				if(blockNumber+1>=stream.nBlock) {
-					blockLen=stream.lastBlockLength;
-					blockSamples=stream.lastBlockSamples;
-					lastBlock=true;
+				//write the decoded data to the output buffer
+				var endSample:uint=lastBlockSamplesUsed+samplesToOutput;
+				
+				var i:uint;
+				if(stream.channels==2) {
+					for(i=lastBlockSamplesUsed;i<endSample;++i) {
+						ob.writeFloat(decodeBuffers[0][i]);
+						ob.writeFloat(decodeBuffers[1][i]);
+					}
 				} else {
-					blockLen=stream.blockLength;
-					blockSamples=stream.blockSamples;
-					lastBlock=false;
+					for(i=lastBlockSamplesUsed;i<endSample;++i) {
+						ob.writeFloat(decodeBuffers[0][i]);
+						ob.writeFloat(decodeBuffers[0][i]);
+					}
 				}
 				
-				//calculate how many samples there are left in the block and set the samplecount to that
-				var samplesLeftInBlock:uint=(blockSamples>blockCurrentSample)?(blockSamples-blockCurrentSample):0;
-				var samplesToDecode:uint=samplesLeftInBlock;
+				samplesLeftToDecode-=samplesToOutput;
+				lastBlockSamplesUsed=endSample;
 				
-				//cap the samplecount to the number of samples that we are doing
-				if(samplesToDecode>samplesLeftToDecode) {
-					samplesToDecode=samplesLeftToDecode;					
+				if(blockNumber+1>stream.nBlock && samplesLeftToDecode>0) {
+					if(stream.loop && loopAllowed) {
+						seek(stream.loopPoint);
+					} else {
+						break;
+					}
 				}
 				
-				//decode the blocks for each channel
+				if(samplesLeftToDecode==0) break;
+				
 				for(var currentChannel:uint=0;currentChannel<stream.channels;++currentChannel) {
-
+				
+					//decode a full block
+					
+					//find offset into current block and the current block
+					
+					var blockLen:uint;
+					var blockSamples:uint;
+					
+					if(blockNumber+1>=stream.nBlock) {
+						blockLen=stream.lastBlockLength;
+						blockSamples=stream.lastBlockSamples;
+					} else {
+						blockLen=stream.blockLength;
+						blockSamples=stream.blockSamples;
+					}
+	
 					var blockStartOffset:uint=(blockNumber*stream.channels)*stream.blockLength;					
 					blockStartOffset += currentChannel*blockLen;
 					
@@ -96,85 +136,68 @@
 	
 						var decoder:ADPCMDecoder=decoders[currentChannel];
 						
-						//init the decoder if the offset is zero
-						if(blockCurrentSample==0) {
-							stream.sampleData.position=blockStartOffset;
+						stream.sampleData.position=blockStartOffset;
 							
-							//trace("block init "+blockNumber+","+position+","+blockStartOffset);
-							
-							var predictor:uint=stream.sampleData.readShort();
-							var stepIndex:uint=stream.sampleData.readShort();
-							decoder.init(predictor,stepIndex);
-							
-							lastInitedBlock=blockNumber;
-						} else if (lastInitedBlock!=blockNumber) {
-							throw new Error("somehow a block begun playback in the middle!");
-						}
+						//trace("block init "+blockNumber+","+position+","+blockStartOffset);
 						
-						stream.sampleData.position=blockStartOffset+adpcmHeaderLength+blockCurrentSample/2;
-						decoder.decodeBlock(stream.sampleData,samplesToDecode,decodeBuffers[currentChannel]);
-					} else {
-						stream.sampleData.position=blockStartOffset+blockCurrentSample/2;
+						var predictor:uint=stream.sampleData.readShort();
+						var stepIndex:uint=stream.sampleData.readShort();
 						
-						decodePCM(samplesToDecode,decodeBuffers[currentChannel]);
-					}
-				}
-				//write the decoded data to the output buffer
-				for(var i:uint=0;i<samplesToDecode;++i) {
-					if(stream.channels==2) {
-						ob.writeFloat(decodeBuffers[0][i]);
-						ob.writeFloat(decodeBuffers[1][i]);
+						decoder.init(predictor,stepIndex);
+						
+						stream.sampleData.position=blockStartOffset+adpcmHeaderLength;
+						decoder.decodeBlock(stream.sampleData,blockSamples,decodeBuffers[currentChannel]);
 					} else {
-						ob.writeFloat(decodeBuffers[0][i]);
-						ob.writeFloat(decodeBuffers[0][i]);
+						stream.sampleData.position=blockStartOffset;
+						
+						decodePCM(blockSamples,decodeBuffers[currentChannel]);
 					}
-				}
-				//update the decode count
-				samplesLeftToDecode-=samplesToDecode;
-				position+=samplesToDecode;
-				
-				if(lastBlock && position>=stream.sampleCount && stream.loop && loopAllowed) {
-					lastBlock=false;
-					seek(stream.loopPoint);
 					
-				}
+				}// end for each channel
 				
-			} while(samplesLeftToDecode>0 && !lastBlock);//keep repeating while we have not decoded enough samples and not(EOS flag set and not looping)
+				lastBlockSamplesUsed=0;
+				lastBlockSamplesTotal=blockSamples;
+				blockNumber++;
+			}// end until enough decoded
 			
 			return renderSize-samplesLeftToDecode;
 		}
 		
 		
-		public static function byteToNumber(byte:uint):Number {
+		private static function byteToNumber(byte:uint):Number {
 			return Number(byte)/256;
 		}
-		public static function shortToNumber(short:uint):Number {
+		private static function shortToNumber(short:uint):Number {
 			return Number(short)/(2<<16);
 		}
 		
 		private function decodePCM(blockSamples:uint,outBuf:Vector.<Number>):void {
 			var sample:Number;
 			var i:uint;
-			for(i=0;i<blockSamples;++i) {
-				if(stream.encoding==1) {
+			
+			if(stream.encoding==1) {
+				for(i=0;i<blockSamples;++i) {
 					sample=shortToNumber(stream.sampleData.readUnsignedShort());
-				} else {
+					outBuf[i]=sample;
+				}
+			} else {
+				for(i=0;i<blockSamples;++i) {
 					sample=byteToNumber(stream.sampleData.readByte());
-				}				
-				outBuf[i]=sample;
+					outBuf[i]=sample;
+				}
 			}
 		}
 		
+		/** Seeks to a different position in the stream
+		@param newPos The position to seek to, measured in samples */
 		public function seek(newPos:uint):void {
 			//position ourself at the begining of the block
-			const blockSize:uint=stream.blockSamples
-			var blockNum:uint=newPos/blockSize;
-			position=blockNum*stream.blockSamples;
+			blockNumber=newPos/stream.blockSamples;
 			
-			trace("seeking to ",newPos,position);
+			trace("seeking to ",newPos,blockNumber);
 			
 			//and then rend past the stuff in the block we don't need
-			var renderSize:uint=newPos % blockSize;
+			var renderSize:uint=newPos % stream.blockSamples;
 			if(renderSize>0) {
 				var scratch:ByteArray=new ByteArray();
 				render(scratch,renderSize);

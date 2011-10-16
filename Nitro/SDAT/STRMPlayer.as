@@ -7,6 +7,8 @@
 	import HTools.Audio.*;
 	import flash.text.TextField;
 	
+	/** Playsback a STRM */
+	
 	public class STRMPlayer {
 		
 		private var decoder:STRMDecoder;
@@ -14,6 +16,9 @@
 		
 		private var playSound:Sound,playChannel:SoundChannel;
 
+		/** Creates a new STRMPlayer
+		@param strm The Stream to play
+		*/
 		public function STRMPlayer(strm:STRM) {
 			decoder=new STRMDecoder(strm);
 			//trace(strm.sampleRate);
@@ -23,10 +28,7 @@
 			playSound.addEventListener(SampleDataEvent.SAMPLE_DATA,onSampleRequest);
 		}
 		
-		public function set debug(t:TextField):void {
-			decoder.debug=t;
-		}
-		
+		/** Begins playback of the stream */
 		public function play():void {
 			decoder.reset();
 			resampler.reset();
@@ -34,10 +36,12 @@
 			playChannel=playSound.play();
 		}
 		
+		/** Halts playback of the stream */
 		public function stop():void {
 			playChannel.stop();
 		}
 		
+		/** The position of the stream, measured in non resampled samples */
 		public function get position():uint {
 			return decoder.playbackPosition;
 		}

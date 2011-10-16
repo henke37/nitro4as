@@ -5,16 +5,23 @@
 	
 	//use namespace strmInternal;
 	
+	/** SWAR file reader
+	
+	<p>SWAR files contains a set of sound clips</p> */
+	
 	public class SWAR extends SubFile{
 
 		private var data:ByteArray;
 		
+		/** The sound clips*/
 		public var waves:Vector.<Wave>;
 
 		public function SWAR() {
 			
 		}
 		
+		/** Loads a file from a ByteArray
+		@param data The ByteArray to load from*/
 		public override function parse(data:ByteArray):void {
 			this.data=data;
 			if(!data) {

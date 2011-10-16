@@ -5,6 +5,10 @@
 	
 	use namespace sequenceInternal;
 	
+	/** Reader for SSEQ files
+	
+	<p>SSEQ files contains a sequence</p>*/
+	
 	public class SSEQ extends SubFile {
 				
 		sequenceInternal var tracks:Vector.<SequenceTrack>;

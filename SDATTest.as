@@ -3,29 +3,43 @@
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import flash.net.*;
 	
+	import Nitro.FileSystem.*;
 	import Nitro.SDAT.*;
-	import HTools.Audio.WaveWriter;
-	import flash.net.FileReference;
+	
+	import HTools.Audio.*;
+	
 	
 	use namespace strmInternal;
 	use namespace sdatInternal;
 	
 	public class SDATTest extends Sprite {
 		
-		[Embed(source="sound_data.sdat", mimeType="application/octet-stream")]
-		private var sdatClass:Class;
+		private var loader:URLLoader;
 		
 		private var reader:SDAT;
+		private var nds:NDS;
 
 		
 		public function SDATTest() {
+			loader=new URLLoader();
+			loader.dataFormat=URLLoaderDataFormat.BINARY;
+			loader.addEventListener(Event.COMPLETE,loaded);
+			loader.load(new URLRequest("game.nds"));
+		}
+		
+		private function loaded(e:Event):void {
+			
+			nds=new NDS();
+			nds.parse(loader.data);
+			
 			reader=new SDAT();
-			reader.parse(new sdatClass());
+			reader.parse(nds.fileSystem.openFileByName("sound_data.sdat"));
 			
 			//listWaveArchives();
-			//listStreams();
-			//streamTest(7,false);
+			listStreams();
+			streamTest(5,true);
 			//swarTest(2,0);
 			
 		}
@@ -56,7 +70,7 @@
 			var i:uint;
 			for each(var stream:STRM in reader.streams) {
 				var name:String=reader.streamSymbols[i];
-				trace(i,name,stream.length,stream.channels,stream.loop,stream.dataPos);
+				trace(i,name,stream.length,stream.channels,stream.loop,stream.loopPoint,stream.dataPos,stream.blockLength,stream.lastBlockSamples,stream.sampleCount);
 				i++;
 			}
 		}
@@ -82,11 +96,13 @@
 			
 			var readSize:uint;
 			
-			const chunkSize:uint=50000;
+			const chunkSize:uint=100;
+			const maxSize:uint=stream.sampleCount*2;
+			var totalReadSize:uint=0;
 			
 			var decoder:STRMDecoder=new STRMDecoder(stream);
 			
-			decoder.loopAllowed=false;//would get us into an infinite loop. That would be bad.
+			//decoder.loopAllowed=false;//would get us into an infinite loop. That would be bad.
 			
 			do {
 				buff.position=0;
@@ -95,7 +111,9 @@
 				
 				buff.position=0;
 				wave.addSamples(buff);
-			} while(readSize==chunkSize);
+				
+				totalReadSize+=readSize;
+			} while(readSize==chunkSize && totalReadSize<maxSize);
 			wave.finalize();
 			
 			stage.addEventListener(MouseEvent.CLICK,saveIt);

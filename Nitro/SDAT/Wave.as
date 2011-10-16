@@ -2,19 +2,29 @@
 	
 	import flash.utils.*;
 	
+	/** A single sound clip */
 	public class Wave {
 		
+		/** The encoding used for the samples */
 		public var encoding:uint;
 		
+		/** 8 bit encoded PCM */
 		public static const PCM8:uint=0;
+		/** 16 bit encoded PCM */
 		public static const PCM16:uint=1;
+		/** ADPCM encoded */
 		public static const ADPCM:uint=2;
+		/** Pulsegenerated */
 		public static const GEN:uint=3;
 		
+		/** If the sample loops or not*/
 		public var loops:Boolean;
+		/** The start position of the looping part, measured in samples*/
 		public var loopStart:uint;
+		/** The length of the looping part*/
 		public var loopLength:uint;
 		
+		/** The samplerate of the sound, measured in Hz*/
 		public var samplerate:uint;
 		
 		public var duration:uint;

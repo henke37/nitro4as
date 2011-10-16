@@ -6,11 +6,15 @@
 	
 	use namespace strmInternal;
 	
+	/** Stream file parser */
+	
 	public class STRM extends SubFile {
 		
 		strmInternal var encoding:uint;
+		/** True if the stream loops */
 		public var loop:Boolean;
 		strmInternal var channels:uint;
+		/** The samplerate of the stream */
 		public var sampleRate:uint;
 		strmInternal var loopPoint:uint;
 		strmInternal var sampleCount:uint;
@@ -28,6 +32,9 @@
 			
 		}
 		
+		/** Parses a STRM file from a ByteArray
+		@param data The ByteArray to read from
+		*/
 		public override function parse(data:ByteArray):void {
 			if(!data) {
 				throw new ArgumentError("data can not be null!");
@@ -71,10 +78,12 @@
 			}
 		}
 		
+		/** The length of the stream, in seconds */
 		public function get length():Number {
 			return sampleCount/sampleRate;
 		}
 		
+		/** True is the stream is in stereo */
 		public function get stereo():Boolean {
 			return channels==2;
 		}
