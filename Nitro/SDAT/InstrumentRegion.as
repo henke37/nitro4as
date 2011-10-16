@@ -1,12 +1,17 @@
 ﻿package Nitro.SDAT {
 	import flash.utils.ByteArray;
 	
+	/** A region in an instrument
+	
+	<p>A region defins how to play a sample</p>*/
+	
 	public class InstrumentRegion {
 		
 		public var swav:uint;
 		public var swar:uint;// the swar used. NB. cross-reference to "1.3.2 Info Block - Entry, Record 2 BANK"
 		
 		public var note:uint;
+		
 		
 		public var attack:uint;// 0..127
 		public var decay:uint;

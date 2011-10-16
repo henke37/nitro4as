@@ -7,15 +7,20 @@
 		
 		private var picture:BitmapData;
 		
+		/** The palette used for encoding the picture, in RGB555 */
 		public var palette:Vector.<uint>;
 		
+		/** The NCGR where the tiles are stored */
 		public var ncgr:NCGR;
+		
+		/** Creates a NCGR file from a BitmapData */
 
 		public function NCGRCreator() {
 			ncgr=new NCGR();
 		}
 		
-		//load picture
+		/** Sets the picture to build from
+		@param p The BitmapData to work on */
 		public function set pic(p:BitmapData):void {
 			
 			if(!p) throw new ArgumentError("Pic can not be null!");
@@ -25,7 +30,8 @@
 			picture=p;
 		}
 		
-		public function findPalette():void {
+		/** Computes the optimal palette for the current picture */
+		public function findPalette(useTransparency:Boolean=true):void {
 			
 			var color:uint;
 			
@@ -78,7 +84,9 @@
 			palette.length=paletteMaxLen;
 			palette.fixed=true;
 			
-			palette[0]=RGB555.toRGB555(0xFFAA00);//transparency is orange
+			if(useTransparency) {
+				palette[0]=RGB555.toRGB555(0xFFAA00);//transparency is orange
+			}
 			
 			for(i=0;i<paletteMaxLen-1;++i) {
 				color=colorOrder[i];
@@ -89,9 +97,7 @@
 			}
 		}
 		
-		//save palette
-		
-		//build tiles
+		/** Builds the tiles for the current picture */
 		public function buildTiles(useTransparency:Boolean):void {
 			var colorIndexes:Object={};
 			var i:uint;

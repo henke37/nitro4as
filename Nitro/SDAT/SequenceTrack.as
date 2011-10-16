@@ -4,6 +4,8 @@
 	
 	import Nitro.SDAT.SequenceEvents.*;
 	
+	/** A track with sequence events */
+	
 	public class SequenceTrack {
 		
 		sequenceInternal var events:Vector.<SequenceEvent>;

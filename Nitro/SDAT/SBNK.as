@@ -3,16 +3,21 @@
 	import flash.utils.*;
 	import Nitro.SectionedFile;
 	
-	//use namespace strmInternal;
+	/** SBNK reader
+	
+	<p>SBNK Files defines a set of sample based instruments</p>*/
 	
 	public class SBNK extends SubFile {
 
+		/** The instruments defined in the file */
 		public var instruments:Vector.<Instrument>;
 
 		public function SBNK() {
 			
 		}
 		
+		/** Loads definitons from a ByteArray
+		@param data The ByteArray to load data from*/
 		public override function parse(data:ByteArray):void {
 			
 			var sections:SectionedFile=new SectionedFile();

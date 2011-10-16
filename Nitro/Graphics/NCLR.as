@@ -28,11 +28,16 @@
 			
 			var sections:SectionedFile=new SectionedFile();
 			sections.parse(data);
+						
+			var section:ByteArray;
+			if(sections.id=="RLCN") {
+				section=sections.open("TTLP");
+			} else if(sections.id=="NCCL") {
+				section=sections.open("PALT");
+			} else {
+				throw new ArgumentError("Incorrect file header, type is "+sections.id);
+			}
 			
-			if(sections.id!="RLCN") throw new ArgumentError("Incorrect file header, type is "+sections.id);
-			
-			
-			var section:ByteArray=sections.open("TTLP");
 			parseTTLP(section);
 			
 			if(sections.hasSection("PMCP")) {

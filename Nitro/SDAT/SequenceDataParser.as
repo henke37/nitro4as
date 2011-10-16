@@ -5,8 +5,13 @@
 	
 	use namespace sequenceInternal;
 	
+	/** Parser for sequence data */
+	
 	public class SequenceDataParser {
 		
+		/** Parses sequence data
+		@param data The sequence data to parse
+		@return The parsed data*/
 		sequenceInternal static function parse(data:ByteArray):Vector.<SequenceTrack> {
 			var track:SequenceTrack;
 			var tracks:Vector.<SequenceTrack>;
@@ -54,6 +59,53 @@
 					
 					case 0x95://call
 						track.events.push(new JumpEvent(read3ByteInt(data),true));
+					break;
+					
+					case 0xA2:
+						track.events.push(new IfEvent());
+					break;
+					
+					case 0xB0:
+						track.events.push(new VarEvent(VarEvent.assign,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB1:
+						track.events.push(new VarEvent(VarEvent.addition,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB2:
+						track.events.push(new VarEvent(VarEvent.subtract,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB3:
+						track.events.push(new VarEvent(VarEvent.multiply,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB4:
+						track.events.push(new VarEvent(VarEvent.divide,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB5:
+						track.events.push(new VarEvent(VarEvent.shift,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB6:
+						track.events.push(new VarEvent(VarEvent.random,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB7:
+						track.events.push(new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB8:
+						track.events.push(new VarEvent(VarEvent.equals,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xB9:
+						track.events.push(new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xBA:
+						track.events.push(new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xBB:
+						track.events.push(new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xBC:
+						track.events.push(new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),read3ByteInt(data)));
+					break;
+					case 0xBD:
+						track.events.push(new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),read3ByteInt(data)));
 					break;
 					
 					case 0xC0:

@@ -1,5 +1,9 @@
 ﻿package Nitro.Graphics {
 	
+	import flash.display.*;
+	import flash.text.*;
+	
+	/** A basic tile group that can be used for storing just the data about the tile in general */
 	public class OamTile {
 		
 		public var paletteIndex:uint;
@@ -13,6 +17,54 @@
 		public function OamTile() {
 			// constructor code
 		}
+		
+		/** Rends the tile group accordingly to the settings
+		@param palette The RGB888 palette to use when rendering the tiles
+		@param tiles The tiles pixel data to use
+		@param useSubImages If sub image addressing should be used
+		@param useTransparency If the tiles should be rendered using transparency
+		@return A DisplayObject that represents the tile group
+		*/
+		public function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+			var oamR:DisplayObject=tiles.renderOam(this,palette,useSubImages,useTranparency);
+			
+			return oamR;
+		}
+		
+		/** Draws a rectangle that represents the OAM
+		@param boxColor The stroke color for the rectangle
+		@param useFill If the rectangle should be filled
+		@param tileNumbers If the tile number should be displayed
+		@return A DisplayObject that contains the drawn rectangle*/
+		public function drawBox(boxColor:uint=0,useFill:Boolean=true,tileNumbers:Boolean=true):DisplayObject {
+			
+			var spr:Sprite=new Sprite();
+			spr.graphics.lineStyle(1,boxColor);
+			
+			if(useFill) {
+				spr.graphics.beginFill(0xFFFFFF);
+			}			
+			spr.graphics.drawRect(0,0,width,height);
+			if(useFill) {
+				spr.graphics.endFill();
+			}
+			
+			
+			if(tileNumbers) {
+				addTileNumber(spr);
+			}
+			return spr;
+		}
+		
+		protected function addTileNumber(spr:Sprite):void {
+			var tf:TextField=new TextField();
+			tf.autoSize=TextFieldAutoSize.LEFT;
+			tf.selectable=false;
+			tf.text=String(tileIndex);
+			
+			spr.addChild(tf);
+		}
+		
 		
 		internal function setSize(size:uint,shape:uint):void {
 			switch(shape) {

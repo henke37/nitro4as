@@ -2,6 +2,8 @@
 	import flash.display.*;
 	import flash.text.*;
 	
+	/** A tile group that can be displayed as an OAM */
+	
 	public class CellOam extends OamTile {
 		
 		public var y:int;
@@ -18,9 +20,15 @@
 			// constructor code
 		}
 		
-		
-		public function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
-			var oamR:DisplayObject=tiles.renderOam(this,palette,useSubImages,useTranparency);
+		/** Rends the tile group accordingly to the settings
+		@param palette The RGB888 palette to use when rendering the tiles
+		@param tiles The tiles pixel data to use
+		@param useSubImages If sub image addressing should be used
+		@param useTransparency If the tiles should be rendered using transparency
+		@return A DisplayObject that represents the tile group
+		*/
+		public override function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+			var oamR:DisplayObject=super.rend(palette,tiles,useSubImages,useTranparency);
 				
 			oamR.x=x;
 			oamR.y=y;
@@ -43,35 +51,28 @@
 		@param useFill If the rectangle should be filled
 		@param tileNumbers If the tile number should be displayed
 		@return A DisplayObject that contains the drawn rectangle*/
-		public function drawBox(boxColor:uint=0,useFill:Boolean=true,tileNumbers:Boolean=true):DisplayObject {
+		public override function drawBox(boxColor:uint=0,useFill:Boolean=true,tileNumbers:Boolean=true):DisplayObject {
 			
-			var spr:Sprite=new Sprite();
-			spr.graphics.lineStyle(1,boxColor);
+			var spr:DisplayObject=super.drawBox(boxColor,useFill,tileNumbers);
+			spr.x=x;
+			spr.y=y;
 			
-			if(useFill) {
-				spr.graphics.beginFill(0xFFFFFF);
-			}			
-			spr.graphics.drawRect(x,y,width,height);
-			if(useFill) {
-				spr.graphics.endFill();
-			}
-			
-			
-			if(tileNumbers) {
-				var tf:TextField=new TextField();
-				tf.x=x;
-				tf.y=y;
-				tf.autoSize=TextFieldAutoSize.LEFT;
-				tf.selectable=false;
-				tf.text=String(tileIndex);
-				
-				if(xFlip) tf.appendText("XF");
-				if(yFlip) tf.appendText("YF");
-				
-				spr.addChild(tf);
-			}
 			return spr;
 		}
+		
+		protected override function addTileNumber(spr:Sprite):void {
+			var tf:TextField=new TextField();
+			tf.autoSize=TextFieldAutoSize.LEFT;
+			tf.selectable=false;
+			tf.text=String(tileIndex);
+			
+			if(xFlip) tf.appendText("XF");
+			if(yFlip) tf.appendText("YF");
+			
+			spr.addChild(tf);
+		}
+		
+		
 	}
 	
 }

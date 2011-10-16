@@ -101,6 +101,13 @@
 				cell.oams.length=numOAMS;
 				cell.oams.fixed=true;
 				
+				var sectionNudge:uint=0;
+				if(partionOffset) {
+					section.position=partionOffset+4+cellItr*4;
+					sectionNudge=section.readUnsignedInt();
+					sectionNudge/=Tile.width*Tile.height;
+				}
+				
 				section.position=oamStart+oamOffset;
 				
 				for(var j:uint=0;j<numOAMS;++j) {
@@ -143,6 +150,7 @@
 					oam.tileIndex=(atts2 & 0x3FF);
 					
 					oam.tileIndex <<= tileIndexShift;
+					oam.tileIndex += sectionNudge;
 					
 					oam.paletteIndex= atts2 >> 12;
 					
