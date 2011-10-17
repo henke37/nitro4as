@@ -36,26 +36,30 @@
 				throw new ArgumentError("Invalid SWAR block, wrong type id");
 			}
 			
-			parseDATA(sections.open("DATA"));
+			parseDATA(sections.open("DATA"),sections.getDataOffsetForId("DATA"));
 			
 			
 		}
 		
-		private function parseDATA(section:ByteArray):void {
+		private function parseDATA(section:ByteArray,dataposition:uint):void {
 			
 			section.endian=Endian.LITTLE_ENDIAN;
 			
 			const padding:uint=8*4;//pointless padding
+			
 			section.position=padding;
 			var count:uint=section.readUnsignedInt();
 			
 			//trace(count);
+			
+			const pointerOffset:int=-dataposition;
 			
 			waves=new Vector.<Wave>();
 			
 			for(var i:uint;i<count;++i) {
 				section.position=padding+4+4*i;
 				var pos:uint=section.readUnsignedInt();
+				pos+=pointerOffset;
 				var wave:Wave=new Wave();
 				wave.parse(pos,section);
 				waves.push(wave);
