@@ -22,7 +22,7 @@
 		/** The start position of the looping part, measured in samples*/
 		public var loopStart:uint;
 		/** The length of the looping part*/
-		public var loopLength:uint;
+		public var nonLoopLength:uint;
 		
 		/** The samplerate of the sound, measured in Hz*/
 		public var samplerate:uint;
@@ -48,7 +48,21 @@
 			samplerate=sdat.readUnsignedShort();
 			duration=sdat.readUnsignedShort();
 			loopStart=sdat.readUnsignedShort();
-			loopLength=sdat.readUnsignedInt();
+			nonLoopLength=sdat.readUnsignedInt();
+			
+			if(encoding==PCM8) {
+				loopStart*=4;
+				nonLoopLength*=4;
+			} else if(encoding==PCM16) {
+				loopStart*=2;
+				nonLoopLength*=2;
+			} else if(encoding==ADPCM) {
+				loopStart-=4;
+				loopStart*=8;
+				nonLoopLength*=8;
+			} else {
+				throw new ArgumentError("Invalid encoding type! "+encoding);
+			}
 			
 			dataPos=wavePos+12;
 		}
@@ -60,6 +74,17 @@
 				case ADPCM: return "ADPCM";
 				default: throw ArgumentError("Invalid encoding");
 			}
+		}
+		
+		public function toString():String {
+			var o:String="[Wave ";
+			o+=duration.toString()+" ";
+			if(loops) {
+				o+="loops: "+loopStart.toString()+"-"+nonLoopLength.toString()+" ";
+			}
+			o+=encodingAsString(encoding)+"]";
+			
+			return o;
 		}
 
 	}

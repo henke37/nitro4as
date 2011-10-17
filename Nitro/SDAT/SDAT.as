@@ -187,13 +187,13 @@
 			var player2Pos:uint=symbPos+sdat.readUnsignedInt();
 			var strmPos:uint=symbPos+sdat.readUnsignedInt();
 			
-			seqSymbols=parseSymbSubRec(symbPos,seqPos);
-			bankSymbols=parseSymbSubRec(symbPos,bankPos);
-			waveArchiveSymbols=parseSymbSubRec(symbPos,waveArchivePos);
-			playerSymbols=parseSymbSubRec(symbPos,playerPos);
-			groupSymbols=parseSymbSubRec(symbPos,groupPos);
-			player2Symbols=parseSymbSubRec(symbPos,player2Pos);
-			streamSymbols=parseSymbSubRec(symbPos,strmPos);
+			seqSymbols         = parseSymbSubRec(symbPos,seqPos);
+			bankSymbols        = parseSymbSubRec(symbPos,bankPos);
+			waveArchiveSymbols = parseSymbSubRec(symbPos,waveArchivePos);
+			playerSymbols      = parseSymbSubRec(symbPos,playerPos);
+			groupSymbols       = parseSymbSubRec(symbPos,groupPos);
+			player2Symbols     = parseSymbSubRec(symbPos,player2Pos);
+			streamSymbols      = parseSymbSubRec(symbPos,strmPos);
 		}
 		
 		private function parseSymbNestSubRec(symbPos:uint,recPos:uint):Vector.<Vector.<String>> {

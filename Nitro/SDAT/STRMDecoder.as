@@ -6,15 +6,14 @@
 	
 	/** A decoder for the samples in a STRM file */
 	
-	public class STRMDecoder {
+	public class STRMDecoder extends BaseDecoder {
 		
 		strmInternal var stream:STRM;
 		
 		private var decoders:Vector.<ADPCMDecoder>;
 		private var decodeBuffers:Vector.<Vector.<Number>>;
 		
-		/** If looping streams should loop */
-		public var loopAllowed:Boolean=true;
+		
 
 		private const adpcmHeaderLength:uint=4;
 
@@ -49,12 +48,12 @@
 		}
 		
 		/** The playback position, measured in samples */
-		public function get playbackPosition():uint {
+		public override function get playbackPosition():uint {
 			return blockNumber*stream.blockSamples+lastBlockSamplesUsed;
 		}
 		
 		/** Resets decoding to the initial state */
-		public function reset():void {
+		public override function reset():void {
 			blockNumber=0;
 			lastBlockSamplesTotal=0;
 			lastBlockSamplesUsed=0;
@@ -67,7 +66,7 @@
 		@param ob The ByteArray to write the decoded samples to
 		@param renderSize How many samples to decode
 		*/
-		public function render(ob:ByteArray,renderSize:uint):uint {
+		public override function render(ob:ByteArray,renderSize:uint):uint {
 			
 			if(renderSize==0) return 0;
 			
@@ -150,7 +149,7 @@
 					} else {
 						stream.sampleData.position=blockStartOffset;
 						
-						decodePCM(blockSamples,decodeBuffers[currentChannel]);
+						decodePCM(stream.sampleData,blockSamples,stream.encoding,decodeBuffers[currentChannel]);
 					}
 					
 				}// end for each channel
@@ -164,35 +163,16 @@
 		}
 		
 		
-		private static function byteToNumber(byte:uint):Number {
-			return Number(byte)/256;
-		}
-		private static function shortToNumber(short:uint):Number {
-			return Number(short)/(2<<16);
-		}
 		
-		private function decodePCM(blockSamples:uint,outBuf:Vector.<Number>):void {
-			var sample:Number;
-			var i:uint;
-			
-			if(stream.encoding==1) {
-				for(i=0;i<blockSamples;++i) {
-					sample=shortToNumber(stream.sampleData.readUnsignedShort());
-					outBuf[i]=sample;
-				}
-			} else {
-				for(i=0;i<blockSamples;++i) {
-					sample=byteToNumber(stream.sampleData.readByte());
-					outBuf[i]=sample;
-				}
-			}
-		}
 		
 		/** Seeks to a different position in the stream
 		@param newPos The position to seek to, measured in samples */
-		public function seek(newPos:uint):void {
+		public override function seek(newPos:uint):void {
 			//position ourself at the begining of the block
 			blockNumber=newPos/stream.blockSamples;
+			
+			lastBlockSamplesTotal=0;
+			lastBlockSamplesUsed=0;
 			
 			trace("seeking to ",newPos,blockNumber);
 			
