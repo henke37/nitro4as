@@ -13,11 +13,11 @@
 		
 		public function get playbackPosition():uint { return 0; }
 		
-		private static function byteToNumber(byte:uint):Number {
-			return Number(byte)/256;
+		private static function byteToNumber(byte:int):Number {
+			return (Number(byte)/128);
 		}
 		private static function shortToNumber(short:uint):Number {
-			return Number(short)/(2<<16);
+			return Number(short)/(1<<16);
 		}
 		
 		protected function decodePCM(ib:ByteArray,blockSamples:uint,encoding:uint,outBuf:Vector.<Number>):void {
