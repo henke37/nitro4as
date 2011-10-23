@@ -221,7 +221,7 @@
 					break;
 					
 					default:
-						trace("unknown command: "+command.toString(16));
+						//trace("unknown command: "+command.toString(16));
 					break;
 				}
 				

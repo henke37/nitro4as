@@ -145,7 +145,7 @@
 			
 		}
 		
-		private function frLoaded(e:Event):void {	
+		private function frLoaded(e:Event):void {
 			nds=new NDS();
 			nds.parse(fr.data);
 			setup();
@@ -167,7 +167,6 @@
 				
 				title.text=nds.banner.enTitle;
 			}
-			
 			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,true);
 			
 			var fileRef:File;

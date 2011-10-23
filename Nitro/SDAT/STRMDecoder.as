@@ -174,7 +174,7 @@
 			lastBlockSamplesTotal=0;
 			lastBlockSamplesUsed=0;
 			
-			trace("seeking to ",newPos,blockNumber);
+			//trace("seeking to ",newPos,blockNumber);
 			
 			//and then rend past the stuff in the block we don't need
 			var renderSize:uint=newPos % stream.blockSamples;

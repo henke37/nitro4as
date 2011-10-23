@@ -25,7 +25,15 @@
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,done);
-			loader.load(new URLRequest("game.nds"));
+			loader.addEventListener(IOErrorEvent.IO_ERROR,ops);
+			loader.addEventListener(ProgressEvent.PROGRESS,loading);
+			try {
+				loader.load(new URLRequest("game.nds"));
+			} catch (err:Error) {
+				trace(err);
+			}
+			
+			playPause_mc.enabled=false;
 		}
 		
 		private function done(e:Event):void {
@@ -52,6 +60,7 @@
 			index_mc.maximum=sdat.waveArchives[1].waves.length-1;
 			
 			playPause_mc.addEventListener(MouseEvent.CLICK,playPause);
+			playPause_mc.enabled=true;
 		}
 		
 		private var player:WavePlayer;
@@ -78,6 +87,13 @@
 			player.play();
 		}
 		
+		private function ops(e:IOErrorEvent):void {
+			trace(e);
+		}
+		
+		private function loading(e:ProgressEvent):void {
+			trace(e.bytesTotal,e.bytesLoaded,e.bytesLoaded/e.bytesTotal);
+		}
 		
 	}
 	
