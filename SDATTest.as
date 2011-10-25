@@ -59,7 +59,7 @@
 			for each(var wave:Wave in swar.waves) {
 				var o:String="  "+i+" "+Wave.encodingAsString(wave.encoding)+" "+wave.duration+" "+wave.loops;
 				if(wave.loops) {
-					o+=" "+wave.loopStart+" "+wave.loopLength;
+					o+=" "+wave.loopStart+" "+wave.nonLoopLength;
 				}
 				trace(o);
 				++i;

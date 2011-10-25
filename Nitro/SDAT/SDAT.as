@@ -2,6 +2,8 @@
 	
 	import flash.utils.*;
 	
+	import Nitro.*;
+	
 	use namespace sdatInternal;
 	
 	/** Reader for SDAT files
@@ -213,22 +215,11 @@
 					o[i]=null;
 					continue;
 				}
-				var s:String=readNullString(stringPos);
+				var s:String=readNullString(sdat,stringPos);
 				//trace(s);
 				o[i]=s;
 			}
 			return o;
-		}
-		
-		private function readNullString(pos:uint):String {
-			sdat.position=pos;
-			var len:uint=0;
-			do {
-				var byte:uint=sdat.readUnsignedByte();
-				len++;
-			} while(byte!=0);
-			sdat.position=pos;
-			return sdat.readUTFBytes(len);
 		}
 		
 		private function readVarLengthInt(b:ByteArray):uint {
