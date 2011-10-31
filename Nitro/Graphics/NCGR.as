@@ -242,6 +242,90 @@
 			return spr;
 		}
 		
+		/** Converts an OAM to a single Vector with color indexes
+		@param oam The OAM to convert
+		@param subImages True if the tiles are aranged in a big grid or false if they are aranged in one grid per oam
+		@return A new Vector with the color indexes
+		*/
+		public function oamToVector(oam:OamTile,subImages:Boolean):Vector.<uint> {
+			if(tiles) {
+				return tileOamToVector(oam,subImages);
+			} else {
+				return pictureOamToVector(oam);
+			}
+		}
+			
+		private function tileOamToVector(oam:OamTile,subImages:Boolean):Vector.<uint> {
+			var o:Vector.<uint>=new Vector.<uint>();
+			o.length=oam.height*oam.width;
+			o.fixed=true;
+			
+			var tileIndex:uint=(bitDepth==8)?oam.tileIndex>>1:oam.tileIndex;
+			
+			const baseX:uint=tileIndex%tilesX;
+			const baseY:uint=tileIndex/tilesX;
+			
+			const yTiles:uint=oam.height/Tile.height;
+			const xTiles:uint=oam.width/Tile.width;
+			
+			var subTileWidth:uint;
+			if(tilesX==0xFFFF) {
+				subTileWidth=xTiles;
+			} else {
+				subTileWidth=tilesX;
+			}
+			
+			for(var y:uint=0;y<yTiles;++y) {
+				for(var x:uint=0;x<xTiles;++x) {
+					
+					var subTileIndex:uint;
+					
+					if(subImages) {
+						var subTileYIndex:uint=baseY+y;
+						var subTileXIndex:uint=baseX+x;
+						
+						subTileIndex=subTileXIndex+subTileYIndex*subTileWidth;
+					} else {
+						subTileIndex=tileIndex+x+y*xTiles;
+					}
+					
+					var tile:Tile=tiles[subTileIndex];
+					
+					for(var tileY:uint=0;tileY<Tile.height;tileY++) {
+						var totalY:uint=tileY+y*Tile.height;
+						for(var tileX:uint=0;tileX<Tile.width;tileX++) {
+							
+							var totalX:uint=tileX+x*Tile.width;
+							
+							var index:uint=totalX+totalY*oam.width;
+							o[index]=tile.pixels[tileX+tileY*Tile.height];
+						}
+					}
+				}
+				
+			}
+			
+			return o;
+		}
+		
+		private function pictureOamToVector(oam:OamTile):Vector.<uint> {
+			const offset:uint=oam.tileIndex*(bitDepth==4?64:32);
+			
+			return picture.slice(offset,oam.height*oam.width);
+		}
+		
+		/** Builds a complete collection of concatinated oams
+		
+		<p>The oams will be edited to contain correct tile indexes.</p>
+		
+		@param useTiles If the data should be formated as a pixel stream or as tiled pixels
+		@param oamPixels The pixel data for each tile
+		@param oams The oams the pixel data belongs to
+		*/
+		public function build(useTiles:Boolean,oamPixels:Vector.<Vector.<uint>>,oams:Vector.<OamTile>):void {
+			
+		}
+		
 		/** Renders the full NCGR as one big picture
 		@param palette The palette to use when rendering, in RGB888 format
 		@param paletteIndex The subpalette index to use
