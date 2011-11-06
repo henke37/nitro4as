@@ -23,9 +23,11 @@
 		/** The number of tiles along the y axis */
 		public var tilesY:uint;
 		
-		public var gridX:uint,gridY:uint;
+		public var gridX:uint;
+		public var gridY:uint;
 		
-		
+		/** The number of bits used to store each pixel.
+		<p>Must be either 4 or 8.</p>*/
 		public var bitDepth:uint;
 
 		public function NCGR() {
@@ -314,16 +316,86 @@
 			return picture.slice(offset,oam.height*oam.width);
 		}
 		
-		/** Builds a complete collection of concatinated oams
+		/** Builds a complete collection of concatinated oams.
 		
-		<p>The oams will be edited to contain correct tile indexes.</p>
+		
 		
 		@param useTiles If the data should be formated as a pixel stream or as tiled pixels
 		@param oamPixels The pixel data for each tile
 		@param oams The oams the pixel data belongs to
+		
+		<p>The oams will be edited to contain correct tile indexes.</p>
+		
+		@return A mapping from old indexes to new indexes
 		*/
-		public function build(useTiles:Boolean,oamPixels:Vector.<Vector.<uint>>,oams:Vector.<OamTile>):void {
+		public function build(useTiles:Boolean,oamPixels:Vector.<Vector.<uint>>,oams:Vector.<OamTile>):Object {
 			
+			if(useTiles) {
+				return buildTiles(oamPixels,oams);
+			} else {
+				return buildPicture(oamPixels,oams);
+			}
+		}
+		
+		private function buildTiles(oamPixels:Vector.<Vector.<uint>>,oams:Vector.<OamTile>):Object {
+			var t:Vector.<Tile>=new Vector.<Tile>;
+			var map:Object={};
+			
+			for(var i:uint=0;i<oams.length;++i) {
+				var oam:OamTile=oams[i];
+				var tilePixels:Vector.<uint>=oamPixels[i];
+				
+				map[oam.tileIndex]=t.length;
+				oam.tileIndex=t.length;
+				
+				for(var yPos:uint=0;yPos<oam.height;yPos+=Tile.height) {
+					for(var xPos:uint=0;xPos<oam.width;xPos+=Tile.width) {
+						var tile:Tile=new Tile();
+						
+						for(var tileYPos:uint=0;tileYPos<Tile.height;++tileYPos) {
+							for(var tileXPos:uint=0;tileXPos<Tile.width;++tileXPos) {
+								
+								var tileOffset:uint=tileYPos*Tile.width+tileXPos;
+								var pixelsOffset:uint=(yPos*Tile.height+tileYPos)*Tile.width+(xPos*Tile.width+tileXPos);
+								
+								tile.pixels[tileOffset]=tilePixels[pixelsOffset];
+							}
+						}
+						
+						t.push(tile);
+					}
+				}
+			}
+			tiles=t;
+			picture=null;
+			
+			tilesX=0xFFFF;
+			tilesY=0xFFFF;
+			
+			return map;
+		}
+		
+		private function buildPicture(oamPixels:Vector.<Vector.<uint>>,oams:Vector.<OamTile>):Object {
+			var pixels:Vector.<uint>=new Vector.<uint>;
+			var map:Object={};
+			
+			for(var i:uint=0;i<oams.length;++i) {
+				var oam:OamTile=oams[i];
+				var tilePixels:Vector.<uint>=oamPixels[i];
+				
+				var tileIndex:uint=pixels.length/(Tile.width*Tile.height);
+				pixels=pixels.concat(tilePixels);
+				map[oam.tileIndex]=tileIndex;
+				oam.tileIndex=tileIndex;
+			}
+			
+			picture=pixels;
+			tiles=null;
+			
+			tilesX=0xFFFF;
+			tilesY=0xFFFF;
+			
+			return map;
 		}
 		
 		/** Renders the full NCGR as one big picture
