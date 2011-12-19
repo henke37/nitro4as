@@ -7,7 +7,7 @@
 	
 	public class GK2 extends Basic {
 
-		public function GK2(nds) {
+		public function GK2(nds:NDS) {
 			super(nds);
 		}
 		

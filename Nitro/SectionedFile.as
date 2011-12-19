@@ -5,13 +5,13 @@
 	
 	public class SectionedFile {
 		
-		private var sections:Object;
-		private var _data:ByteArray;
+		protected var sections:Object;
+		protected var _data:ByteArray;
 		
-		private var mainId:String;
+		protected var mainId:String;
 		
 		public static const sectionHeaderSize:uint=8;
-		private static const headerSize:uint=0x10;
+		protected static const headerSize:uint=0x10;
 
 		public function SectionedFile() {
 			// constructor code
@@ -143,12 +143,3 @@
 	
 }
 
-/** A section in the file */
-class Section {
-	/** The size of the section. */
-	public var size:uint;
-	/** The position of the section in the file. */
-	public var offset:uint;
-	/** The four character id of the section.*/
-	public var id:String;
-}
