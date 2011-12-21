@@ -9,7 +9,7 @@
 		public function NSBCA() {
 		}
 		
-		public function parse(data:ByteArray) {
+		public function parse(data:ByteArray):void {
 			var sections:SectionedFile3D=new SectionedFile3D();
 			sections.parse(data);
 			

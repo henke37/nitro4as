@@ -21,9 +21,9 @@
 			var sections:SectionedFile=new SectionedFile();
 			sections.parse(data);
 			
-			var fat:Object=sections.findSection("BTAF");
-			var fnt:Object=sections.findSection("BTNF");
-			var img:Object=sections.findSection("GMIF");
+			var fat:Section=sections.findSection("BTAF");
+			var fnt:Section=sections.findSection("BTNF");
+			var img:Section=sections.findSection("GMIF");
 			
 			fileSystem=new FileSystem();
 			fileSystem.parse(

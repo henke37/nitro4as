@@ -4,6 +4,8 @@
 	
 	import flash.utils.*;
 	
+	/** Reader for the common sectioned file variant used by 3d file formats. */
+	
 	public class SectionedFile3D extends SectionedFile {
 
 		public function SectionedFile3D() {
@@ -55,10 +57,23 @@
 			
 		}
 		
-		/** Builds a file from the given
+		/** Opens a named section
+		@param id The four letter id of the section
+		@return The contents of the section
+		@throw ArgumentError The id was bad*/
+		public override function open(id:String):ByteArray {			
+			var section:Section=findSection(id);
+			
+			var o:ByteArray=new ByteArray();
+			o.writeBytes(_data,section.offset,section.size);
+			o.position=0;
+			return o;
+		}
+		
+		/** Builds a file from the given sections
 		@param id The new main id of the file
 		@param sectionList An Object containing ByteArrays for the sections in the file. */
-		public function build(id:String,sectionList:Object):void {
+		public override function build(id:String,sectionList:Object):void {
 			throw new Error("Not implemented!");
 		}
 
