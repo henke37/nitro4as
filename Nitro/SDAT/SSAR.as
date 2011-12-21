@@ -9,8 +9,6 @@
 	
 	public class SSAR extends SubFile {
 		
-		private var sdat:ByteArray;
-		
 		sequenceInternal var offset:uint;
 
 		public function SSAR() {

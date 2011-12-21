@@ -9,9 +9,7 @@
 	
 	<p>SWAR files contains a set of sound clips</p> */
 	
-	public class SWAR extends SubFile{
-
-		private var data:ByteArray;
+	public class SWAR extends SubFile {
 		
 		/** The sound clips*/
 		public var waves:Vector.<Wave>;
@@ -23,7 +21,6 @@
 		/** Loads a file from a ByteArray
 		@param data The ByteArray to load from*/
 		public override function parse(data:ByteArray):void {
-			this.data=data;
 			if(!data) {
 				throw new ArgumentError("data can not be null!");
 			}

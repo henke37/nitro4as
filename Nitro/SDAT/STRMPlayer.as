@@ -10,8 +10,6 @@
 	/** Playsback a STRM */
 	
 	public class STRMPlayer extends BasePlayer {
-		
-		private var playSound:Sound,playChannel:SoundChannel;
 
 		/** Creates a new STRMPlayer
 		@param strm The Stream to play

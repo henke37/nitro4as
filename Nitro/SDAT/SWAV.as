@@ -9,9 +9,6 @@
 	/** Reader for SWAV files */
 	
 	public class SWAV extends SubFile {
-
-		private var sdat:ByteArray;
-		private var type:String;
 		
 		public var wave:Wave;
 
