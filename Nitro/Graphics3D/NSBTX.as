@@ -99,7 +99,7 @@
 				
 				var colorCount:uint=(lastPaletteOffset-offset)/RGB555.byteSize;
 				
-				//if(colorCount>256) throw new Error("colorCount is ludicrous!");
+				if(colorCount>256) throw new Error("colorCount is ludicrous!");
 				
 				trace(entry.name,offset.toString(16),info.infoData.unknown, colorCount);
 				
@@ -109,7 +109,7 @@
 				
 				section.position=offset+paletteDataBaseOffset;
 				for(var j:uint=0;j<colorCount;++j) {
-					colors[j]=RGB555.read555Color(section);
+					colors[j]=section.readUnsignedShort();
 				}
 				
 				entry.unconvertedColors=colors;
