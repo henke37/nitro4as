@@ -3,8 +3,9 @@
 	import flash.utils.*;
 	import flash.geom.*;
 	
-	/** A texture */
+	import Nitro.Graphics.*;
 	
+	/** A texture */	
 	public class TextureEntry {
 		
 		/** The encoding used for the texture */
@@ -168,7 +169,24 @@
 		}
 		
 		private function drawCompressed(bmd:BitmapData,palette:PaletteEntry):void {}
-		private function drawDirect(bmd:BitmapData):void {}
+		
+		private function drawDirect(bmd:BitmapData):void {
+			const pixelCount:uint=width*height;
+			var vect:Vector.<uint>=new Vector.<uint>();
+			vect.length=pixelCount;
+			vect.fixed=true;
+			
+			pixelData.endian=Endian.LITTLE_ENDIAN;
+			pixelData.position=0;
+			
+			for(var i:uint=0;i<pixelCount;++i) {
+				var c:uint=pixelData.readUnsignedByte();
+				c=RGB555.fromRGB555(c);
+				vect[i]=c;
+			}
+			
+			bmd.setVector(new Rectangle(0,0,width,height),vect);
+		}
 		
 		public function get bpp():uint {
 			switch(format) {

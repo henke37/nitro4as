@@ -83,22 +83,27 @@
 				var palette:PaletteEntry=new PaletteEntry();
 				palette.name=info.name;
 				
-				var colorCount:uint=(lastPaletteOffset-offset)/RGB555.byteSize;
+				if(lastPaletteOffset==offset) {
+					palette.unconvertedColors=colors;
+				} else {
 				
-				if(colorCount>256) throw new Error("colorCount is ludicrous!");
-				
-				trace(palette.name,offset.toString(16),info.infoData.unknown, colorCount);
-				
-				var colors:Vector.<uint>=new Vector.<uint>();
-				colors.length=colorCount;
-				colors.fixed=true;
-				
-				section.position=offset+paletteDataBaseOffset;
-				for(var j:uint=0;j<colorCount;++j) {
-					colors[j]=section.readUnsignedShort();
+					var colorCount:uint=(lastPaletteOffset-offset)/RGB555.byteSize;
+					
+					if(colorCount>256) throw new Error("colorCount is ludicrous!");
+					
+					//trace(palette.name,offset.toString(16),info.infoData.unknown, colorCount);
+					
+					var colors:Vector.<uint>=new Vector.<uint>();
+					colors.length=colorCount;
+					colors.fixed=true;
+					
+					section.position=offset+paletteDataBaseOffset;
+					for(var j:uint=0;j<colorCount;++j) {
+						colors[j]=section.readUnsignedShort();
+					}
+					
+					palette.unconvertedColors=colors;
 				}
-				
-				palette.unconvertedColors=colors;
 				
 				palettes[paletteInfos.length-i-1]=palette;
 				lastPaletteOffset=offset;
@@ -137,7 +142,7 @@
 				
 				texture.pixelData=pixelData;
 				
-				trace(info.name,info.infoData.width,info.infoData.height,TextureEntry.textypeToString(info.infoData.format),uint(info.infoData.offset).toString(16));
+				//trace(info.name,info.infoData.width,info.infoData.height,TextureEntry.textypeToString(info.infoData.format),uint(info.infoData.offset).toString(16));
 				
 				
 				textures[i]=texture;
