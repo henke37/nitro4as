@@ -7,6 +7,8 @@
 	@param startOffset The position in the ByteArray where the info block is located
 	@param infoReader A callback Function that parses the format specific part
 	@return A Vector containing the parsed records
+	
+	<p>The infoReader callback function takes one argument, a ByteArray containing the format specific data. It returns an Object.</p>
 	*/
 	
 	internal function readInfo(data:ByteArray,startOffset:uint,infoReader:Function):Vector.<InfoData> {

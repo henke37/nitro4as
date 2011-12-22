@@ -3,6 +3,7 @@
 	import flash.utils.*;
 	
 	import Nitro.*;
+	import Nitro.Graphics.*;
 	
 	/**
 	Parser for NSBTX files.
@@ -29,7 +30,8 @@
 			parseTex(sections.open("TEX0"));
 		}
 		
-		/** Parses just a TEX0 section */
+		/** Parses just a TEX0 section
+		@param section The section data*/
 		internal function parseTex(section:ByteArray):void {
 			var i:uint;
 			var info:InfoData;
@@ -62,22 +64,6 @@
 			paletteDataSize<<=3;
 			
 			
-			function textureInfoReader(data:ByteArray):* {				
-				var o:Object ={};
-				o.offset=data.readUnsignedShort()<<3;
-				var params:uint=data.readUnsignedShort();
-				o.width = 8 << (params >> 4 & 0x7);
-				o.height = 8 << (params >> 7 & 0x7);
-				o.format = params >> 10 & 0x7;
-				o.palette = params >> 13 & 0x7;
-				o.flipX = Boolean(params >> 2 & 1);
-				o.flipY = Boolean(params >> 3 & 1);
-				o.repeatX = Boolean(params & 1);
-				o.repeatY = Boolean(params >> 1 & 1);
-				o.transparent = Boolean(params >> 13 & 1);
-				
-				return o;
-			}
 			
 			
 			const textureInfos:Vector.<InfoData>=readInfo(section,textureInfoOffset, textureInfoReader);
@@ -89,37 +75,91 @@
 			}
 			
 			
-			function paletteInfoReader(data:ByteArray):Object {				
-				var paletteDataOffset:uint=paletteDataBaseOffset;
-				paletteDataOffset+=data.readUnsignedShort()<<3;
-				
-				var unknown:uint=data.readUnsignedShort();
-				
-				return { offset: paletteDataOffset, unknown: unknown };
-			}
+			
 			
 			
 			//var infoData:ByteArray=new ByteArray();
 			//section.readBytes(infoData,0);
 			const paletteInfos:Vector.<InfoData>=readInfo(section,paletteInfoOffset,paletteInfoReader);
 			
+			paletteInfos.sort(sortPalettesInReverse);
+			
 			palettes=new Vector.<PaletteEntry>();
 			palettes.length=paletteInfos.length;
 			palettes.fixed=true;
 			
+			var lastPaletteOffset:uint=paletteDataSize;
+			
 			for (i=0;i<paletteInfos.length;++i) {
 				info = paletteInfos[i];
+				var offset:uint=info.infoData.offset;
 				
 				var entry:PaletteEntry=new PaletteEntry();
 				entry.name=info.name;
 				
-				trace(entry.name,uint(info.infoData.offset).toString(16),info.infoData.unknown);
+				var colorCount:uint=(lastPaletteOffset-offset)/RGB555.byteSize;
+				
+				//if(colorCount>256) throw new Error("colorCount is ludicrous!");
+				
+				trace(entry.name,offset.toString(16),info.infoData.unknown, colorCount);
+				
+				var colors:Vector.<uint>=new Vector.<uint>();
+				colors.length=colorCount;
+				colors.fixed=true;
+				
+				section.position=offset+paletteDataBaseOffset;
+				for(var j:uint=0;j<colorCount;++j) {
+					colors[j]=RGB555.read555Color(section);
+				}
+				
+				entry.unconvertedColors=colors;
 				
 				palettes[i]=entry;
+				lastPaletteOffset=offset;
 			}
 			
 		}
 		
+		private function textureInfoReader(data:ByteArray):* {				
+			var o:Object ={};
+			o.offset=data.readUnsignedShort()<<3;
+			var params:uint=data.readUnsignedShort();
+			o.width = 8 << (params >> 4 & 0x7);
+			o.height = 8 << (params >> 7 & 0x7);
+			o.format = params >> 10 & 0x7;
+			o.palette = params >> 13 & 0x7;
+			o.flipX = Boolean(params >> 2 & 1);
+			o.flipY = Boolean(params >> 3 & 1);
+			o.repeatX = Boolean(params & 1);
+			o.repeatY = Boolean(params >> 1 & 1);
+			o.transparent = Boolean(params >> 13 & 1);
+			
+			return o;
+		}
+		
+		private function paletteInfoReader(data:ByteArray):Object {				
+			return {
+				offset: data.readUnsignedShort()<<3,
+				unknown: data.readUnsignedShort()
+			};
+		}
+		
+		/** Retrives a palette entry based on its name
+		@param name The name of the palette entry
+		@return The retrived palette entry
+		@throws ArgumentError There is no entry with that name */
+		public function getPaletteByName(name:String):PaletteEntry {
+			for each(var entry:PaletteEntry in palettes) {
+				if(entry.name==name) {
+					return entry;
+				}
+			}
+			throw new ArgumentError("No palette with that name");
+		}
+		
+		private static function sortPalettesInReverse(a:InfoData,b:InfoData):int {
+			return b.infoData.offset-a.infoData.offset;
+		}
 		
 
 	}

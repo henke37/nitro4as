@@ -17,7 +17,7 @@
 		public static const TEXTYPE_16COLOR:uint=3;
 		/** 8 bpp 256 color encoding */
 		public static const TEXTYPE_256COLOR:uint=4;
-		/** 2x2 matrix compressed encoding */
+		/** 4x4 matrix compressed encoding */
 		public static const TEXTYPE_COMPRESSED:uint=5;
 		/** A5I3 encoding */
 		public static const TEXTYPE_A5I3:uint=6;
@@ -54,6 +54,7 @@
 			texTypeStrings[6]="A5I3";
 			texTypeStrings[7]="Direct";
 		}
+		
 
 	}
 	

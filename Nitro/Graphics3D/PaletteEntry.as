@@ -1,6 +1,7 @@
 ﻿package Nitro.Graphics3D {
 	
 	import Nitro.Graphics.*;
+	import flash.display.BitmapData;
 	
 	/** A palette */
 	
@@ -28,6 +29,10 @@
 			if(_convertedColors) return _convertedColors;
 			_convertedColors=RGB555.paletteFromRGB555(_unconvertedColors);
 			return _convertedColors;
+		}
+		
+		public function draw():BitmapData {
+			return drawPalette(convertedColors,false);
 		}
 		
 
