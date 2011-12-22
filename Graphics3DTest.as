@@ -27,52 +27,59 @@
 			
 			var fs:IEasyFileSystem=new GK2(nds);
 			
-			var texture:NSBTX=new NSBTX();
-			texture.parse(fs.openFile("jpn/modelitemlocal.bin/1"));
+			var textureBank:NSBTX=new NSBTX();
+			textureBank.parse(fs.openFile("jpn/modelitemlocal.bin/1"));
 			
-			var entry:PaletteEntry=texture.getPaletteByName("bag_01_pl");
+			var palette:PaletteEntry=textureBank.getPaletteByName("bag_01_pl");
 			
-			var b:Bitmap=new Bitmap(entry.draw());
+			var b:Bitmap=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			addChild(b);
 			
-			entry=texture.getPaletteByName("bag_02_pl");
-			b=new Bitmap(entry.draw());
+			palette=textureBank.getPaletteByName("bag_02_pl");
+			b=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			b.x=16*8;
 			addChild(b);
 			
-			entry=texture.getPaletteByName("bag_03_pl");
-			b=new Bitmap(entry.draw());
+			palette=textureBank.getPaletteByName("bag_03_pl");
+			b=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			b.x=16*8*2;
 			addChild(b);
 			
-			entry=texture.getPaletteByName("bag_gan_02_pl");
-			b=new Bitmap(entry.draw());
+			palette=textureBank.getPaletteByName("bag_gan_02_pl");
+			b=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			b.x=16*8*2;
 			b.y=8;
 			addChild(b);
 			
-			entry=texture.getPaletteByName("bag_gan_04_pl");
-			b=new Bitmap(entry.draw());
+			palette=textureBank.getPaletteByName("bag_gan_04_pl");
+			b=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			b.x=16*8*2;
 			b.y=8*2;
 			addChild(b);
 			
-			entry=texture.getPaletteByName("bag_gan_05_pl");
-			b=new Bitmap(entry.draw());
+			palette=textureBank.getPaletteByName("bag_gan_05_pl");
+			b=new Bitmap(palette.draw());
 			b.scaleX=8;
 			b.scaleY=8;
 			b.x=16*8*2;
 			b.y=8*3;
+			addChild(b);
+			
+			var texture:TextureEntry=textureBank.getTextureByName("bag_01");
+			b=new Bitmap(texture.draw());
+			//b.scaleX=8;
+			//b.scaleY=8;
+			b.y=16*8;
 			addChild(b);
 		}
 	}

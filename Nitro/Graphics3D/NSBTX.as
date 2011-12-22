@@ -65,24 +65,10 @@
 			
 			
 			
-			
-			const textureInfos:Vector.<InfoData>=readInfo(section,textureInfoOffset, textureInfoReader);
-			
-			for(i=0;i<textureInfos.length;++i) {
-				info=textureInfos[i];
-				
-				trace(info.name,info.infoData.width,info.infoData.height,TextureEntry.textypeToString(info.infoData.format),uint(info.infoData.offset).toString(16));
-			}
-			
-			
-			
-			
-			
-			//var infoData:ByteArray=new ByteArray();
-			//section.readBytes(infoData,0);
+			//Parse the palettes first
 			const paletteInfos:Vector.<InfoData>=readInfo(section,paletteInfoOffset,paletteInfoReader);
 			
-			paletteInfos.sort(sortPalettesInReverse);
+			paletteInfos.sort(sortEntriesInReverse);
 			
 			palettes=new Vector.<PaletteEntry>();
 			palettes.length=paletteInfos.length;
@@ -94,14 +80,14 @@
 				info = paletteInfos[i];
 				var offset:uint=info.infoData.offset;
 				
-				var entry:PaletteEntry=new PaletteEntry();
-				entry.name=info.name;
+				var palette:PaletteEntry=new PaletteEntry();
+				palette.name=info.name;
 				
 				var colorCount:uint=(lastPaletteOffset-offset)/RGB555.byteSize;
 				
 				if(colorCount>256) throw new Error("colorCount is ludicrous!");
 				
-				trace(entry.name,offset.toString(16),info.infoData.unknown, colorCount);
+				trace(palette.name,offset.toString(16),info.infoData.unknown, colorCount);
 				
 				var colors:Vector.<uint>=new Vector.<uint>();
 				colors.length=colorCount;
@@ -112,11 +98,57 @@
 					colors[j]=section.readUnsignedShort();
 				}
 				
-				entry.unconvertedColors=colors;
+				palette.unconvertedColors=colors;
 				
-				palettes[i]=entry;
+				palettes[paletteInfos.length-i-1]=palette;
 				lastPaletteOffset=offset;
 			}
+			
+			
+			
+			//Parse the textures later
+			const textureInfos:Vector.<InfoData>=readInfo(section,textureInfoOffset, textureInfoReader);
+			textures=new Vector.<TextureEntry>();
+			textures.length=textureInfos.length;
+			textures.fixed=true;
+			
+			for(i=0;i<textureInfos.length;++i) {
+				info=textureInfos[i];
+				
+				var texture:TextureEntry=new TextureEntry();
+				
+				texture.name=info.name;
+				texture.width=info.infoData.width;
+				texture.height=info.infoData.height;
+				texture.format=info.infoData.format;
+				texture.palette=palettes[info.infoData.palette];
+				texture.transparentZero=info.infoData.transparent;
+				texture.flipX=info.infoData.flipX;
+				texture.flipY=info.infoData.flipY;
+				texture.repeatX=info.infoData.repeatX;
+				texture.repeatY=info.infoData.repeatY;
+				
+				var pixelData:ByteArray=new ByteArray();
+				
+				var baseOffset:uint=(info.infoData.format==5?compressedTextureDataBaseOffset:textureDataBaseOffset);
+				var readSize:uint=texture.width*texture.height*texture.bpp/8;
+				
+				section.position=info.infoData.offset+baseOffset;
+				section.readBytes(pixelData,0,readSize);
+				
+				texture.pixelData=pixelData;
+				
+				trace(info.name,info.infoData.width,info.infoData.height,TextureEntry.textypeToString(info.infoData.format),uint(info.infoData.offset).toString(16));
+				
+				
+				textures[i]=texture;
+			}
+			
+			
+			
+			
+			
+			
 			
 		}
 		
@@ -149,15 +181,28 @@
 		@return The retrived palette entry
 		@throws ArgumentError There is no entry with that name */
 		public function getPaletteByName(name:String):PaletteEntry {
-			for each(var entry:PaletteEntry in palettes) {
-				if(entry.name==name) {
-					return entry;
+			for each(var palette:PaletteEntry in palettes) {
+				if(palette.name==name) {
+					return palette;
 				}
 			}
 			throw new ArgumentError("No palette with that name");
 		}
 		
-		private static function sortPalettesInReverse(a:InfoData,b:InfoData):int {
+		/** Retrives a texture based on its name
+		@param name The name of the texture
+		@return The retrived texture
+		@throws ArgumentError There is no entry with that name */
+		public function getTextureByName(name:String):TextureEntry {
+			for each(var texture:TextureEntry in textures) {
+				if(texture.name==name) {
+					return texture;
+				}
+			}
+			throw new ArgumentError("No texture with that name");
+		}
+		
+		private static function sortEntriesInReverse(a:InfoData,b:InfoData):int {
 			return b.infoData.offset-a.infoData.offset;
 		}
 		
