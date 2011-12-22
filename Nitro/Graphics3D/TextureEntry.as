@@ -50,9 +50,6 @@
 		/** If the texture should repeat outside of the definition area on the Y axis */
 		public var repeatY:Boolean;
 		
-		/** The palette index used for this texture */
-		public var palette:PaletteEntry;
-		
 		/** The pixel data for the texture */
 		internal var pixelData:ByteArray;
 		
@@ -68,33 +65,33 @@
 			// constructor code
 		}
 		
-		public function draw():BitmapData {
+		public function draw(palette:PaletteEntry):BitmapData {
 			var bmd:BitmapData=new BitmapData(width,height,true,0xFFFF00FF);
 			bmd.lock();
 			
 			switch(format) {
 				case TEXTYPE_A3I5:
-					drawA3I5(bmd);
+					drawA3I5(bmd,palette);
 				break;
 				
 				case TEXTYPE_4COLOR:
-					draw4Color(bmd);
+					draw4Color(bmd,palette);
 				break;
 				
 				case TEXTYPE_16COLOR:
-					draw16Color(bmd);
+					draw16Color(bmd,palette);
 				break;
 				
 				case TEXTYPE_256COLOR:
-					draw256Color(bmd);
+					draw256Color(bmd,palette);
 				break;
 				
 				case TEXTYPE_COMPRESSED:
-					drawCompressed(bmd);
+					drawCompressed(bmd,palette);
 				break;
 				
 				case TEXTYPE_A5I3:
-					drawA5I3(bmd);
+					drawA5I3(bmd,palette);
 				break;
 				
 				case TEXTYPE_DIRECT:
@@ -106,12 +103,47 @@
 			return bmd;
 		}
 		
-		private function drawA3I5(bmd:BitmapData):void {}
-		private function drawA5I3(bmd:BitmapData):void {}
-		private function draw4Color(bmd:BitmapData):void {}
-		private function draw16Color(bmd:BitmapData):void {}
+		private function drawA3I5(bmd:BitmapData,palette:PaletteEntry):void {}
+		private function drawA5I3(bmd:BitmapData,palette:PaletteEntry):void {}
+		private function draw4Color(bmd:BitmapData,palette:PaletteEntry):void {}
+		private function draw16Color(bmd:BitmapData,palette:PaletteEntry):void {
+			const pixelCount:uint=width*height;
+			var vect:Vector.<uint>=new Vector.<uint>();
+			vect.length=pixelCount;
+			vect.fixed=true;
+			
+			var colors:Vector.<uint>=palette.convertedColors;
+			
+			pixelData.endian=Endian.LITTLE_ENDIAN;
+			pixelData.position=0;
+			
+			for(var i:uint=0;i<pixelCount;) {
+				var b:uint=pixelData.readUnsignedByte();
+				var c:uint;
+				
+				c=b&0xF;
+				
+				if(c==0 && transparentZero) {
+					c=0x00FF00FF;
+				} else {
+					c=colors[c] | 0xFF000000;
+				}
+				vect[i++]=c;
+				
+				c=b>>4;
+				
+				if(c==0 && transparentZero) {
+					c=0x00FF00FF;
+				} else {
+					c=colors[c] | 0xFF000000;
+				}
+				vect[i++]=c;
+			}
+			
+			bmd.setVector(new Rectangle(0,0,width,height),vect);
+		}
 		
-		private function draw256Color(bmd:BitmapData):void {
+		private function draw256Color(bmd:BitmapData,palette:PaletteEntry):void {
 			const pixelCount:uint=width*height;
 			var vect:Vector.<uint>=new Vector.<uint>();
 			vect.length=pixelCount;
@@ -135,7 +167,7 @@
 			bmd.setVector(new Rectangle(0,0,width,height),vect);
 		}
 		
-		private function drawCompressed(bmd:BitmapData):void {}
+		private function drawCompressed(bmd:BitmapData,palette:PaletteEntry):void {}
 		private function drawDirect(bmd:BitmapData):void {}
 		
 		public function get bpp():uint {

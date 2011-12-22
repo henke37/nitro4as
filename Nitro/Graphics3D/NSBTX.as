@@ -121,7 +121,6 @@
 				texture.width=info.infoData.width;
 				texture.height=info.infoData.height;
 				texture.format=info.infoData.format;
-				texture.palette=palettes[info.infoData.palette];
 				texture.transparentZero=info.infoData.transparent;
 				texture.flipX=info.infoData.flipX;
 				texture.flipY=info.infoData.flipY;

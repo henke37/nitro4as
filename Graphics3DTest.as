@@ -76,10 +76,18 @@
 			addChild(b);
 			
 			var texture:TextureEntry=textureBank.getTextureByName("bag_01");
-			b=new Bitmap(texture.draw());
+			b=new Bitmap(texture.draw(textureBank.getPaletteByName("bag_01_pl")));
 			//b.scaleX=8;
 			//b.scaleY=8;
 			b.y=16*8;
+			addChild(b);
+			
+			texture=textureBank.getTextureByName("bag_03");
+			b=new Bitmap(texture.draw(textureBank.getPaletteByName("bag_03_pl")));
+			//b.scaleX=8;
+			//b.scaleY=8;
+			b.y=16*8;
+			b.x=256;
 			addChild(b);
 		}
 	}
