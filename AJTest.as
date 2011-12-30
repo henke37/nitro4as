@@ -5,8 +5,10 @@
 	import flash.net.*;
 	import flash.events.*;
 	
+	import flash.filesystem.*;
+	
 	import Nitro.*;
-	import Nitro.FileSystem.*;
+	import Nitro.FileSystem.NDS;
 	import Nitro.Apollo.*;
 	
 	public class AJTest extends MovieClip {
@@ -20,19 +22,17 @@
 			loader.load(new URLRequest("aj.nds"));
 		}
 		
-		private var subfile:ByteArray;
-		private var fr:FileReference;
 		
 		private function loaded(e:Event):void {
 			var nds:NDS=new NDS();
 			nds.parse(loader.data);
 			
 			var cpack:CPAC=new CPAC();
-			cpack.parse(nds.fileSystem.openFileByName("cpac_3d.bin"));
+			cpack.parse(nds.fileSystem.openFileByName("cpac_2d.bin"));
 			
-			var id:uint=1;
+			var id:uint=4;
 			
-			subfile=cpack.open(id);
+			var subfile:ByteArray=cpack.open(id);
 			
 			var subarchive:SubArchive=new SubArchive();
 			subarchive.parse(subfile);
@@ -41,11 +41,14 @@
 			
 				subfile=subarchive.open(subid);
 			
-				trace(subfile.readUTFBytes(4));
+				var fs:FileStream=new FileStream();
+				fs.open(new File("C:\\Users\\Henrik\\Desktop\\ds reverse engineering\\unpacked\\aj unpacked\\data\\cpack_2d\\"+id+"\\"+subid+".bin"),FileMode.WRITE);
+				
+				fs.writeBytes(subfile);
+				
+				fs.close();
 			}
 			
-			//fr=new FileReference();
-			//fr.save(subfile,subid+".bin");
 		}
 	}
 	

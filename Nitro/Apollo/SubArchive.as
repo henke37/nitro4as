@@ -44,7 +44,7 @@
 				entry.compressed=Boolean(mixed & 0x80000000);
 				entry.size=mixed & ~0x80000000;
 				
-				trace(entry);
+				//trace(entry);
 				
 				subfiles.push(entry);				
 			} while(data.position<subfiles[0].offset);

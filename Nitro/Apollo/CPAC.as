@@ -28,7 +28,7 @@
 				entry.offset=data.readUnsignedInt();
 				entry.size=data.readUnsignedInt();
 				
-				trace(entry);
+				//trace(entry);
 				
 				subfiles.push(entry);
 			} while(data.position < subfiles[0].offset);
