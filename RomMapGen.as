@@ -27,7 +27,7 @@
 				loader=new URLLoader();
 				loader.addEventListener(Event.COMPLETE,loaded);
 				loader.dataFormat=URLLoaderDataFormat.BINARY;
-				loader.load(new URLRequest("game.nds"));
+				loader.load(new URLRequest("gk2.nds"));
 			} else {
 				status_txt.text="Click to load game from disk";
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
@@ -69,9 +69,16 @@
 			stage.addEventListener(MouseEvent.CLICK,saveDump);
 		}
 		
+		private static function hex(x:uint):String {
+			return "0x"+x.toString(16);
+		}
+		
 		private function saveDump(e:MouseEvent):void {
 			fr=new FileReference();
-			var xml:XML=<nds></nds>;
+			var xml:XML=<nds>
+				<arm9 mirror={hex(nds.arm9Mirror)} romoffset={hex(nds.arm9Offset)} length={hex(nds.arm9Len)} entrypoint={hex(nds.arm9ExecuteStart)} />
+				<arm7 mirror={hex(nds.arm7Mirror)} romoffset={hex(nds.arm7Offset)} length={hex(nds.arm7Len)} entrypoint={hex(nds.arm7ExecuteStart)} />
+			</nds>;
 			
 			if(nds.banner) {
 				xml.appendChild(<banner>
@@ -98,15 +105,16 @@
 				xml.appendChild(overlay);
 			}
 			
+			trace(xml);
 			
-			fr.save(xml,"ndsmap.xml");
+			//fr.save(xml,"ndsmap.xml");
 		}
 		
 		private static function addOverlays(xml:XML,overlays:Vector.<Overlay>):void {
 			for each(var overlay:Overlay in overlays) {
 				xml.appendChild(<overlay id={overlay.id} fileId={overlay.fileId}>
-					<ram address={overlay.ramAddress} size={overlay.ramSize} />
-					<bss size={overlay.bssSize} start={overlay.bssStart} stop={overlay.bssStop} />
+					<ram address={hex(overlay.ramAddress)} size={hex(overlay.ramSize)} />
+					<bss size={hex(overlay.bssSize)} start={hex(overlay.bssStart)} stop={hex(overlay.bssStop)} />
 				</overlay>);
 			}
 		}

@@ -8,6 +8,7 @@
 	
 	import Nitro.FileSystem.*;
 	import Nitro.*;
+	import Nitro.Apollo.*;
 	
 	public class PACTest extends MovieClip {
 		

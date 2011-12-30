@@ -89,6 +89,9 @@
 			b.y=16*8;
 			b.x=256;
 			addChild(b);
+			
+			var model:NSBMD=new NSBMD();
+			model.parse(fs.openFile("jpn/modelitemlocal.bin/0"));
 		}
 	}
 	

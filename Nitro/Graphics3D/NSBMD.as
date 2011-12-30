@@ -26,7 +26,44 @@
 		}
 		
 		private function parseMdl(section:ByteArray):void {
+			section.endian=Endian.LITTLE_ENDIAN;
 			
+			var modelInfos:Vector.<InfoData>=readInfo(section,8,modelInfoReader);
+			
+			for each(var info:InfoData in modelInfos) {
+				trace(info.name);
+				
+				var modelOffset:uint=info.infoData.offset;
+				
+				section.position=modelOffset;
+				
+				var blockSize:uint=section.readUnsignedInt();
+				var bonesOffset:uint=section.readUnsignedInt();
+				var materialsOffset:uint=section.readUnsignedInt();
+				var polygonStartOffset:uint=section.readUnsignedInt();
+				var polygonEndOffset:uint=section.readUnsignedInt();
+				
+				section.position+=3;
+				
+				var objCount:uint=section.readUnsignedByte();
+				var materialCount:uint=section.readUnsignedByte();
+				var polygonCount:uint=section.readUnsignedByte();
+				
+				section.position+=1;
+				
+				var scaleMode:uint=section.readUnsignedByte();
+				
+				section.position+=2;
+				
+				var verticeCount:uint=section.readUnsignedShort();
+				var surfaceCount:uint=section.readUnsignedShort();
+				var triangleCount:uint=section.readUnsignedShort();
+				var quadCount:uint=section.readUnsignedShort();
+			}
+		}
+		
+		private static function modelInfoReader(data:ByteArray):Object {
+			return { offset: data.readUnsignedInt() };
 		}
 
 	}
