@@ -12,10 +12,10 @@
 		
 		private var rawPalette:Vector.<uint>;
 		
-		/** The width of the image */
+		/** The width of the image, in pixels */
 		public var width:uint;
 		
-		/** The height of the image */
+		/** The height of the image, in pixels */
 		public var height:uint;
 
 		public function IndexedBitmap() {
@@ -24,15 +24,29 @@
 		
 		public function parse(data:ByteArray):void {
 			
+			if(data.length<4+16+Tile.height*Tile.width/2) throw new ArgumentError("File is way too short!");
+			
 			data.endian=Endian.LITTLE_ENDIAN;
 			data.position=0;
 			
 			width=data.readUnsignedShort();
 			height=data.readUnsignedShort() & ~0x00008000;
 			
-			const shortSize:uint=4+16*2+width*height/2;
+			if(width%Tile.width!=0) throw new ArgumentError("The width has to be evenly divideable by the tile width!");
+			if(height%Tile.height!=0) throw new ArgumentError("The height has to be evenly divideable by the tile height!");
 			
-			const bpp:uint=((shortSize==data.length)?4:8);
+			const shortSize:uint=4+16*2+width*height/2;
+			const longSize:uint=4+256*2+width*height;
+			
+			var bpp:uint;
+			
+			if(data.length==shortSize) {
+				bpp=4;
+			} else if(data.length==longSize) {
+				bpp=8;
+			} else {
+				throw new ArgumentError("Unsupported file length");
+			}
 			
 			const paletteSize:uint=((bpp==4)?16:256);
 			
