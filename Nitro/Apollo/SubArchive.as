@@ -37,15 +37,18 @@
 			
 			do {
 				var entry:SubFileEntry=new SubFileEntry();
-				entry.offset=data.readUnsignedInt()+dataBaseOffset;
-				
+				var offset:uint=data.readUnsignedInt();
 				var mixed:uint=data.readUnsignedInt();
 				
 				entry.compressed=Boolean(mixed & 0x80000000);
 				entry.size=mixed & ~0x80000000;
+				entry.offset=offset+dataBaseOffset;
 				
-				//trace(entry);
+				trace(entry);
 				
+				if(entry.size==0) {
+					entry=null;
+				}
 				subfiles.push(entry);				
 			} while(data.position<subfiles[0].offset);
 			

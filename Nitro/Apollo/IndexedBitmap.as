@@ -30,7 +30,9 @@
 			data.position=0;
 			
 			width=data.readUnsignedShort();
-			height=data.readUnsignedShort() & ~0x00008000;
+			var flags:uint=data.readUnsignedShort();
+			height=flags & ~0x00008000;
+			var nibbles:Boolean=Boolean(flags & 0x00008000);
 			
 			if(width%Tile.width!=0) throw new ArgumentError("The width has to be evenly divideable by the tile width!");
 			if(height%Tile.height!=0) throw new ArgumentError("The height has to be evenly divideable by the tile height!");
@@ -38,17 +40,17 @@
 			const shortSize:uint=4+16*2+width*height/2;
 			const longSize:uint=4+256*2+width*height;
 			
-			var bpp:uint;
+			var bpp:uint=nibbles?4:8;
 			
-			if(data.length==shortSize) {
-				bpp=4;
-			} else if(data.length==longSize) {
-				bpp=8;
+			if(data.length==shortSize && bpp==4) {
+			} else if(data.length==longSize && bpp==8) {
 			} else {
 				throw new ArgumentError("Unsupported file length");
 			}
 			
 			const paletteSize:uint=((bpp==4)?16:256);
+			
+			//trace(width,height,transparent,bpp);
 			
 			rawPalette=new Vector.<uint>();
 			rawPalette.length=paletteSize;
@@ -74,8 +76,8 @@
 			}
 		}
 		
-		public function toBMD():BitmapData {
-			var out:BitmapData=new BitmapData(width,height);
+		public function toBMD(transparent:Boolean):BitmapData {
+			var out:BitmapData=new BitmapData(width,height,transparent);
 			
 			out.lock();
 			
@@ -93,7 +95,7 @@
 				
 				for(var xPos:uint=0;xPos<xTiles;++xPos) {
 					var tile:Tile=tiles[yPos*xTiles+xPos];
-					var tileBMD:BitmapData=tile.toBMD(convertedPalette);
+					var tileBMD:BitmapData=tile.toBMD(convertedPalette,0,transparent);
 					
 					dstPnt.x=xPos*Tile.width;
 					

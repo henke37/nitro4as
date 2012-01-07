@@ -9,11 +9,12 @@
 	import flash.filesystem.*;
 	
 	import fl.controls.*;
-	
+	import fl.events.*;
 	
 	import Nitro.*;
 	import Nitro.FileSystem.NDS;
 	import Nitro.Apollo.*;
+	import Nitro.Compression.*;
 	
 
 	
@@ -26,8 +27,8 @@
 		private var cpack:CPAC;
 		private var subarchive:SubArchive;
 		
-		public var id_mc:NumericStepper;
 		public var subid_mc:NumericStepper;
+		public var transparent_mc:CheckBox;
 		
 		public var error_txt:TextField;
 		
@@ -51,16 +52,14 @@
 			cpack=new CPAC();
 			cpack.parse(nds.fileSystem.openFileByName("cpac_2d.bin"));
 			
-			id_mc.maximum=cpack.length-1;
-			id_mc.addEventListener(Event.CHANGE,idChange);
-			
 			loadSubArchive();
 			
-			subid_mc.addEventListener(Event.CHANGE,subIdChange);
+			subid_mc.addEventListener(Event.CHANGE,change);
+			transparent_mc.addEventListener(Event.CHANGE,change);
 		}
 		
 		private function loadSubArchive():void {
-			var subfile:ByteArray=cpack.open(id_mc.value);
+			var subfile:ByteArray=cpack.open(4);
 			
 			subarchive=new SubArchive();
 			subarchive.parse(subfile);
@@ -68,32 +67,29 @@
 			subid_mc.maximum=subarchive.length-1;
 			subid_mc.value=0;
 			
-			subIdChange(null);
+			change(null);
 		}
 		
-		private function subIdChange(e:Event):void {
+		private function change(e:Event):void {
 			try {
-				loadImage(subid_mc.value);
+				loadImage(subid_mc.value,transparent_mc.selected);
 				error_txt.visible=false;
+				b.visible=true;
 			} catch(e:Error) {
 				error_txt.visible=true;
 				error_txt.text=e.message;
+				b.visible=false;
 			}
 		}
 		
-		private function idChange(e:Event):void {
-			loadSubArchive();
-			
-		}
-		
-		private function loadImage(subid:uint):void {
+		private function loadImage(subid:uint,transparent:Boolean):void {
 			
 			var subfile:ByteArray=subarchive.open(subid);
 			
 			var pict:IndexedBitmap=new IndexedBitmap();
 			pict.parse(subfile);
 			
-			b.bitmapData=pict.toBMD();
+			b.bitmapData=pict.toBMD(transparent);
 		}
 			
 		private function dumpArchive(fileName:String,id:uint):void {
@@ -119,6 +115,7 @@
 			}
 			
 		}
+
 	}
 	
 }
