@@ -11,6 +11,7 @@
 	import Nitro.*;
 	
 	import fl.controls.*;
+	import fl.data.*;
 	
 	use namespace strmInternal;
 	
@@ -34,6 +35,7 @@
 		
 		public var progress_mc:Slider;
 		public var list_mc:List;
+		public var source_mc:ComboBox;
 		
 		private var loopMark:Shape;
 		
@@ -56,7 +58,7 @@
 			title.wordWrap=true;
 			title.height=titleHeight;
 			title.text="Nitro SDAT Stream player WIP";
-			addChild(title);
+			addChildAt(title,0);
 			
 			playback=new TextField();
 			playback.y=Banner.ICON_HEIGHT*iconZoom;
@@ -81,6 +83,14 @@
 			list_mc.x=Banner.ICON_WIDTH*iconZoom;
 			list_mc.y=title.y+title.height;
 			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,380-(title.y+title.height));
+			list_mc.labelFunction=listLabeler;
+			
+			//source_mc.visible=false;
+			source_mc.x=list_mc.x+list_mc.width-source_mc.width;
+			source_mc.y=list_mc.y-source_mc.height;
+			source_mc.labelField="name";
+			source_mc.addEventListener(Event.CHANGE,sourceChange);
+			source_mc.visible=false;
 			
 			loopMark=new Shape();
 			loopMark.graphics.lineStyle(1,0xFF0000);
@@ -169,20 +179,47 @@
 			}
 			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,true);
 			
+			if(files.length==0) {
+				status.text="No sdat found";
+				return;
+			}
+			
+			var sources:DataProvider=new DataProvider();
+			
 			var fileRef:File;
 			if(files.length>0) {
 				fileRef=files[0] as File;
 			}
 			
-			if(fileRef) {
-				var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
-				sdat=new SDAT();
-				sdat.parse(fileContents);
-				listStreams();
+			var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
+			sdat=new SDAT();
+			sdat.parse(fileContents);
+			
+			
+			if(sdat.streams.length==0) {
+				status.text="No Streams";
 			} else {
-				status.text="No sdat found";
+				var streamSource:Object={};
+				streamSource.dataProvider=listStreams();
+				streamSource.name="Streams";
+				sources.addItem(streamSource);
+			}
+			
+			if(sources.length>0) {			
+				list_mc.visible=true;
+				status.visible=false;
+				
+				source_mc.dataProvider=sources;
+				source_mc.selectedIndex=0;
+				source_mc.visible=sources.length>1;
+				
+				sourceChange(null);
 			}
 
+		}
+		
+		private function sourceChange(e:Event):void {
+			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
 		}
 		
 		private function playStream(streamNumber:uint):void {
@@ -191,37 +228,42 @@
 			player.play();
 		}
 		
-		private function listStreams():void {
+		private function listStreams():DataProvider {
 			
-			status.text="";
-			
-			if(sdat.streams.length==0) {
-				status.text="No Streams";
-				return;
-			}
-			
-			status.visible=false;
-			list_mc.visible=true;
-			list_mc.dataProvider.removeAll();
+			var provider:DataProvider=new DataProvider();
 						
 			for(var streamIndex:String in sdat.streams) {
-				var streamName:String;
-				if(!sdat.streamSymbols) {
-					streamName="STREAM #"+streamIndex;
-				} else if(streamIndex in sdat.streamSymbols) {
-					streamName=sdat.streamSymbols[streamIndex];
-				} else {
-					streamName="UNLISTED STREAM #"+streamIndex;
+				var strm:STRM=sdat.streams[streamIndex];
+				
+				var item:Object={ index: streamIndex, type: "stream" };
+				
+				item.length=strm.length;
+				item.loopPoint=strm.loopPoint/strm.sampleRate;
+				item.loops=strm.loop;
+				
+				if(sdat.streamSymbols) {
+					if(streamIndex in sdat.streamSymbols) {
+						item.name=sdat.streamSymbols[streamIndex];
+					}
 				}
 				
-				list_mc.addItem({ label: streamName, index: streamIndex, type: "stream" });
+				provider.addItem(item);
 				
-				//status.htmlText+="<a href=\"event:stream/"+streamIndex+"\">"+streamIndex+" "+streamName+"</a><br>";
 			}
 			
+			return provider;
+		}
+		
+		private function listLabeler(item:Object):String {
+			var name:String="";
 			
+			name=item.name;
+				
+			if(!name || !name.match(/\S/i)) {
+				name=String(item.type).toLocaleUpperCase()+" #"+item.index;
+			}
 			
-			//status.addEventListener(TextEvent.LINK,streamClick);
+			return name +" - "+formatTime(item.length) + (item.loops?(" - Loop: "+formatTime(item.loopPoint)):"");
 		}
 		
 		private function listSelect(e:Event):void {
