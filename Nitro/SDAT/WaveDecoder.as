@@ -33,7 +33,6 @@
 		}
 		
 		private function decode():void {
-			trace("decode");
 				
 			wave.sdat.position=wave.dataPos;
 			

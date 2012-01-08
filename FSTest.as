@@ -30,8 +30,8 @@
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
 		
-		private var stream:STRM;
-		private var player:STRMPlayer;
+		private var playingItem:Object;
+		private var player:BasePlayer;
 		
 		public var progress_mc:Slider;
 		public var list_mc:List;
@@ -105,14 +105,14 @@
 			if(!player) return;
 			progress_mc.liveDragging=false;
 			progress_mc.minimum=0;
-			progress_mc.maximum=stream.sampleCount;
+			progress_mc.maximum=playingItem.length;
 			progress_mc.value=player.position;
 			
-			var ptext:String=formatTime(player.position/stream.sampleRate)+"/"+formatTime(stream.sampleCount/stream.sampleRate);
+			var ptext:String=formatTime(player.position/playingItem.sampleRate)+"/"+formatTime(playingItem.length/playingItem.sampleRate);
 			
-			ptext+=" "+stream.sampleRate+"Hz "+(stream.stereo?"stereo":"mono")+" "+Wave.encodingAsString(stream.encoding);
-			if(stream.loop) {
-				ptext+=" Loop:"+formatTime(stream.loopPoint/stream.sampleRate);
+			ptext+=" "+playingItem.sampleRate+"Hz "+(playingItem.stereo?"stereo":"mono")+" "+Wave.encodingAsString(playingItem.encoding);
+			if(playingItem.loops) {
+				ptext+=" Loop:"+formatTime(playingItem.loopPoint/playingItem.sampleRate);
 			}
 			
 			playback.text=ptext;
@@ -205,6 +205,26 @@
 				sources.addItem(streamSource);
 			}
 			
+			if(sdat.waveArchives.length>0) {
+				for (var archiveIndex:String in sdat.waveArchives) {
+					var archive:SWAR=sdat.waveArchives[archiveIndex];
+					
+					var archiveSource:Object={};
+					var name:String;
+					
+					if(sdat.waveArchiveSymbols) {
+						name=sdat.waveArchiveSymbols[archiveIndex];
+					}
+					
+					if(!name) {
+						name="SWAR #"+archiveIndex;
+					}
+					archiveSource.name=name;
+					archiveSource.dataProvider=listSwar(archive);
+					sources.addItem(archiveSource);
+				}
+			}
+			
 			if(sources.length>0) {			
 				list_mc.visible=true;
 				status.visible=false;
@@ -222,12 +242,6 @@
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
 		}
 		
-		private function playStream(streamNumber:uint):void {
-			stream=sdat.streams[streamNumber];
-			player=new STRMPlayer(stream);
-			player.play();
-		}
-		
 		private function listStreams():DataProvider {
 			
 			var provider:DataProvider=new DataProvider();
@@ -237,9 +251,13 @@
 				
 				var item:Object={ index: streamIndex, type: "stream" };
 				
-				item.length=strm.length;
-				item.loopPoint=strm.loopPoint/strm.sampleRate;
+				item.length=strm.sampleCount;
+				item.loopPoint=strm.loopPoint;
 				item.loops=strm.loop;
+				item.sampleRate=strm.sampleRate;
+				item.stereo=strm.stereo;
+				item.encoding=strm.encoding;
+				item.stream=strm;
 				
 				if(sdat.streamSymbols) {
 					if(streamIndex in sdat.streamSymbols) {
@@ -254,6 +272,28 @@
 			return provider;
 		}
 		
+		private function listSwar(swar:SWAR):DataProvider {
+			var provider:DataProvider=new DataProvider();
+			
+			for(var sampleIndex:String in swar.waves) {
+				var wave:Wave=swar.waves[sampleIndex];
+				
+				var item:Object={index: sampleIndex, type: "wave"};
+				
+				item.length=wave.sampleCount;
+				item.loops=wave.loops;
+				item.loopPoint=wave.loopStart;
+				item.sampleRate=wave.samplerate;
+				item.stereo=false;
+				item.encoding=wave.encoding;
+				item.wave=wave;
+				
+				provider.addItem(item);
+			}
+			
+			return provider;
+		}
+		
 		private function listLabeler(item:Object):String {
 			var name:String="";
 			
@@ -263,7 +303,7 @@
 				name=String(item.type).toLocaleUpperCase()+" #"+item.index;
 			}
 			
-			return name +" - "+formatTime(item.length) + (item.loops?(" - Loop: "+formatTime(item.loopPoint)):"");
+			return name +" - "+formatTime(item.length/item.sampleRate) + (item.loops?(" - Loop: "+formatTime(item.loopPoint/item.sampleRate)):"");
 		}
 		
 		private function listSelect(e:Event):void {
@@ -271,10 +311,14 @@
 				player.stop();
 			}
 			
-			var obj:Object=list_mc.selectedItem;
-			if(obj.type=="stream") {
-				playStream(obj.index);
+			playingItem=list_mc.selectedItem;
+			if(playingItem.type=="stream") {
+				player=new STRMPlayer(playingItem.stream);
+			} else if(playingItem.type=="wave") {
+				player=new WavePlayer(playingItem.wave);
 			}
+			
+			player.play();
 		}
 		
 		/*

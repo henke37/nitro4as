@@ -67,6 +67,10 @@
 			dataPos=wavePos+12;
 		}
 		
+		public function get sampleCount():uint {
+			return loopStart+nonLoopLength;
+		}
+		
 		public static function encodingAsString(encoding:uint):String {
 			switch(encoding) {
 				case PCM8: return "PCM8";
