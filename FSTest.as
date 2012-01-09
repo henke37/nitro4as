@@ -21,8 +21,6 @@
 		
 		private var nds:NDS;
 		
-		private var sdat:SDAT;
-		
 		private var status:TextField;
 		private var title:TextField;
 		private var playback:TextField;
@@ -41,7 +39,7 @@
 		
 		public function FSTest() {
 			
-			stage.align=StageAlign.TOP_LEFT;
+			//stage.align=StageAlign.TOP_LEFT;
 			
 			status=new TextField();
 			status.x=Banner.ICON_WIDTH*iconZoom;
@@ -78,19 +76,23 @@
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
 			
+			//source_mc.visible=false;
+			source_mc.x=Banner.ICON_WIDTH*iconZoom;
+			source_mc.y=title.y+title.height;
+			source_mc.labelFunction=sourceLabeler;
+			source_mc.width=550-Banner.ICON_WIDTH*iconZoom;
+			source_mc.addEventListener(Event.CHANGE,sourceChange);
+			source_mc.visible=false;
+			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
 			list_mc.x=Banner.ICON_WIDTH*iconZoom;
-			list_mc.y=title.y+title.height;
-			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,380-(title.y+title.height));
+			list_mc.y=source_mc.y+source_mc.height;
+			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,400-(source_mc.y+source_mc.height));
 			list_mc.labelFunction=listLabeler;
 			
-			//source_mc.visible=false;
-			source_mc.x=list_mc.x+list_mc.width-source_mc.width;
-			source_mc.y=list_mc.y-source_mc.height;
-			source_mc.labelField="name";
-			source_mc.addEventListener(Event.CHANGE,sourceChange);
-			source_mc.visible=false;
+			progress_mc.width=Banner.ICON_WIDTH*iconZoom-20;
+			progress_mc.visible=false;
 			
 			loopMark=new Shape();
 			loopMark.graphics.lineStyle(1,0xFF0000);
@@ -186,48 +188,55 @@
 			
 			var sources:DataProvider=new DataProvider();
 			
-			var fileRef:File;
-			if(files.length>0) {
-				fileRef=files[0] as File;
-			}
+			var fileId:uint=0;
+			for each(var fileRef:File in files) {
 			
-			var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
-			sdat=new SDAT();
-			sdat.parse(fileContents);
-			
-			
-			if(sdat.streams.length==0) {
-				status.text="No Streams";
-			} else {
-				var streamSource:Object={};
-				streamSource.dataProvider=listStreams();
-				streamSource.name="Streams";
-				sources.addItem(streamSource);
-			}
-			
-			if(sdat.waveArchives.length>0) {
-				for (var archiveIndex:String in sdat.waveArchives) {
-					var archive:SWAR=sdat.waveArchives[archiveIndex];
-					
-					var archiveSource:Object={};
-					var name:String;
-					
-					if(sdat.waveArchiveSymbols) {
-						name=sdat.waveArchiveSymbols[archiveIndex];
-					}
-					
-					if(!name) {
-						name="SWAR #"+archiveIndex;
-					}
-					archiveSource.name=name;
-					archiveSource.dataProvider=listSwar(archive);
-					sources.addItem(archiveSource);
+				var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
+				var sdat:SDAT=new SDAT();
+				sdat.parse(fileContents);
+				
+				var fileName:String=nds.fileSystem.getFullNameForFile(fileRef);
+				
+				if(sdat.streams.length==0) {
+					status.text="No Streams";
+				} else {
+					var streamSource:Object={};
+					streamSource.dataProvider=listStreams(sdat);
+					streamSource.name="Streams";
+					streamSource.fileName=fileName;
+					streamSource.fileIndex=fileId;
+					sources.addItem(streamSource);
 				}
+				
+				if(sdat.waveArchives.length>0) {
+					for (var archiveIndex:String in sdat.waveArchives) {
+						var archive:SWAR=sdat.waveArchives[archiveIndex];
+						
+						var archiveSource:Object={};
+						var name:String;
+						
+						if(sdat.waveArchiveSymbols) {
+							name=sdat.waveArchiveSymbols[archiveIndex];
+						}
+						
+						if(!name) {
+							name="SWAR #"+archiveIndex;
+						}
+						archiveSource.name=name;
+						archiveSource.fileName=fileName;
+						archiveSource.fileIndex=fileId;
+						archiveSource.dataProvider=listSwar(archive);
+						sources.addItem(archiveSource);
+					}
+				}
+				
+				++fileId;
 			}
 			
 			if(sources.length>0) {			
 				list_mc.visible=true;
 				status.visible=false;
+				progress_mc.visible=true;
 				
 				source_mc.dataProvider=sources;
 				source_mc.selectedIndex=0;
@@ -242,7 +251,7 @@
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
 		}
 		
-		private function listStreams():DataProvider {
+		private function listStreams(sdat:SDAT):DataProvider {
 			
 			var provider:DataProvider=new DataProvider();
 						
@@ -304,6 +313,11 @@
 			}
 			
 			return name +" - "+formatTime(item.length/item.sampleRate) + (item.loops?(" - Loop: "+formatTime(item.loopPoint/item.sampleRate)):"");
+		}
+		
+		private function sourceLabeler(item:Object):String {
+			//trace(item.fileName,item.fileName.match(/\/([^\/]+)$/));
+			return item.fileIndex + " - "+ item.name;
 		}
 		
 		private function listSelect(e:Event):void {
