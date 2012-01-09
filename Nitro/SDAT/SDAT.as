@@ -132,8 +132,13 @@
 					break;
 				}
 				
-				subFile.parse(subFileData);
-				container.push(subFile);
+				try {
+					subFile.parse(subFileData);
+					container.push(subFile);
+				} catch(e:Error) {
+					container.push(null);
+					trace(e.getStackTrace());
+				}
 			}
 			
 			
