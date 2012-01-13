@@ -6,12 +6,14 @@
 	import flash.events.*;
 	import flash.text.*;
 	
-	import Nitro.FileSystem.*;	
+	import Nitro.FileSystem.*;
+	import Nitro.SDAT.InfoRecords.*;
 	import Nitro.SDAT.*;
 	import Nitro.*;
 	
 	import fl.controls.*;
 	import fl.data.*;
+	
 	
 	use namespace strmInternal;
 	
@@ -197,7 +199,7 @@
 				
 				var fileName:String=nds.fileSystem.getFullNameForFile(fileRef);
 				
-				if(sdat.streams.length==0) {
+				if(sdat.streamInfo.length==0) {
 					status.text="No Streams";
 				} else {
 					var streamSource:Object={};
@@ -208,9 +210,9 @@
 					sources.addItem(streamSource);
 				}
 				
-				if(sdat.waveArchives.length>0) {
-					for (var archiveIndex:String in sdat.waveArchives) {
-						var archive:SWAR=sdat.waveArchives[archiveIndex];
+				if(sdat.waveArchiveInfo.length>0) {
+					for(var archiveIndex:uint=0;archiveIndex<sdat.waveArchiveInfo.length;++archiveIndex) {
+						var archive:SWAR=sdat.openSWAR(archiveIndex);
 						
 						var archiveSource:Object={};
 						var name:String;
@@ -254,9 +256,10 @@
 		private function listStreams(sdat:SDAT):DataProvider {
 			
 			var provider:DataProvider=new DataProvider();
-						
-			for(var streamIndex:String in sdat.streams) {
-				var strm:STRM=sdat.streams[streamIndex];
+			
+			for(var streamIndex:uint=0;streamIndex<sdat.streamInfo.length;++streamIndex) {
+				
+				var strm:STRM=sdat.openSTRM(streamIndex);
 				
 				var item:Object={ index: streamIndex, type: "stream" };
 				
@@ -275,7 +278,6 @@
 				}
 				
 				provider.addItem(item);
-				
 			}
 			
 			return provider;

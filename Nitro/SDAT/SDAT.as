@@ -3,6 +3,7 @@
 	import flash.utils.*;
 	
 	import Nitro.*;
+	import Nitro.SDAT.InfoRecords.*;
 	
 	use namespace sdatInternal;
 	
@@ -14,13 +15,19 @@
 		
 		sdatInternal var sdat:ByteArray;
 		
-		public var streams:Vector.<STRM>;
+		/*
+		public var streamInfo:Vector.<STRM>;
 		public var soundBanks:Vector.<SBNK>;
 		public var waveArchives:Vector.<SWAR>;
 		public var sequences:Vector.<SSEQ>;
-		public var sequenceArchives:Vector.<SSAR>;
+		public var sequenceArchives:Vector.<SSAR>;*/
 		
-		public var files:Vector.<FATRecord>;
+		public var sequenceInfo:Vector.<SequenceInfoRecord>;
+		public var streamInfo:Vector.<StreamInfoRecord>;
+		public var sequenceArchiveInfo:Vector.<BaseInfoRecord>;
+		public var waveArchiveInfo:Vector.<BaseInfoRecord>;
+		
+		private var files:Vector.<FATRecord>;
 		
 		public var seqSymbols:Vector.<String>;
 		public var bankSymbols:Vector.<String>;
@@ -29,6 +36,8 @@
 		public var groupSymbols:Vector.<String>;
 		public var player2Symbols:Vector.<String>;
 		public var streamSymbols:Vector.<String>;
+		
+		private static const infoSubSectionCount:uint=8;
 		
 		public function SDAT() {
 			
@@ -40,11 +49,12 @@
 		public function parse(_sdat:ByteArray):void {
 			sdat=_sdat
 			
+			/*
 			streams=new Vector.<STRM>();
 			soundBanks=new Vector.<SBNK>();
 			waveArchives=new Vector.<SWAR>();
 			sequences=new Vector.<SSEQ>();
-			sequenceArchives=new Vector.<SSAR>();
+			sequenceArchives=new Vector.<SSAR>();*/
 			
 			var type:String=sdat.readUTFBytes(4);
 			if(type!="SDAT") {
@@ -77,15 +87,17 @@
 			
 			files=parseFat(fatPos);
 			
+			parseInfo(infoPos,infoSize);
+			
 			if(hasSymb) {			
 				parseSymb(symbPos,symbSize);
 			}
 			
-			loadFiles();
+			//loadFiles();
 			
 		}
 		
-		private function loadFiles():void {
+		/* private function loadFiles():void {
 			
 			
 			for each(var file:FATRecord in files) {
@@ -147,7 +159,7 @@
 			waveArchives.fixed=true;
 			sequences.fixed=true;
 			sequenceArchives.fixed=true;
-		}
+		}*/
 		
 		private function parseFat(fatPos:uint):Vector.<FATRecord> {
 			sdat.position=fatPos;
@@ -160,13 +172,161 @@
 			var numRecords:uint=sdat.readUnsignedInt();
 			//trace(numRecords);
 			var o:Vector.<FATRecord>=new Vector.<FATRecord>();
+			o.length=numRecords;
+			o.fixed=true;
 			for(var i:uint;i<numRecords;++i) {
 				sdat.position=fatPos+12+16*i;
 				var pos:uint=sdat.readUnsignedInt();
 				var size:uint=sdat.readUnsignedInt();				
-				o.push(new FATRecord(size,pos));
+				o[i]=new FATRecord(size,pos);
 			}
 			return o;
+		}
+		
+		private function openFileById(fatId:uint):ByteArray {
+			if(fatId>=files.length) throw new RangeError("Can't open a file id higher than the file count!");
+			
+			var record:FATRecord=files[fatId];
+			
+			var o:ByteArray=new ByteArray();
+			o.writeBytes(sdat,record.pos,record.size);
+			
+			o.position=0;
+			
+			return o;
+		}
+		
+		public function openSSEQ(seqId:uint):SSEQ {
+			var seq:SSEQ=new SSEQ();
+			seq.parse(openFileById(sequenceInfo[seqId].fatId));
+			
+			return seq;
+		}
+		
+		public function openSTRM(strmId:uint):STRM {
+			var strm:STRM=new STRM();
+			strm.parse(openFileById(streamInfo[strmId].fatId));
+			
+			return strm;
+		}
+		
+		public function openSWAR(swarId:uint):SWAR {
+			var swar:SWAR=new SWAR();
+			swar.parse(openFileById(waveArchiveInfo[swarId].fatId));
+			
+			return swar;
+		}
+		
+		private function parseInfo(infoPos:uint,infoSize:uint):void {
+			var i:uint;
+			var offset:uint;
+			
+			var info:ByteArray=new ByteArray();
+			info.writeBytes(sdat,infoPos,infoSize);
+			info.position=0;
+			info.endian=Endian.LITTLE_ENDIAN;
+			
+			var type:String=info.readUTFBytes(4);
+			if(type!="INFO") throw new ArgumentError("Invalid INFO block, wrong type!");
+			
+			var internalSize:uint=info.readUnsignedInt();
+			if(internalSize!=infoSize) throw new ArgumentError("Invalid INFO block, internal size does not match with external size!");
+			
+			var infoSectionOffsets:Vector.<uint>=new Vector.<uint>();
+			infoSectionOffsets.length=infoSubSectionCount;
+			infoSectionOffsets.fixed=true;
+			
+			for(i=0;i<infoSubSectionCount;++i) {
+				infoSectionOffsets[i]=info.readUnsignedInt();
+			}
+			
+			//read the sequence info
+			info.position=infoSectionOffsets[0];
+			var sequenceCount:uint=info.readUnsignedInt();
+			
+			var sequenceInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,sequenceCount);
+			
+			sequenceInfo=new Vector.<SequenceInfoRecord>;
+			
+			for(i=0;i<sequenceCount;++i) {
+				var seqRecord:SequenceInfoRecord=new SequenceInfoRecord();
+				
+				offset=sequenceInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;
+				
+				seqRecord.fatId=info.readUnsignedShort();
+				info.position+=2;
+				seqRecord.bankId=info.readUnsignedShort();
+				seqRecord.vol=info.readUnsignedByte();
+				seqRecord.cpr=info.readUnsignedByte();
+				seqRecord.ppr=info.readUnsignedByte();
+				seqRecord.ply=info.readUnsignedByte();
+				info.position+=2;
+				
+				//trace(seqRecord);
+				
+				sequenceInfo.push(seqRecord);
+			}
+			sequenceInfo.fixed=true;
+			
+			//read the wave archive info
+			info.position=infoSectionOffsets[3];
+			var waveArchiveCount:uint=info.readUnsignedInt();
+			
+			var waveArchiveInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,waveArchiveCount);
+			
+			waveArchiveInfo=new Vector.<BaseInfoRecord>;
+			for(i=0;i<waveArchiveCount;++i) {
+				var waveArchiveRecord:BaseInfoRecord=new BaseInfoRecord();
+				
+				offset=waveArchiveInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;
+				
+				waveArchiveRecord.fatId=info.readUnsignedShort();
+				
+				waveArchiveInfo.push(waveArchiveRecord);
+			}
+			waveArchiveInfo.fixed=true;
+			
+			//read the stream info
+			info.position=infoSectionOffsets[7];
+			var streamCount:uint=info.readUnsignedInt();
+			
+			var streamInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,streamCount);
+			
+			streamInfo=new Vector.<StreamInfoRecord>();
+			
+			for(i=0;i<streamCount;++i) {
+				var streamRecord:StreamInfoRecord=new StreamInfoRecord();
+				
+				offset=streamInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=streamInfoOffsets[i];
+				
+				streamRecord.fatId=info.readUnsignedShort();
+				info.position+=2;
+				streamRecord.vol=info.readUnsignedByte();
+				streamRecord.pri=info.readUnsignedByte();
+				streamRecord.ply=info.readUnsignedByte();
+				info.position+=5;
+				
+				//trace(streamRecord);
+				
+				streamInfo.push(streamRecord);
+			}
+			streamInfo.fixed=true;
+		}
+		
+		private function readInfoRecordPtrTable(info:ByteArray,count:uint):Vector.<uint> {
+			var sectionRecordOffsets:Vector.<uint>=new Vector.<uint>();
+			sectionRecordOffsets.length=count;
+			sectionRecordOffsets.fixed=true;
+			for(var i:uint=0;i<count;++i) {
+				sectionRecordOffsets[i]=info.readUnsignedInt();
+			}
+			return sectionRecordOffsets;
 		}
 		
 		private function parseSymb(symbPos:uint,symbSize:uint):void {
@@ -248,7 +408,7 @@
 			var i:uint;
 			for each(var symbName:String in streamSymbols) {
 				if(symbName==name) {
-					return streams[i];
+					return openSTRM(i);
 				}
 				++i;
 			}
