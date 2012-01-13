@@ -144,7 +144,7 @@
 				var subDir:Directory=entry as Directory;
 				
 				if(subDir && allowRecursion) {
-					out=out.concat(searchForFile(subDir,filter,true));
+					out=out.concat(searchForFile(subDir,filter,true,justFirst));
 				}
 				
 				if(justFirst && out.length>0) {

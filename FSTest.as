@@ -179,7 +179,7 @@
 				
 				title.text=nds.banner.enTitle;
 			}
-			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,true);
+			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,false);
 			
 			if(files.length==0) {
 				status.text="No sdat found";
