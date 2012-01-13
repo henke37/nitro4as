@@ -15,13 +15,6 @@
 		
 		sdatInternal var sdat:ByteArray;
 		
-		/*
-		public var streamInfo:Vector.<STRM>;
-		public var soundBanks:Vector.<SBNK>;
-		public var waveArchives:Vector.<SWAR>;
-		public var sequences:Vector.<SSEQ>;
-		public var sequenceArchives:Vector.<SSAR>;*/
-		
 		public var sequenceInfo:Vector.<SequenceInfoRecord>;
 		public var streamInfo:Vector.<StreamInfoRecord>;
 		public var sequenceArchiveInfo:Vector.<BaseInfoRecord>;
@@ -47,14 +40,7 @@
 		@param _sdat The ByteArray to read from
 		*/
 		public function parse(_sdat:ByteArray):void {
-			sdat=_sdat
-			
-			/*
-			streams=new Vector.<STRM>();
-			soundBanks=new Vector.<SBNK>();
-			waveArchives=new Vector.<SWAR>();
-			sequences=new Vector.<SSEQ>();
-			sequenceArchives=new Vector.<SSAR>();*/
+			sdat=_sdat;
 			
 			var type:String=sdat.readUTFBytes(4);
 			if(type!="SDAT") {
@@ -93,73 +79,7 @@
 				parseSymb(symbPos,symbSize);
 			}
 			
-			//loadFiles();
-			
 		}
-		
-		/* private function loadFiles():void {
-			
-			
-			for each(var file:FATRecord in files) {
-				
-				var subFileData:ByteArray=new ByteArray();
-				subFileData.writeBytes(sdat,file.pos,file.size);
-				subFileData.position=0;
-				
-				var fileType:String=subFileData.readUTFBytes(4);
-				subFileData.position=0;
-				
-				var subFile:SubFile=null;
-				var container:*;
-				
-				switch(fileType) {
-					case "STRM":
-						subFile=new STRM();
-						container=streams;
-					break;
-					
-					case "SBNK":
-						subFile=new SBNK();
-						container=soundBanks;
-					break;
-					
-					case "SWAR":
-						subFile=new SWAR();
-						container=waveArchives;
-					break;
-					
-					case "SSAR":
-						subFile=new SSAR();
-						container=sequenceArchives;
-					break;
-					
-					case "SSEQ":
-						subFile=new SSEQ();
-						container=sequences;
-					break;
-					
-					default:
-					break;
-						throw new Error("Unknown filetype encountered");
-					break;
-				}
-				
-				try {
-					subFile.parse(subFileData);
-					container.push(subFile);
-				} catch(e:Error) {
-					container.push(null);
-					trace(e.getStackTrace());
-				}
-			}
-			
-			
-			streams.fixed=true;
-			soundBanks.fixed=true;
-			waveArchives.fixed=true;
-			sequences.fixed=true;
-			sequenceArchives.fixed=true;
-		}*/
 		
 		private function parseFat(fatPos:uint):Vector.<FATRecord> {
 			sdat.position=fatPos;
@@ -269,6 +189,26 @@
 				sequenceInfo.push(seqRecord);
 			}
 			sequenceInfo.fixed=true;
+			
+			//read the sequence archive info
+			info.position=infoSectionOffsets[1];
+			var sequenceArchiveCount:uint=info.readUnsignedInt();
+			
+			var sequenceArchiveInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,sequenceArchiveCount);
+			
+			sequenceArchiveInfo=new Vector.<BaseInfoRecord>;
+			for(i=0;i<sequenceArchiveCount;++i) {
+				var sequenceArchiveRecord:BaseInfoRecord=new BaseInfoRecord();
+				
+				offset=sequenceArchiveInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;
+				
+				sequenceArchiveRecord.fatId=info.readUnsignedShort();
+				
+				sequenceArchiveInfo.push(sequenceArchiveRecord);
+			}
+			sequenceArchiveInfo.fixed=true;
 			
 			//read the wave archive info
 			info.position=infoSectionOffsets[3];
