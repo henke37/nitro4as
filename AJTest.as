@@ -16,7 +16,7 @@
 	import Nitro.Apollo.*;
 	import Nitro.Compression.*;
 	
-
+	import com.adobe.images.PNGEncoder;
 	
 	public class AJTest extends MovieClip {
 		
@@ -29,6 +29,7 @@
 		
 		public var subid_mc:NumericStepper;
 		public var transparent_mc:CheckBox;
+		public var ripall_mc:Button;
 		
 		public var error_txt:TextField;
 		
@@ -56,6 +57,8 @@
 			
 			subid_mc.addEventListener(Event.CHANGE,change);
 			transparent_mc.addEventListener(Event.CHANGE,change);
+			
+			ripall_mc.addEventListener(ComponentEvent.BUTTON_DOWN,startRip);
 		}
 		
 		private function loadSubArchive():void {
@@ -90,6 +93,49 @@
 			pict.parse(subfile);
 			
 			b.bitmapData=pict.toBMD(transparent);
+		}
+		
+		private function startRip(e:Event=null):void {
+			var baseFolder:File=new File();
+			baseFolder.addEventListener(Event.SELECT,ripDirSelected);
+			baseFolder.browseForDirectory("Rip output dir");
+		}
+		
+		private function ripDirSelected(e:Event):void {
+			var outDir:File=File(e.target);
+			ripGraphics(outDir.nativePath);
+		}
+		
+		private function ripGraphics(outputDir:String):void {
+			
+			trace(outputDir);
+			
+			var pict:IndexedBitmap=new IndexedBitmap();
+			
+			for(var subid:uint=0;subid<subarchive.length;++subid) {
+				try {
+					var subfile:ByteArray=subarchive.open(subid);
+					
+					pict.parse(subfile);
+					
+					var transparent:Boolean=subid!=104&&subid>1&&subid<388;
+				
+					var bmd:BitmapData=pict.toBMD(transparent);
+					
+					var outputFile:File=new File(outputDir+File.separator+subid+".png");
+					trace(outputFile.nativePath);
+					
+					var fileData:ByteArray=PNGEncoder.encode(bmd);
+					
+					var fs:FileStream=new FileStream();
+					fs.open(outputFile,FileMode.WRITE);
+					fs.writeBytes(fileData,0,fileData.length);
+					fs.close();
+				} catch (e:Error) {
+					trace(e.getStackTrace());
+					continue;
+				}
+			}
 		}
 			
 		private function dumpArchive(fileName:String,id:uint):void {

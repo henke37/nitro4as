@@ -44,7 +44,7 @@
 				entry.size=mixed & ~0x80000000;
 				entry.offset=offset+dataBaseOffset;
 				
-				trace(entry);
+				//trace(entry);
 				
 				if(entry.size==0) {
 					entry=null;
