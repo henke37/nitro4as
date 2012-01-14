@@ -43,10 +43,10 @@
 			sdat=new SDAT();
 			sdat.parse(nds.fileSystem.openFileByName("sound_data.sdat"));
 			
-			for (var i:String in sdat.waveArchives) {
+			for (var i:uint=0;i<sdat.waveArchiveInfo.length;++i) {
 				var symb:String=sdat.waveArchiveSymbols[i];
 				
-				var swar:SWAR=sdat.waveArchives[i];
+				var swar:SWAR=sdat.openSWAR(i);
 				
 				trace(symb,swar.waves.length);
 				
@@ -57,7 +57,7 @@
 			}
 			
 			index_mc.minimum=0;
-			index_mc.maximum=sdat.waveArchives[1].waves.length-1;
+			index_mc.maximum=sdat.openSWAR(1).waves.length-1;
 			
 			playPause_mc.addEventListener(MouseEvent.CLICK,playPause);
 			playPause_mc.enabled=true;
@@ -73,7 +73,7 @@
 			
 			var index:uint=index_mc.value;
 			
-			var wave:Wave=sdat.waveArchives[1].waves[index];
+			var wave:Wave=sdat.openSWAR(1).waves[index];
 			
 			trace(index,wave);
 			

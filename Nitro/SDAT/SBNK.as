@@ -125,7 +125,7 @@
 			return instrument;
 		}
 		
-		private function parseSplitInstrument(section:ByteArray,offset):Instrument {
+		private function parseSplitInstrument(section:ByteArray,offset:uint):Instrument {
 			var regionEnds:Vector.<uint>=new Vector.<uint>();
 			
 			for(;;) {

@@ -9,6 +9,8 @@
 	import Nitro.SDAT.*;
 	
 	import HTools.Audio.*;
+	import Nitro.SDAT.InfoRecords.BaseInfoRecord;
+	import Nitro.SDAT.InfoRecords.StreamInfoRecord;
 	
 	
 	use namespace strmInternal;
@@ -46,8 +48,11 @@
 		
 		private function listWaveArchives():void {
 			var i:uint;
-			for each(var swar:SWAR in reader.waveArchives) {
+			for each(var info:BaseInfoRecord in reader.waveArchiveInfo) {
 				var name:String=reader.waveArchiveSymbols[i];
+				
+				var swar:SWAR=reader.openSWAR(i);
+				
 				trace(name,swar.waves.length);
 				listWaveArchiveContent(swar);
 				i++;
@@ -68,8 +73,9 @@
 		
 		private function listStreams():void {
 			var i:uint;
-			for each(var stream:STRM in reader.streams) {
+			for each(var info:StreamInfoRecord in reader.streamInfo) {
 				var name:String=reader.streamSymbols[i];
+				var stream:STRM=reader.openSTRM(i);
 				trace(i,name,stream.length,stream.channels,stream.loop,stream.loopPoint,stream.dataPos,stream.blockLength,stream.lastBlockSamples,stream.sampleCount);
 				i++;
 			}
@@ -77,7 +83,7 @@
 		
 		private var streamPlayer:STRMPlayer;
 		private function streamTest(streamNumber:uint,dump:Boolean):void {
-			var stream:STRM=reader.streams[streamNumber];
+			var stream:STRM=reader.openSTRM(streamNumber);
 			
 			trace(stream.dataPos,stream.blockLength,stream.nBlock,stream.blockSamples,stream.channels);
 						
@@ -126,7 +132,7 @@
 		
 		private var wavePlayer:WavePlayer;
 		private function swarTest(swar:uint,sub:uint):void {
-			var wave:Wave=reader.waveArchives[swar].waves[sub];
+			var wave:Wave=reader.openSWAR(swar).waves[sub];
 			wavePlayer=new WavePlayer(wave);
 			wavePlayer.play();
 		}
