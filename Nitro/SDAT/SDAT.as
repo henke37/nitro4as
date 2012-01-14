@@ -19,6 +19,7 @@
 		public var streamInfo:Vector.<StreamInfoRecord>;
 		public var sequenceArchiveInfo:Vector.<BaseInfoRecord>;
 		public var waveArchiveInfo:Vector.<BaseInfoRecord>;
+		public var bankInfo:Vector.<BankInfoRecord>;
 		
 		private var files:Vector.<FATRecord>;
 		
@@ -137,6 +138,13 @@
 			return swar;
 		}
 		
+		public function openBank(bankId:uint):SBNK {
+			var bank:SBNK=new SBNK();
+			bank.parse(openFileById(bankInfo[bankId].fatId));
+			
+			return bank;
+		}
+		
 		private function parseInfo(infoPos:uint,infoSize:uint):void {
 			var i:uint;
 			var offset:uint;
@@ -159,6 +167,9 @@
 			for(i=0;i<infoSubSectionCount;++i) {
 				infoSectionOffsets[i]=info.readUnsignedInt();
 			}
+			
+			
+			
 			
 			//read the sequence info
 			info.position=infoSectionOffsets[0];
@@ -190,6 +201,9 @@
 			}
 			sequenceInfo.fixed=true;
 			
+			
+			
+			
 			//read the sequence archive info
 			info.position=infoSectionOffsets[1];
 			var sequenceArchiveCount:uint=info.readUnsignedInt();
@@ -210,6 +224,38 @@
 			}
 			sequenceArchiveInfo.fixed=true;
 			
+			
+			
+			//read the bank info
+			info.position=infoSectionOffsets[2];
+			var bankCount:uint=info.readUnsignedInt();
+			
+			var bankInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,bankCount);
+			
+			bankInfo=new Vector.<BankInfoRecord>;
+			
+			for(i=0;i<bankCount;++i) {
+				var bankRecord:BankInfoRecord=new BankInfoRecord();
+				
+				offset=bankInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;
+				
+				bankRecord.fatId=info.readUnsignedShort();
+				info.position+=2;
+				
+				for(var j:uint=0;j<4;++j) {
+					bankRecord.swars[j]=info.readUnsignedShort();
+				}
+				
+				//trace(bankRecord);
+				
+				bankInfo.push(bankRecord);
+			}
+			bankInfo.fixed=true;
+			
+			
+			
 			//read the wave archive info
 			info.position=infoSectionOffsets[3];
 			var waveArchiveCount:uint=info.readUnsignedInt();
@@ -229,6 +275,9 @@
 				waveArchiveInfo.push(waveArchiveRecord);
 			}
 			waveArchiveInfo.fixed=true;
+			
+			
+			
 			
 			//read the stream info
 			info.position=infoSectionOffsets[7];
