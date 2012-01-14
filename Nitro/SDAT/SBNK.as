@@ -73,7 +73,7 @@
 				break;
 				
 				case 17:
-					return new Instrument();
+					return parseSplitInstrument(section,offset);
 				break;
 				
 				default:
@@ -84,10 +84,14 @@
 		
 		private function parseSimpleInstrument(section:ByteArray,offset:uint):Instrument {
 			var instrument:Instrument=new Instrument();
+			instrument.regions.length=1;
+			instrument.regions.fixed=true;
+			
 			section.position=offset;
 			var region:InstrumentRegion=new InstrumentRegion();
 			region.parse(section);
-			instrument.definitions.push(region);
+			instrument.regions[0]=region;
+			
 			return instrument;
 		}
 		
@@ -104,16 +108,54 @@
 			
 			var range:uint=high-low;
 			
+			instrument.regions.length=range;
+			instrument.regions.fixed=true;
+			
 			for(var i:uint;i<range;++i) {
 				section.position=offset+2+i*12+2;
+				
 				var region:InstrumentRegion=new InstrumentRegion();
 				region.parse(section);
-				instrument.definitions.push(region);
+				
+				instrument.regions[i]=region;
 			}
 			
 			//trace(range);
 			
 			return instrument;
+		}
+		
+		private function parseSplitInstrument(section:ByteArray,offset):Instrument {
+			var regionEnds:Vector.<uint>=new Vector.<uint>();
+			
+			for(;;) {
+				var regionEnd:uint=section.readUnsignedByte();
+				
+				if(!regionEnd) break;
+				regionEnds.push(regionEnd);
+			}
+			
+			var instrument:Instrument=new Instrument();
+			
+			instrument.regions.length=regionEnds.length;
+			instrument.regions.fixed=true;
+			
+			section.position=8;
+			
+			var startPos:uint=0;
+			for(var i:uint=0;i<regionEnds.length;++i) {
+				
+				var region:ExtendedInstrumentRegion=new ExtendedInstrumentRegion();
+				region.parse(section);
+				region.lowEnd=startPos;
+				region.highEnd=regionEnds[i];
+				
+				startPos=regionEnds[i]+1;
+				
+				instrument.regions[i]=region;
+			}
+			
+			return null;
 		}
 
 	}

@@ -7,7 +7,9 @@
 	
 	public class InstrumentRegion {
 		
+		/** The wave in the archive to use for this region */
 		public var swav:uint;
+		/** The wave archive where in to find the sample for this region */
 		public var swar:uint;// the swar used. NB. cross-reference to "1.3.2 Info Block - Entry, Record 2 BANK"
 		
 		public var note:uint;

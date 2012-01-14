@@ -4,10 +4,10 @@
 	
 	public class Instrument {
 
-		public var definitions:Vector.<InstrumentRegion>;
+		public var regions:Vector.<InstrumentRegion>;
 
 		public function Instrument() {
-			definitions=new Vector.<InstrumentRegion>();
+			regions=new Vector.<InstrumentRegion>();
 		}
 
 	}
