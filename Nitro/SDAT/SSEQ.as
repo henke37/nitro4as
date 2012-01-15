@@ -10,8 +10,9 @@
 	<p>SSEQ files contains a sequence</p>*/
 	
 	public class SSEQ extends SubFile {
-				
-		sequenceInternal var tracks:Vector.<SequenceTrack>;
+		
+		/** The event tracks in the sequence */
+		public var tracks:Vector.<SequenceTrack>;
 
 		public function SSEQ() {
 			

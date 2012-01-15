@@ -23,9 +23,11 @@
 			
 			var trackStarts:Vector.<uint>=new Vector.<uint>();
 			
-			//var offsets:Vector.<Object>=new Vector.<Object>();
+			var commandIndex:uint=0;
 			
 			for(;;) {
+				
+				track.offsets[data.position]=commandIndex++;
 				
 				var trackOver:Boolean=false;
 				
@@ -231,6 +233,8 @@
 					} else {
 						data.position=trackStarts.shift();
 						trackOver=false;
+						
+						commandIndex=0;
 						
 						track=new SequenceTrack();
 						tracks.push(track);

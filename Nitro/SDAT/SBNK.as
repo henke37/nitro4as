@@ -57,6 +57,9 @@
 		}
 		
 		private function makeInstrument(section:ByteArray,type:uint,offset:uint):Instrument {
+			
+			var instrument:Instrument;
+			
 			switch(type) {
 				case 0:
 					return null;
@@ -65,21 +68,24 @@
 				case 1:
 				case 2:
 				case 3:
-					return parseSimpleInstrument(section,offset);
+					instrument=parseSimpleInstrument(section,offset);
+					instrument.noteType=type-1;
 				break;
 				
 				case 16:
-					return parseDrumInstrument(section,offset);
+					instrument=parseDrumInstrument(section,offset);
 				break;
 				
 				case 17:
-					return parseSplitInstrument(section,offset);
+					instrument=parseSplitInstrument(section,offset);
 				break;
 				
 				default:
 					return null;
 				break;
 			}
+			
+			return instrument;
 		}
 		
 		private function parseSimpleInstrument(section:ByteArray,offset:uint):Instrument {

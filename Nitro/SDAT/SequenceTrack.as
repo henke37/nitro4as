@@ -9,9 +9,11 @@
 	public class SequenceTrack {
 		
 		sequenceInternal var events:Vector.<SequenceEvent>;
+		sequenceInternal var offsets:Object;
 
 		public function SequenceTrack() {
 			events=new Vector.<SequenceEvent>();
+			offsets={};
 		}
 
 	}
