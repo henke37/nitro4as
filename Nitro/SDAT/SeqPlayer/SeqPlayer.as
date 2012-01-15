@@ -20,7 +20,9 @@
 			
 			mixer=new Mixer();
 			chanMgr=new ChannelManager();
-			tracker=new Tracker();
+			tracker=new Tracker(chanMgr);
+			
+			mixer.callback=chanMgr.updateTick;
 		}
 		
 		/** Loads a standalone sequence by it's symbolic name

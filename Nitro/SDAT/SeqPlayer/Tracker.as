@@ -9,10 +9,15 @@
 		
 		private var seq:SSEQ;
 		
+		internal var chanMgr:ChannelManager;
+		
 		private var tracks:Vector.<TrackState>;
+		
+		internal var volume:uint;
 
-		public function Tracker() {
-			// constructor code
+		public function Tracker(chanMgr:ChannelManager) {
+			if(!chanMgr) throw new ArgumentError("chanMgr can not be null!");
+			this.chanMgr=chanMgr;
 		}
 		
 		/** Loads the tracks from a sequence and readies playback.
@@ -27,7 +32,7 @@
 			
 			var i:uint=0;
 			for each(var track:SequenceTrack in seq.tracks) {
-				var trackState:TrackState=new TrackState(track);
+				var trackState:TrackState=new TrackState(this,track);
 				tracks[i++]=trackState;
 			}
 		}

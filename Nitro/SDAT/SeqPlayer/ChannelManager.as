@@ -19,7 +19,7 @@
 		private static const pcmChnArray:Vector.<uint> = new <uint> [ 4, 5, 6, 7, 2, 0, 3, 1, 8, 9, 10, 11, 14, 12, 15, 13 ];
 		private static const psgChnArray:Vector.<uint> = new <uint> [ 13, 12, 11, 10, 9, 8 ];
 		private static const noiseChnArray:Vector.<uint> = new <uint> [ 15, 14 ];
-		private static const chnArrayArray:Vector.<Vector.<uint>> = new Vector.<Vector.<uint>> [ pcmChnArray, psgChnArray, noiseChnArray ];
+		private static const chnArrayArray:Vector.<Vector.<uint>>=new Vector.<Vector.<uint>>([ pcmChnArray, psgChnArray, noiseChnArray ]);;
 		{
 			initStatics();
 		}
@@ -28,11 +28,20 @@
 			pcmChnArray.fixed=true;
 			psgChnArray.fixed=true;
 			noiseChnArray.fixed=true;
+			chnArrayArray.fixed=true;
 		}
 		
 		public function startNote(instrument:Instrument):void {
 			
+			var channelId:uint=allocateChannel(instrument.noteType,0);//TODO- find the priority
 			
+		}
+		
+		/** Updates the mixer state every few samples 
+		@return How many samples until it needs to be run again*/
+		internal function updateTick():int {
+			
+			return 10;
 		}
 		
 		/*
@@ -61,6 +70,7 @@
 			if (curChnNo == -1 || prio < ADSR_ch[curChnNo].prio) return -1;
 			return curChnNo;
 		}*/
+		
 		
 		private function allocateChannel(type:uint,prio:uint):uint {
 			var bestChannel:int=-1;

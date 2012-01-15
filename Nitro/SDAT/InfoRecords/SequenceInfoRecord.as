@@ -8,8 +8,12 @@
 		/** The playback volume */
 		public var vol:uint;
 		
+		/** The channel preasure */
 		public var cpr:uint;
+		
+		/** The polyphonic preasure */
 		public var ppr:uint;
+		
 		public var ply:uint;
 
 		public function SequenceInfoRecord() {
