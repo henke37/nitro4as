@@ -13,12 +13,12 @@
 		
 		private var tracks:Vector.<TrackState>;
 		
-		internal var volume:uint;
-		internal var pan:uint;
-		internal var expression:uint;
-		
 		/** The tempo measured in BPM */
 		internal var tempo:uint;
+		
+		private var updateCounter:uint;
+		
+		private static const updateThreshold:uint=240;
 
 		public function Tracker(chanMgr:ChannelManager) {
 			if(!chanMgr) throw new ArgumentError("chanMgr can not be null!");
@@ -40,6 +40,25 @@
 				var trackState:TrackState=new TrackState(this,track);
 				tracks[i++]=trackState;
 			}
+		}
+		
+		public function reset():void {
+			for each(var track:TrackState in tracks) {
+				track.reset();
+			}
+		}
+		
+		internal function updateTick():void {
+			
+			while(updateCounter>updateThreshold) {
+				
+				for each(var track:TrackState in tracks) {
+					
+				}
+				updateCounter-=updateThreshold;
+			}
+			
+			updateCounter+=tempo;
 		}
 
 	}

@@ -15,6 +15,18 @@
 		public function Instrument() {
 			regions=new Vector.<InstrumentRegion>();
 		}
+		
+		public function regionForNote(note:uint):InstrumentRegion {
+			if(regions.length==1) return regions[0];
+			
+			for each(var region:InstrumentRegion in regions) {
+				if(region.matchesNote(note)) {
+					return region;
+				}
+			}
+			
+			return null;
+		}
 
 	}
 	

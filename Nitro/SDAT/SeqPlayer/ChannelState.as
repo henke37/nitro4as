@@ -23,6 +23,9 @@
 		public var modSpeed:uint;
 		public var modDelay:uint;
 		
+		private var modDelayCnt:uint;
+		private var modCounter:uint;
+		
 		public static const MOD_FREQ:uint=0;
 		public static const MOD_VOL:uint=1;
 		public static const MOD_PAN:uint=2;
@@ -52,9 +55,19 @@
 			this.mixerChannel=mixerChannel;
 		}
 		
+		public function reset():void {
+			ampl=-ADSR_THRESHOLD;
+		}
+		
 		public function start():void {
 			adsrState=STATE_ATTACK;
 			ampl=-ADSR_THRESHOLD;
+			
+			active=true;
+			
+			modDelayCnt=0;
+			
+			tick();
 		}
 		
 		internal function tick():void {
@@ -80,18 +93,41 @@
 				case STATE_RELEASE:
 					ampl-=releaseRate;
 					if(ampl<= -ADSR_THRESHOLD) {
-						//TODO: KILL SOUND
+						killSound();
+						return;
 					}
 				break;
 			}
 			
-			var modParam:uint;
+			var modParam:uint=0;
+			
+			if (modDelayCnt < modDelay) {
+				modDelayCnt ++;
+			} else {
+			
+				var speed:uint = (modSpeed & 0x0000FFFF) << 6;
+				var counter:uint = (modCounter + speed) >>> 8;
+				
+				counter %= 0x80;
+				
+				modCounter += speed;
+				modCounter &= 0x00FF;
+				modCounter |= counter << 8;
+				
+				modParam = GetSoundSine(modCounter >>> 8) * modRange * modDepth;
+			}
 			
 			var totalVolume:uint=vol+vel+expr+ampl;
 			
 			if(modType==MOD_VOL) {
 				totalVolume+=modParam;
 			}
+		}
+		
+		public function GetSoundSine(x:uint):uint {return 42; }
+		
+		public function killSound():void {
+			active=false;
 		}
 
 	}

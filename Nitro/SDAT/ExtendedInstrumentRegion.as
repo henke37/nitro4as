@@ -11,6 +11,10 @@
 		public function ExtendedInstrumentRegion() {
 			
 		}
+		
+		public override function matchesNote(n:uint):Boolean {
+			return n >= lowEnd && n <=highEnd;
+		}
 
 	}
 	

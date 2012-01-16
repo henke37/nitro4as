@@ -16,13 +16,23 @@
 		
 		private var callReturn:uint;
 		
-		private var priority:uint;
+		internal var priority:uint;
 		private var polyphonic:Boolean;
 		
-		internal var attack:uint;
-		internal var decay:uint;
-		internal var sustain:uint;
-		internal var release:uint;
+		internal var attack:int;
+		internal var decay:int;
+		internal var sustain:int;
+		internal var release:int;
+		
+		internal var volume:uint;
+		internal var pan:uint;
+		internal var expression:uint;
+		
+		internal var modType:uint;
+		internal var modDepth:uint;
+		internal var modRange:uint;
+		internal var modSpeed:uint;
+		internal var modDelay:uint;
 
 		public function TrackState(tracker:Tracker,track:SequenceTrack) {
 			if(!track) throw new ArgumentError("Track can not be null!");
@@ -31,13 +41,35 @@
 			this.tracker=tracker;
 		}
 		
+		public function reset():void {
+			attack=-1;
+			decay=-1;
+			sustain=-1;
+			release=-1;
+			
+			position=0;
+			
+			volume=64;
+			expression=127;
+			pan=64;
+			
+			modType = ChannelState.MOD_FREQ;
+			modDepth = 0;
+			modRange = 1;
+			modSpeed = 16;
+			modDelay = 10;
+			priority = 64;
+		}
+		
 		private function executeEvent(evt:SequenceEvent):void {
 			if(evt is NoteEvent) {
-				tracker.chanMgr.startNote(null,this);
+				var noteEvt:NoteEvent=evt as NoteEvent;
+				var instrument:Instrument=instrumentForNote(noteEvt);
+				tracker.chanMgr.startNote(instrument,noteEvt,this);
 			} else if(evt is RestEvent) {
 				
 			} else if(evt is ExpressionEvent) {
-				tracker.expression=(evt as ExpressionEvent).value;
+				expression=(evt as ExpressionEvent).value;
 			} else if(evt is PriorityEvent) {
 				priority=(evt as PriorityEvent).prio;
 			} else if(evt is MonoPolyEvent) {
@@ -47,7 +79,7 @@
 				if(volEvt.master) {
 					
 				} else {
-					tracker.volume=volEvt.volume;
+					volume=volEvt.volume;
 				}
 			} else if(evt is ADSREvent) {
 				var adsrEvt:ADSREvent=evt as ADSREvent;
@@ -69,7 +101,7 @@
 					break;
 				}
 			} else if(evt is PanEvent) {
-				tracker.pan=(evt as PanEvent).pan;
+				pan=(evt as PanEvent).pan;
 			} else if(evt is TempoEvent) {
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
@@ -86,6 +118,11 @@
 					loopCountDown--;
 				}
 			}
+		}
+		
+		
+		private function instrumentForNote(noteEvt:NoteEvent):Instrument {
+			return null;
 		}
 
 	}

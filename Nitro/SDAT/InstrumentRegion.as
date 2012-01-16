@@ -40,6 +40,10 @@
 			pan=sdat.readUnsignedByte();	
 
 		}
+		
+		public function matchesNote(n:uint):Boolean {
+			return n==note;
+		}
 
 	}
 	

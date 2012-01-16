@@ -13,6 +13,8 @@
 		internal var mixer:Mixer;
 		internal var chanMgr:ChannelManager;
 		internal var tracker:Tracker;
+		
+		private static const UPDATE_RATE:uint=42;
 
 		public function SeqPlayer(sdat:SDAT) {
 			if(!sdat) throw new ArgumentError("sdat can't be null!");
@@ -22,7 +24,7 @@
 			chanMgr=new ChannelManager(mixer);
 			tracker=new Tracker(chanMgr);
 			
-			mixer.callback=chanMgr.updateTick;
+			mixer.callback=updateTick;
 		}
 		
 		/** Loads a standalone sequence by it's symbolic name
@@ -35,6 +37,13 @@
 			if(seqId<0) throw new ArgumentError("No sequence with the name \""+name+"\"!");
 			
 			loadSeqById(seqId);
+		}
+		
+		/** Clears out all state */
+		public function reset():void {
+			mixer.reset();
+			chanMgr.reset();
+			tracker.reset();
 		}
 		
 		/** Loads a standalone sequence by its id number
@@ -62,6 +71,15 @@
 			}
 			
 			bank=sdat.openBank(bankId);
+		}
+		
+		/** Runs every few samples to update the channel status
+		@return How many samples until it needs to be run again*/
+		private function updateTick():uint {
+			chanMgr.updateTick();
+			tracker.updateTick();
+			
+			return UPDATE_RATE;
 		}
 		
 
