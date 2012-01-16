@@ -6,13 +6,13 @@
 		
 		private var channels:Vector.<ChannelState>;
 
-		public function ChannelManager() {
+		public function ChannelManager(mixer:Mixer) {
 			channels=new Vector.<ChannelState>();
 			channels.length=Mixer.channelCount;
 			channels.fixed=true;
 			
 			for(var i:uint=0;i<Mixer.channelCount;++i) {
-				channels[i]=new ChannelState();
+				channels[i]=new ChannelState(mixer.channels[i]);
 			}
 		}
 		
@@ -31,10 +31,26 @@
 			chnArrayArray.fixed=true;
 		}
 		
-		public function startNote(instrument:Instrument):void {
+		public function startNote(instrument:Instrument,trackState:TrackState):void {
 			
-			var channelId:uint=allocateChannel(instrument.noteType,0);//TODO- find the priority
+			var channelId:int=allocateChannel(instrument.noteType,0);//TODO- find the priority
 			
+			if(channelId<0) return;
+			
+			var chanState:ChannelState=channels[channelId];
+			
+			var region:InstrumentRegion;
+			
+			chanState.attackRate=trackState.attack!=-1?trackState.attack:region.attack;
+			chanState.decayRate =trackState.decay!=-1?trackState.decay:region.decay;
+			chanState.sustainLevel=trackState.sustain!=-1?trackState.sustain:region.sustain;
+			chanState.releaseRate=trackState.release!=-1?trackState.release:region.release;
+			
+			chanState.mixerChannel.reset();
+			
+			if(instrument.noteType==Instrument.NOTETYPE_PULSE) {
+				var pulseChan:PulseChannel=PulseChannel(chanState.mixerChannel);
+			}
 		}
 		
 		/** Updates the mixer state every few samples 

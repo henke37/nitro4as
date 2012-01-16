@@ -19,7 +19,7 @@
 			this.sdat=sdat;
 			
 			mixer=new Mixer();
-			chanMgr=new ChannelManager();
+			chanMgr=new ChannelManager(mixer);
 			tracker=new Tracker(chanMgr);
 			
 			mixer.callback=chanMgr.updateTick;

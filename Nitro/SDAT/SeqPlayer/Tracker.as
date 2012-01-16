@@ -14,6 +14,11 @@
 		private var tracks:Vector.<TrackState>;
 		
 		internal var volume:uint;
+		internal var pan:uint;
+		internal var expression:uint;
+		
+		/** The tempo measured in BPM */
+		internal var tempo:uint;
 
 		public function Tracker(chanMgr:ChannelManager) {
 			if(!chanMgr) throw new ArgumentError("chanMgr can not be null!");
