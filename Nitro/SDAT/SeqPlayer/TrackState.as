@@ -33,6 +33,9 @@
 		internal var modRange:uint;
 		internal var modSpeed:uint;
 		internal var modDelay:uint;
+		
+		internal var pitchBend:int;
+		internal var pitchBendRange:uint;
 
 		public function TrackState(tracker:Tracker,track:SequenceTrack) {
 			if(!track) throw new ArgumentError("Track can not be null!");
@@ -59,9 +62,15 @@
 			modSpeed = 16;
 			modDelay = 10;
 			priority = 64;
+			
+			pitchBend=0;
+			pitchBendRange=2;
 		}
 		
 		private function executeEvent(evt:SequenceEvent):void {
+			
+			var normalFlow:Boolean=true;
+			
 			if(evt is NoteEvent) {
 				var noteEvt:NoteEvent=evt as NoteEvent;
 				var instrument:Instrument=instrumentForNote(noteEvt);
@@ -106,8 +115,9 @@
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
 				var jmpEvt:JumpEvent=evt as JumpEvent;
-				position=jmpEvt.target;
+				position=track.offsets[jmpEvt.target];
 				if(jmpEvt.isCall) callReturn=position+1;
+				normalFlow=false;
 			} else if(evt is LoopStartEvent) {
 				var loopStartEvt:LoopStartEvent=evt as LoopStartEvent;
 				loopCountDown=loopStartEvt.count;
@@ -116,7 +126,12 @@
 				if(loopCountDown>0) {
 					position=loopReturn;
 					loopCountDown--;
+					normalFlow=false;
 				}
+			}
+			
+			if(normalFlow) {
+				position++;
 			}
 		}
 		

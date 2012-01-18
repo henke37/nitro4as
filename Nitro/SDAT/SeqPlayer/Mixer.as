@@ -1,12 +1,15 @@
 ﻿package Nitro.SDAT.SeqPlayer {
 	import flash.utils.*;
 	
+	/** An aproximation of the Nitro hardware mixer */
 	public class Mixer {
 		
 		public static const channelCount:uint=16;
 		
+		/** The channels in the mixer */
 		public var channels:Vector.<MixerChannel>;
 		
+		/** The automatic update callback responsible for playing notes on the mixer */
 		public var callback:Function;
 		
 		private var callbackTimer:int;

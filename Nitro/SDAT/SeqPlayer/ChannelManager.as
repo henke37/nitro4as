@@ -5,9 +5,18 @@
 	/** ChannelManager, resolves note events into channel assignments */
 	public class ChannelManager {
 		
-		private var channels:Vector.<ChannelState>;
+		/** The control structures for the controlled channels */
+		internal var channels:Vector.<ChannelState>;
+		
+		/** The wave archives used as the sample sources */
+		internal var waveArchives:Object;
 
+		/** Creates a new channel manager
+		@param mixer The mixer whose channels to manage*/
 		public function ChannelManager(mixer:Mixer) {
+			
+			if(!mixer) throw new ArgumentError("Mixer may not be null!");
+			
 			channels=new Vector.<ChannelState>();
 			channels.length=Mixer.channelCount;
 			channels.fixed=true;
@@ -23,20 +32,31 @@
 			}
 		}
 		
+		/** Starts a new note
+		@param instrument The instrument with which to play the note
+		@param noteEvt The note play event
+		@param trackState The tracker state to read details from
+		*/
 		public function startNote(instrument:Instrument,noteEvt:NoteEvent,trackState:TrackState):void {
 			
-			var channelId:int=allocateChannel(instrument.noteType,trackState.priority);//TODO- find the priority
+			if(!instrument) throw new ArgumentError("Instrument can not be null!");
+			if(!noteEvt) throw new ArgumentError("noteEvnt can not be null!");
+			if(!trackState) throw new ArgumentError("trackState can not be null!");
 			
-			if(channelId<0) return;
+			var chanState:ChannelState=allocateChannel(instrument.noteType,trackState.priority);
 			
-			var chanState:ChannelState=channels[channelId];
+			if(!chanState) throw new Error("Failed to allocate a channel!");
 			
 			var region:InstrumentRegion=instrument.regionForNote(noteEvt.note);
 			
-			chanState.attackRate=trackState.attack!=-1?trackState.attack:region.attack;
-			chanState.decayRate =trackState.decay!=-1?trackState.decay:region.decay;
-			chanState.sustainLevel=trackState.sustain!=-1?trackState.sustain:region.sustain;
-			chanState.releaseRate=trackState.release!=-1?trackState.release:region.release;
+			if(!region) throw new Error("Failed to locate a region for the note!");
+			
+			chanState.track=trackState;
+			
+			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
+			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
+			chanState.sustainLevel=Tables.cnvSustain(trackState.sustain!=-1?trackState.sustain:region.sustain);
+			chanState.releaseRate=Tables.cnvFall(trackState.release!=-1?trackState.release:region.release);
 			
 			chanState.modDelay=trackState.modDelay;
 			chanState.modDepth=trackState.modDepth;
@@ -49,9 +69,26 @@
 			
 			chanState.mixerChannel.reset();
 			
-			if(instrument.noteType==Instrument.NOTETYPE_PULSE) {
-				var pulseChan:PulseChannel=PulseChannel(chanState.mixerChannel);
-			}
+			if(instrument.noteType==Instrument.NOTETYPE_PCM) {
+				var wave:Wave=SWAR(waveArchives[region.swar]).waves[region.swav];
+				
+				chanState.mixerChannel.loadWave(wave);
+				
+				chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.note);
+			} else {
+				chanState.freq = Tables.ADJUST_FREQ(-Tables.SOUND_FREQ(440*8), noteEvt.note, 69);
+				chanState.mixerChannel.psgMode=true;
+				
+				if(instrument.noteType==Instrument.NOTETYPE_PULSE) {
+					var pulseChan:PulseChannel=chanState.mixerChannel as PulseChannel;
+					pulseChan.duty=region.swav;
+				}
+			} 
+			
+			chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+			
+			chanState.start();
+			
 		}
 		
 		/** Updates the mixer state every few samples 
@@ -107,13 +144,27 @@
 			chnArrayArray.fixed=true;
 		}
 		
-		private function allocateChannel(type:uint,prio:uint):uint {
-			var bestChannel:int=-1;
+		private function allocateChannel(type:uint,prio:uint):ChannelState {
+			var bestChannel:ChannelState;
 			
 			var candidates:Vector.<uint>=chnArrayArray[type];
 			
 			for each(var candidateIndex:uint in candidates) {
+				var candidateChannel:ChannelState=channels[candidateIndex];
 				
+				if(bestChannel) {
+					if(bestChannel.priority>candidateChannel.priority) {
+						bestChannel=candidateChannel;
+					} else if(bestChannel.priority==candidateChannel.priority) {
+						if(bestChannel.ampl>candidateChannel.priority) {
+							bestChannel=candidateChannel;
+						}
+					}
+				} else {
+					if(prio>candidateChannel.priority) {
+						bestChannel=candidateChannel;
+					}
+				}
 			}
 			
 			return bestChannel;

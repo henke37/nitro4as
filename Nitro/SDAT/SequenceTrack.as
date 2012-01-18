@@ -8,8 +8,8 @@
 	
 	public class SequenceTrack {
 		
-		sequenceInternal var events:Vector.<SequenceEvent>;
-		sequenceInternal var offsets:Object;
+		public var events:Vector.<SequenceEvent>;
+		public var offsets:Object;
 
 		public function SequenceTrack() {
 			events=new Vector.<SequenceEvent>();

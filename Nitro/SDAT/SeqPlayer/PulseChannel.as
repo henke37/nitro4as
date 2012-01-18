@@ -1,6 +1,9 @@
 ﻿package Nitro.SDAT.SeqPlayer {
 	
+	/** A MixerChannel that can also output a pulsewave */
 	public class PulseChannel extends MixerChannel {
+		
+		public var duty:uint;
 		
 		private var pulseTimer:uint;
 

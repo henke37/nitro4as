@@ -2,20 +2,22 @@
 	import Nitro.SDAT.*;
 	import Nitro.SDAT.SequenceEvents.*;
 	
+	/** A player for sequences */	
 	public class SeqPlayer {
 		
 		private var sdat:SDAT;
 		
 		private var bank:SBNK;
 		private var seq:SSEQ;
-		private var waveArchives:Object;
 		
-		internal var mixer:Mixer;
-		internal var chanMgr:ChannelManager;
-		internal var tracker:Tracker;
+		private var mixer:Mixer;
+		private var chanMgr:ChannelManager;
+		private var tracker:Tracker;
 		
 		private static const UPDATE_RATE:uint=42;
 
+		/** Creates a new Sequence player
+		@param sdat The SDAT to load data from */
 		public function SeqPlayer(sdat:SDAT) {
 			if(!sdat) throw new ArgumentError("sdat can't be null!");
 			this.sdat=sdat;
@@ -61,7 +63,7 @@
 		private function loadBank(bankId:uint):void {
 			var swars:Vector.<uint>=sdat.bankInfo[bankId].swars;
 			
-			waveArchives={};
+			var waveArchives:Object={};
 			
 			for(var i:uint=0;i<4;++i) {
 				var swarId:uint=swars[i];
@@ -69,6 +71,8 @@
 					waveArchives[swarId]=sdat.openSWAR(swarId);
 				}
 			}
+			
+			chanMgr.waveArchives=waveArchives;
 			
 			bank=sdat.openBank(bankId);
 		}
