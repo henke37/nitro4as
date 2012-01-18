@@ -64,6 +64,9 @@
 			chanState.modSpeed=trackState.modSpeed;
 			chanState.modType=trackState.modType;
 			
+			chanState.vol = trackState.volume;
+			chanState.expr = trackState.expression;
+			
 			chanState.notePan=trackState.pan;
 			chanState.instrumentPan=region.pan;
 			
@@ -76,6 +79,7 @@
 				
 				chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.note);
 			} else {
+				//TODO: watch further research on this part
 				chanState.freq = Tables.ADJUST_FREQ(-Tables.SOUND_FREQ(440*8), noteEvt.note, 69);
 				chanState.mixerChannel.psgMode=true;
 				
@@ -89,6 +93,36 @@
 			
 			chanState.start();
 			
+		}
+		
+		public function updateModulation(trackState:TrackState):void {
+			for each(var chanState:ChannelState in channels) {
+				if(chanState.track!=trackState) continue;
+				
+				chanState.modDelay=trackState.modDelay;
+				chanState.modDepth=trackState.modDepth;
+				chanState.modRange=trackState.modRange;
+				chanState.modSpeed=trackState.modSpeed;
+				chanState.modType=trackState.modType;
+			}
+		}
+		
+		public function updatePitchBend(trackState:TrackState):void {
+			for each(var chanState:ChannelState in channels) {
+				if(chanState.track!=trackState) continue;
+				
+				chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+			}
+		}
+		
+		public function updateNotes(trackState:TrackState):void {
+			for each(var chanState:ChannelState in channels) {
+				if(chanState.track!=trackState) continue;
+				
+				chanState.vol = trackState.volume;
+				chanState.expr = trackState.expression;
+				chanState.notePan=trackState.pan;
+			}
 		}
 		
 		/** Updates the mixer state every few samples 

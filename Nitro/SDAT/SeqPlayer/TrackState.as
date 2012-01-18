@@ -79,6 +79,7 @@
 				
 			} else if(evt is ExpressionEvent) {
 				expression=(evt as ExpressionEvent).value;
+				tracker.chanMgr.updateNotes(this);
 			} else if(evt is PriorityEvent) {
 				priority=(evt as PriorityEvent).prio;
 			} else if(evt is MonoPolyEvent) {
@@ -89,6 +90,7 @@
 					
 				} else {
 					volume=volEvt.volume;
+					tracker.chanMgr.updateNotes(this);
 				}
 			} else if(evt is ADSREvent) {
 				var adsrEvt:ADSREvent=evt as ADSREvent;
@@ -111,6 +113,7 @@
 				}
 			} else if(evt is PanEvent) {
 				pan=(evt as PanEvent).pan;
+				tracker.chanMgr.updateNotes(this);
 			} else if(evt is TempoEvent) {
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
@@ -128,13 +131,50 @@
 					loopCountDown--;
 					normalFlow=false;
 				}
+			} else if(evt is ModulationEvent) {
+				var modEvt:ModulationEvent= evt as ModulationEvent;
+				switch(modEvt.type) {
+					
+					case "depth":
+						modDepth=modEvt.value;
+					break;
+					
+					case "speed":
+						modSpeed=modEvt.value;
+					break;
+					
+					case "type":
+						modType=modEvt.value;
+					break;
+					
+					case "range":
+						modRange=modEvt.value;
+					break;
+					
+					case "delay":
+						modDelay=modEvt.value;
+					break;
+					
+					default:
+						throw new Error("Unknown modulation event type!");
+					break;
+				}
+				
+				tracker.chanMgr.updateModulation(this);
+			} else if(evt is PitchBendEvent) {
+				var pitchEvt:PitchBendEvent=evt as PitchBendEvent;
+				if(pitchEvt.range) {
+					pitchBendRange=pitchEvt.bend;
+				} else {
+					pitchBend=pitchEvt.bend;
+				}
+				tracker.chanMgr.updatePitchBend(this);
 			}
 			
 			if(normalFlow) {
 				position++;
 			}
 		}
-		
 		
 		private function instrumentForNote(noteEvt:NoteEvent):Instrument {
 			return null;

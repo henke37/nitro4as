@@ -23,6 +23,8 @@
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,loaded);
 			loader.load(new URLRequest("aj.nds"));
+			
+			stage.align=StageAlign.TOP_LEFT;
 		}
 		
 		private function loaded(e:Event):void {
