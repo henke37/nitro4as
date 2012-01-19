@@ -1,31 +1,17 @@
 ﻿package Nitro.SDAT.SeqPlayer {
 	import Nitro.SDAT.*;
 	
+	import flash.events.*;
+	
 	/** ChannelState, deals with the state of a single audio channel */
 	public class ChannelState {
 		
 		public var active:Boolean;
 		
-		/** The volume of the channel */
-		public var vol:uint;
-		
 		/** The velocity of the channel */
 		public var vel:uint;
 		
-		/** Expression, yet another volume modifier */
-		public var expr:uint;
-		
-		public var notePan:uint;
 		public var instrumentPan:uint;
-		
-		/** The modulation type to perform */
-		public var modType:uint;
-		public var modDepth:uint;
-		public var modRange:uint;
-		public var modSpeed:uint;
-		
-		/** The number of ticks before the modulation kicks in */
-		public var modDelay:uint;
 		
 		/** The countdown before the modulation begins */
 		private var modDelayCnt:uint;
@@ -66,10 +52,15 @@
 		
 		/** The track that started the current sound */
 		internal var track:TrackState;
+		
+		/** The time the sound has left to play */
+		internal var countDown:uint;
 
 		public function ChannelState(mixerChannel:MixerChannel) {
 			if(!mixerChannel) throw new ArgumentError("mixerChannel can not be null!");
 			this.mixerChannel=mixerChannel;
+			
+			mixerChannel.addEventListener(Event.COMPLETE,soundOver);
 		}
 		
 		public function reset():void {
@@ -118,11 +109,11 @@
 			
 			var modParam:uint=0;
 			
-			if (modDelayCnt < modDelay) {
+			if (modDelayCnt < track.modDelay) {
 				modDelayCnt ++;
 			} else {
 			
-				var speed:uint = (modSpeed & 0x0000FFFF) << 6;
+				var speed:uint = (track.modSpeed & 0x0000FFFF) << 6;
 				
 				
 				/* var counter:uint = (modCounter + speed) >>> 8;
@@ -136,7 +127,7 @@
 				
 				modCounter=(modCounter+speed) % 0x8000;
 				
-				modParam = Tables.soundSin(modCounter >>> 8) * modRange * modDepth;
+				modParam = Tables.soundSin(modCounter >>> 8) * track.modRange * track.modDepth;
 			}
 			
 			/*
@@ -147,12 +138,12 @@
 			totalvol += AMPL >> 7;*/
 			
 			var totalVolume:uint=Tables.cnvVol(127);
-			totalVolume+=Tables.cnvVol(vol);
-			totalVolume+=Tables.cnvVol(expr);
+			totalVolume+=Tables.cnvVol(track.volume);
+			totalVolume+=Tables.cnvVol(track.expression);
 			totalVolume+=Tables.cnvVol(vel);
 			totalVolume+=ampl >> 7;
 			
-			if(modType==MOD_VOL) {
+			if(track.modType==MOD_VOL) {
 				totalVolume+=modParam;
 			}
 			
@@ -160,8 +151,8 @@
 			
 			if (totalVolume < 0) totalVolume = 0;
 			
-			var pan:uint = notePan + instrumentPan - 64;
-			if (modType == 2) pan += modParam;
+			var pan:uint = track.pan + instrumentPan - 64;
+			if (track.modType == 2) pan += modParam;
 			if (pan < 0) pan = 0;
 			if (pan > 127) pan = 127;
 			
@@ -170,15 +161,27 @@
 			
 			var totalTimer:uint=timer;
 			
-			if(modType==MOD_FREQ) {
+			if(track.modType==MOD_FREQ) {
 				totalTimer=Tables.AdjustFreq(totalTimer,modParam);
 			}
 			
 			mixerChannel.timer=totalTimer;
 		}
 		
-		public function killSound():void {
+		public function endNote():void {
+			adsrState=STATE_RELEASE;
+			priority=1;
+		}
+		
+		private function killSound():void {
 			active=false;
+			priority=1;
+			mixerChannel.enabled=false;
+		}
+		
+		private function soundOver(e:Event):void {
+			active=false;
+			priority=1;
 		}
 
 	}

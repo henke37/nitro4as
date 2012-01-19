@@ -53,7 +53,7 @@
 			while(updateCounter>updateThreshold) {
 				
 				for each(var track:TrackState in tracks) {
-					
+					track.tick();
 				}
 				updateCounter-=updateThreshold;
 			}

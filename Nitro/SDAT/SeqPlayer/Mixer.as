@@ -28,6 +28,8 @@
 					channels[i]=new MixerChannel();
 				}
 			}
+			
+			readScratchBuffer=new ByteArray();
 		}
 		
 		/** Resets the mixer to the pre playback state */
@@ -64,8 +66,36 @@
 			return totalSamples;
 		}
 		
+		private var readScratchBuffer:ByteArray;
+		
 		/** Rends a chunk of samples uninterupted by the callback. */
 		private function rendChunk(b:ByteArray,s:uint):uint {
+			var i:uint;
+			var sample:Number;
+			var startOffset:uint=b.position;
+			
+			for(i=0;i<s;++i) {
+				b.writeFloat(0);
+				b.writeFloat(0);
+			}
+			
+			for each (var channel:MixerChannel in channels) {
+				if(!channel.enabled) continue;
+				
+				readScratchBuffer.position=0
+				
+				var readSamples:uint=channel.genSamples(readScratchBuffer,s);
+				
+				var loopEnd:uint=readSamples*2;
+				b.position=startOffset;
+				for(i=0;i<loopEnd;++i) {
+					sample=b.readFloat();
+					sample+=readScratchBuffer.readFloat();
+					b.position-=4;
+					b.writeFloat(sample);
+				}
+			}
+			
 			return s;
 		}
 

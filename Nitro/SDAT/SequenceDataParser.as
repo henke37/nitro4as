@@ -219,6 +219,7 @@
 					break;
 					
 					case 0xFF:
+						track.events.push(new EndTrackEvent());
 						trackOver=true;
 					break;
 					

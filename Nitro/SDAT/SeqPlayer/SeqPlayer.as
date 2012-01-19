@@ -2,6 +2,10 @@
 	import Nitro.SDAT.*;
 	import Nitro.SDAT.SequenceEvents.*;
 	
+	import flash.media.*;
+	import flash.events.*;
+	import flash.utils.*;
+	
 	/** A player for sequences */	
 	public class SeqPlayer {
 		
@@ -14,7 +18,11 @@
 		private var chanMgr:ChannelManager;
 		private var tracker:Tracker;
 		
+		private var outSnd:Sound;
+		
 		private static const UPDATE_RATE:uint=42;
+		
+		private static const PLAYBACK_SAMPLES:uint=8192
 
 		/** Creates a new Sequence player
 		@param sdat The SDAT to load data from */
@@ -84,6 +92,25 @@
 			tracker.updateTick();
 			
 			return UPDATE_RATE;
+		}
+		
+		/** Starts playing the loaded sequence */
+		public function play():void {
+			
+			if(!seq) throw new Error("No sequence loaded!");
+			
+			outSnd=new Sound();
+			outSnd.addEventListener(SampleDataEvent.SAMPLE_DATA,playbackListener);
+			outSnd.play();
+		}
+		
+		private function playbackListener(e:SampleDataEvent):void {
+			mixer.rend(e.data,PLAYBACK_SAMPLES);
+		}
+		
+		public function rend(b:ByteArray,s:uint):uint {
+			if(!seq) throw new Error("No sequence loaded!");
+			return mixer.rend(b,s);
 		}
 		
 

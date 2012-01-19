@@ -36,6 +36,10 @@
 		
 		internal var pitchBend:int;
 		internal var pitchBendRange:uint;
+		
+		private var updateDelay:uint;
+		
+		private var active:Boolean;
 
 		public function TrackState(tracker:Tracker,track:SequenceTrack) {
 			if(!track) throw new ArgumentError("Track can not be null!");
@@ -65,6 +69,9 @@
 			
 			pitchBend=0;
 			pitchBendRange=2;
+			
+			updateDelay=0;
+			active=true;
 		}
 		
 		private function executeEvent(evt:SequenceEvent):void {
@@ -75,11 +82,13 @@
 				var noteEvt:NoteEvent=evt as NoteEvent;
 				var instrument:Instrument=instrumentForNote(noteEvt);
 				tracker.chanMgr.startNote(instrument,noteEvt,this);
+				if(!polyphonic) {
+					updateDelay=noteEvt.duration;
+				}
 			} else if(evt is RestEvent) {
-				
+				updateDelay=(evt as RestEvent).rest;
 			} else if(evt is ExpressionEvent) {
 				expression=(evt as ExpressionEvent).value;
-				tracker.chanMgr.updateNotes(this);
 			} else if(evt is PriorityEvent) {
 				priority=(evt as PriorityEvent).prio;
 			} else if(evt is MonoPolyEvent) {
@@ -90,7 +99,6 @@
 					
 				} else {
 					volume=volEvt.volume;
-					tracker.chanMgr.updateNotes(this);
 				}
 			} else if(evt is ADSREvent) {
 				var adsrEvt:ADSREvent=evt as ADSREvent;
@@ -113,7 +121,6 @@
 				}
 			} else if(evt is PanEvent) {
 				pan=(evt as PanEvent).pan;
-				tracker.chanMgr.updateNotes(this);
 			} else if(evt is TempoEvent) {
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
@@ -159,8 +166,6 @@
 						throw new Error("Unknown modulation event type!");
 					break;
 				}
-				
-				tracker.chanMgr.updateModulation(this);
 			} else if(evt is PitchBendEvent) {
 				var pitchEvt:PitchBendEvent=evt as PitchBendEvent;
 				if(pitchEvt.range) {
@@ -169,11 +174,25 @@
 					pitchBend=pitchEvt.bend;
 				}
 				tracker.chanMgr.updatePitchBend(this);
+			} else if(evt is EndTrackEvent) {
+				this.active=false;
 			}
 			
 			if(normalFlow) {
 				position++;
 			}
+		}
+		
+		public function tick():void {
+			if(updateDelay) {
+				--updateDelay;
+				return;
+			}
+			
+			do {
+				if(!active) break;
+				executeEvent(track.events[position]);
+			} while(updateDelay==0);
 		}
 		
 		private function instrumentForNote(noteEvt:NoteEvent):Instrument {

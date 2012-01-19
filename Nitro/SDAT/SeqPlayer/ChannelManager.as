@@ -53,21 +53,15 @@
 			
 			chanState.track=trackState;
 			
+			chanState.countDown=noteEvt.duration;
+			
 			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
 			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
 			chanState.sustainLevel=Tables.cnvSustain(trackState.sustain!=-1?trackState.sustain:region.sustain);
 			chanState.releaseRate=Tables.cnvFall(trackState.release!=-1?trackState.release:region.release);
 			
-			chanState.modDelay=trackState.modDelay;
-			chanState.modDepth=trackState.modDepth;
-			chanState.modRange=trackState.modRange;
-			chanState.modSpeed=trackState.modSpeed;
-			chanState.modType=trackState.modType;
+			chanState.vel=noteEvt.velocity;
 			
-			chanState.vol = trackState.volume;
-			chanState.expr = trackState.expression;
-			
-			chanState.notePan=trackState.pan;
 			chanState.instrumentPan=region.pan;
 			
 			chanState.mixerChannel.reset();
@@ -95,33 +89,11 @@
 			
 		}
 		
-		public function updateModulation(trackState:TrackState):void {
-			for each(var chanState:ChannelState in channels) {
-				if(chanState.track!=trackState) continue;
-				
-				chanState.modDelay=trackState.modDelay;
-				chanState.modDepth=trackState.modDepth;
-				chanState.modRange=trackState.modRange;
-				chanState.modSpeed=trackState.modSpeed;
-				chanState.modType=trackState.modType;
-			}
-		}
-		
 		public function updatePitchBend(trackState:TrackState):void {
 			for each(var chanState:ChannelState in channels) {
 				if(chanState.track!=trackState) continue;
 				
 				chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
-			}
-		}
-		
-		public function updateNotes(trackState:TrackState):void {
-			for each(var chanState:ChannelState in channels) {
-				if(chanState.track!=trackState) continue;
-				
-				chanState.vol = trackState.volume;
-				chanState.expr = trackState.expression;
-				chanState.notePan=trackState.pan;
 			}
 		}
 		
@@ -132,6 +104,18 @@
 			for each(var channel:ChannelState in channels) {
 				if(!channel.active) continue;
 				channel.tick();
+			}
+		}
+		
+		internal function countDownChannels():void {
+			for each(var channel:ChannelState in channels) {
+				if(!channel.active) continue;
+				
+				if(channel.countDown) {
+					channel.countDown--;
+				} else {
+					channel.endNote();
+				}
 			}
 		}
 		
