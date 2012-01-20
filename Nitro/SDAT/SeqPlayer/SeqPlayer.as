@@ -11,7 +11,6 @@
 		
 		private var sdat:SDAT;
 		
-		private var bank:SBNK;
 		private var seq:SSEQ;
 		
 		private var mixer:Mixer;
@@ -82,7 +81,7 @@
 			
 			chanMgr.waveArchives=waveArchives;
 			
-			bank=sdat.openBank(bankId);
+			chanMgr.bank=sdat.openBank(bankId);
 		}
 		
 		/** Runs every few samples to update the channel status

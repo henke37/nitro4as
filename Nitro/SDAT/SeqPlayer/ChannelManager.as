@@ -10,6 +10,8 @@
 		
 		/** The wave archives used as the sample sources */
 		internal var waveArchives:Object;
+		
+		internal var bank:SBNK;
 
 		/** Creates a new channel manager
 		@param mixer The mixer whose channels to manage*/
@@ -37,11 +39,11 @@
 		@param noteEvt The note play event
 		@param trackState The tracker state to read details from
 		*/
-		public function startNote(instrument:Instrument,noteEvt:NoteEvent,trackState:TrackState):void {
-			
-			if(!instrument) throw new ArgumentError("Instrument can not be null!");
+		public function startNote(noteEvt:NoteEvent,trackState:TrackState):void {
 			if(!noteEvt) throw new ArgumentError("noteEvnt can not be null!");
 			if(!trackState) throw new ArgumentError("trackState can not be null!");
+			
+			var instrument:Instrument=bank.instruments[trackState.patch];
 			
 			var chanState:ChannelState=allocateChannel(instrument.noteType,trackState.priority);
 			

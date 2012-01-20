@@ -16,6 +16,8 @@
 		
 		private var callReturn:uint;
 		
+		internal var patch:uint;
+		
 		internal var priority:uint;
 		private var polyphonic:Boolean;
 		
@@ -80,8 +82,7 @@
 			
 			if(evt is NoteEvent) {
 				var noteEvt:NoteEvent=evt as NoteEvent;
-				var instrument:Instrument=instrumentForNote(noteEvt);
-				tracker.chanMgr.startNote(instrument,noteEvt,this);
+				tracker.chanMgr.startNote(noteEvt,this);
 				if(!polyphonic) {
 					updateDelay=noteEvt.duration;
 				}
@@ -176,6 +177,8 @@
 				tracker.chanMgr.updatePitchBend(this);
 			} else if(evt is EndTrackEvent) {
 				this.active=false;
+			} else if(evt is ProgramChangeEvent) {
+				patch=(evt as ProgramChangeEvent).program;
 			}
 			
 			if(normalFlow) {
@@ -193,10 +196,6 @@
 				if(!active) break;
 				executeEvent(track.events[position]);
 			} while(updateDelay==0);
-		}
-		
-		private function instrumentForNote(noteEvt:NoteEvent):Instrument {
-			return null;
 		}
 
 	}
