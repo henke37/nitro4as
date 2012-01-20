@@ -6,6 +6,8 @@
 		
 		public static const channelCount:uint=16;
 		
+		public static const internalSamplerate:uint=33513982;
+		
 		/** The channels in the mixer */
 		public var channels:Vector.<MixerChannel>;
 		
@@ -37,6 +39,7 @@
 			for each(var channel:MixerChannel in channels) {
 				channel.reset();
 			}
+			callbackTimer=0;
 		}
 		
 		/** Rends the audio stream and invokes the update callback as needed

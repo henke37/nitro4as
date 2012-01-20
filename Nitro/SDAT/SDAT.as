@@ -104,7 +104,7 @@
 			return o;
 		}
 		
-		private function openFileById(fatId:uint):ByteArray {
+		public function openFileById(fatId:uint):ByteArray {
 			if(fatId>=files.length) throw new RangeError("Can't open a file id higher than the file count!");
 			
 			var record:FATRecord=files[fatId];

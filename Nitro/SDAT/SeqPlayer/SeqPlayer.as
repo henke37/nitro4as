@@ -19,7 +19,7 @@
 		
 		private var outSnd:Sound;
 		
-		private static const UPDATE_RATE:uint=42;
+		private static const UPDATE_RATE:uint=64 * 2728 * 44100 / Mixer.internalSamplerate;//note, not a nice integer
 		
 		private static const PLAYBACK_SAMPLES:uint=8192
 
@@ -97,6 +97,8 @@
 		public function play():void {
 			
 			if(!seq) throw new Error("No sequence loaded!");
+			
+			reset();
 			
 			outSnd=new Sound();
 			outSnd.addEventListener(SampleDataEvent.SAMPLE_DATA,playbackListener);

@@ -46,6 +46,7 @@
 			for each(var track:TrackState in tracks) {
 				track.reset();
 			}
+			tempo=120;
 		}
 		
 		internal function updateTick():void {

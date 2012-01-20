@@ -32,13 +32,16 @@
 		}
 		
 		private function readDATA(section:ByteArray):void {
+			
+			section.endian=Endian.LITTLE_ENDIAN;
+			
 			const padding:uint=8*4;
 			section.position=padding;
 			var numInstruments:uint=section.readUnsignedInt();
 			
-			return;
-			
-			instruments=new Vector.<Instrument>(numInstruments,true);
+			instruments=new Vector.<Instrument>();
+			instruments.length=numInstruments
+			instruments.fixed=true;
 			
 			var realInstruments:uint;
 			for(var i:uint;i<numInstruments;++i) {
@@ -109,7 +112,7 @@
 			var high:uint=section.readUnsignedByte();
 			
 			if(high<low) {
-				throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
+				//throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
 			}
 			
 			var range:uint=high-low;

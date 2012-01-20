@@ -110,7 +110,9 @@
 		
 		protected function nextGenSample():Number { return 0; }
 		
-		public function set timer(t:uint):void {
+		public function set timer(t:int):void {
+			
+			freq=-(33513982/2)/t;
 			
 			if(resampler) {
 				resampler.inputRate=freq;
@@ -119,7 +121,7 @@
 			_timer=t;
 		}
 		
-		public function get timer():uint { return _timer; }
+		public function get timer():int { return _timer; }
 
 	}
 	
