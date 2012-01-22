@@ -8,12 +8,10 @@
 	
 	public class SequenceTrack {
 		
-		public var events:Vector.<SequenceEvent>;
-		public var offsets:Object;
-
-		public function SequenceTrack() {
-			events=new Vector.<SequenceEvent>();
-			offsets={};
+		public var startPosition:uint;
+		
+		public function SequenceTrack(startPosition:uint) {
+			this.startPosition=startPosition;
 		}
 
 	}

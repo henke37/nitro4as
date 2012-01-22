@@ -12,24 +12,29 @@
 		/** Parses sequence data
 		@param data The sequence data to parse
 		@return The parsed data*/
-		sequenceInternal static function parse(data:ByteArray):Vector.<SequenceTrack> {
-			var track:SequenceTrack;
-			var tracks:Vector.<SequenceTrack>;
+		sequenceInternal static function parse(data:ByteArray):Sequence {
 			
-			tracks=new Vector.<SequenceTrack>();
+			var seq:Sequence=new Sequence();
 			
-			track=new SequenceTrack();
-			tracks.push(track);
+			var flows:Object={};
+			var unparsedFlows:Vector.<Flow>=new Vector.<Flow>();
 			
 			var trackStarts:Vector.<uint>=new Vector.<uint>();
+			
+			var newFlow:Flow;
+			
+			newFlow=new Flow(0);
+			trackStarts[0]=0;
+			flows[0]=newFlow;
+			newFlow.parsed=true;
 			
 			var commandIndex:uint=0;
 			
 			for(;;) {
 				
-				track.offsets[data.position]=commandIndex++;
+				var flowOver:Boolean=false;
 				
-				var trackOver:Boolean=false;
+				newFlow=null;
 				
 				var command:uint=data.readUnsignedByte();
 				
@@ -51,15 +56,21 @@
 						data.position+=1;//skip past the id
 						var trackPos:uint=read3ByteInt(data);
 						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
+						newFlow=new Flow(trackPos);
 						trackStarts.push(trackPos);
 					break;
 					
 					case 0x94:
-						evt=new JumpEvent(read3ByteInt(data),false);
+						var jmpTarget:uint=read3ByteInt(data);
+						evt=new JumpEvent(jmpTarget,false);
+						newFlow=new Flow(jmpTarget);
+						flowOver=true;
 					break;
 					
 					case 0x95://call
-						evt=new JumpEvent(read3ByteInt(data),true);
+						jmpTarget=read3ByteInt(data);
+						evt=new JumpEvent(jmpTarget,true);
+						newFlow=new Flow(jmpTarget);
 					break;
 					
 					case 0xA2:
@@ -215,11 +226,12 @@
 					
 					case 0xFD:
 						evt=new ReturnEvent();
+						flowOver=true;
 					break;
 					
 					case 0xFF:
 						evt=new EndTrackEvent();
-						trackOver=true;
+						flowOver=true;
 					break;
 					
 					default:
@@ -227,25 +239,36 @@
 					break;
 				}
 				
+				commandIndex++;
+				
 				if(evt) {
-					track.events.push(evt);
-					trace(evt);
+					seq.events.push(evt);
+					//trace(evt,commandIndex,data.position.toString(16));
 				}
 				
-				if(trackOver) {
-					if(trackStarts.length==0) {
+				if(newFlow && !(newFlow.rawOffset in flows)) {
+					unparsedFlows.push(newFlow);
+					flows[newFlow.rawOffset]=newFlow;
+				}
+				
+				if(flowOver) {
+					if(unparsedFlows.length==0) {
 						break;
 					} else {
-						data.position=trackStarts.shift();
-						trackOver=false;
-						
-						track=new SequenceTrack();
-						tracks.push(track);
+						var nextFlow:Flow=unparsedFlows.shift();
+						data.position=nextFlow.rawOffset;
+						nextFlow.parsed=true;
+						nextFlow.commandIndex=commandIndex;
+						//trace("new flow at:",nextFlow.rawOffset.toString(16));
 					}
 				}
 			}
 			
-			return tracks;
+			for(var trackIndex:uint=0;trackIndex<trackStarts.length;++trackIndex) {
+				seq.trackStarts.push(flows[trackStarts[trackIndex]].commandIndex);
+			}
+			
+			return seq;
 		}
 		
 		private static function readVarLen(data:ByteArray):uint {
@@ -264,5 +287,15 @@
 			value+=data.readUnsignedShort()<<8;
 			return value;
 		}
+	}
+}
+
+class Flow {
+	public var parsed:Boolean=false;
+	public var rawOffset:uint;
+	public var commandIndex:uint;
+	
+	public function Flow(rawOffset:uint) {
+		this.rawOffset=rawOffset;
 	}
 }

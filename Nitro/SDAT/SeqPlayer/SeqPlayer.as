@@ -64,7 +64,7 @@
 			var bankId:uint=sdat.sequenceInfo[seqId].bankId;
 			loadBank(bankId);
 			
-			tracker.loadTracks(seq);
+			tracker.loadTracks(seq.sequence);
 		}
 		
 		private function loadBank(bankId:uint):void {

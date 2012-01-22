@@ -5,8 +5,6 @@
 	/** The current state of a track in the Tracker */
 	public class TrackState {
 		
-		private var track:SequenceTrack;
-		
 		private var tracker:Tracker;
 		
 		private var position:uint;
@@ -43,10 +41,9 @@
 		
 		private var active:Boolean;
 
-		public function TrackState(tracker:Tracker,track:SequenceTrack) {
-			if(!track) throw new ArgumentError("Track can not be null!");
+		public function TrackState(tracker:Tracker,trackStart:uint) {
 			if(!tracker) throw new ArgumentError("Tracker can not be null!");
-			this.track=track;
+			position=trackStart;
 			this.tracker=tracker;
 		}
 		
@@ -55,8 +52,6 @@
 			decay=-1;
 			sustain=-1;
 			release=-1;
-			
-			position=0;
 			
 			volume=64;
 			expression=127;
@@ -126,10 +121,7 @@
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
 				var jmpEvt:JumpEvent=evt as JumpEvent;
-				if(!(jmpEvt.target in track.offsets)) {
-					throw new Error("Jump to unknown address " +jmpEvt.target);
-				}
-				position=track.offsets[jmpEvt.target];
+				position=jmpEvt.target;
 				if(jmpEvt.isCall) callReturn=position+1;
 				normalFlow=false;
 			} else if(evt is LoopStartEvent) {
@@ -197,8 +189,9 @@
 			
 			do {
 				if(!active) break;
-				trace(position,track.events[position]);
-				executeEvent(track.events[position]);
+				var nextEvt:SequenceEvent=tracker.seq.events[position];
+				trace(position,nextEvt);
+				executeEvent(nextEvt);
 			} while(updateDelay==0);
 		}
 

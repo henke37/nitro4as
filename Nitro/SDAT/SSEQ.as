@@ -11,8 +11,8 @@
 	
 	public class SSEQ extends SubFile {
 		
-		/** The event tracks in the sequence */
-		public var tracks:Vector.<SequenceTrack>;
+		/** The stored sequence */
+		public var sequence:Sequence;
 
 		public function SSEQ() {
 			
@@ -38,7 +38,7 @@
 			sequenceData.position=0;
 			sequenceData.endian=Endian.LITTLE_ENDIAN;
 			
-			tracks=SequenceDataParser.parse(sequenceData);
+			sequence=SequenceDataParser.parse(sequenceData);
 		}
 
 	}

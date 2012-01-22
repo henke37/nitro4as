@@ -57,7 +57,7 @@
 			
 			chanState.countDown=noteEvt.duration;
 			
-			trace("allocated new channel with a duration of ",noteEvt.duration);
+			trace("allocated new channel with a duration of",noteEvt.duration);
 			
 			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
 			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
