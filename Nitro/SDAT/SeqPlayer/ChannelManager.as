@@ -9,7 +9,7 @@
 		internal var channels:Vector.<ChannelState>;
 		
 		/** The wave archives used as the sample sources */
-		internal var waveArchives:Object;
+		internal var waveArchives:Vector.<SWAR>;
 		
 		internal var bank:SBNK;
 
@@ -71,7 +71,7 @@
 			chanState.mixerChannel.reset();
 			
 			if(instrument.noteType==Instrument.NOTETYPE_PCM) {
-				var wave:Wave=SWAR(waveArchives[region.swar]).waves[region.swav];
+				var wave:Wave=waveArchives[region.swar].waves[region.swav];
 				
 				chanState.mixerChannel.loadWave(wave);
 				
