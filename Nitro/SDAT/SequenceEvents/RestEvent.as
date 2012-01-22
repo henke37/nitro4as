@@ -7,6 +7,10 @@
 		public function RestEvent(_rest:uint) {
 			rest=_rest;
 		}
+		
+		public function toString():String {
+			return "[RestEvent duration="+rest+"]";
+		}
 
 	}
 	

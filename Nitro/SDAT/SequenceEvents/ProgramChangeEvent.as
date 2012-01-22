@@ -7,6 +7,10 @@
 		public function ProgramChangeEvent(_program:uint) {
 			program=_program;
 		}
+		
+		public function toString():String {
+			return "[ProgramChangeEvent program="+program+"]";
+		}
 
 	}
 	

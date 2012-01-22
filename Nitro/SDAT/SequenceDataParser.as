@@ -33,19 +33,18 @@
 				
 				var command:uint=data.readUnsignedByte();
 				
-				if(command<0x80) {//notes
-					track.events.push(new NoteEvent(command,data.readUnsignedByte(),readVarLen(data)));
-					continue;
-				}
+				var evt:SequenceEvent=null;
 				
-				switch(command) {
+				if(command<0x80) {//notes
+					evt=new NoteEvent(command,data.readUnsignedByte(),readVarLen(data));
+				} else switch(command) {
 					
 					case 0x80:
-						track.events.push(new RestEvent(readVarLen(data)));
+						evt=new RestEvent(readVarLen(data));
 					break;
 					
 					case 0x81:
-						track.events.push(new ProgramChangeEvent(readVarLen(data)));
+						evt=new ProgramChangeEvent(readVarLen(data));
 					break;
 					
 					case 0x93://open track
@@ -56,150 +55,150 @@
 					break;
 					
 					case 0x94:
-						track.events.push(new JumpEvent(read3ByteInt(data),false));
+						evt=new JumpEvent(read3ByteInt(data),false);
 					break;
 					
 					case 0x95://call
-						track.events.push(new JumpEvent(read3ByteInt(data),true));
+						evt=new JumpEvent(read3ByteInt(data),true);
 					break;
 					
 					case 0xA2:
-						track.events.push(new IfEvent());
+						evt=new IfEvent();
 					break;
 					
 					case 0xB0:
-						track.events.push(new VarEvent(VarEvent.assign,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.assign,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB1:
-						track.events.push(new VarEvent(VarEvent.addition,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.addition,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB2:
-						track.events.push(new VarEvent(VarEvent.subtract,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.subtract,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB3:
-						track.events.push(new VarEvent(VarEvent.multiply,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.multiply,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB4:
-						track.events.push(new VarEvent(VarEvent.divide,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.divide,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB5:
-						track.events.push(new VarEvent(VarEvent.shift,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.shift,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB6:
-						track.events.push(new VarEvent(VarEvent.random,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.random,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB7:
-						track.events.push(new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB8:
-						track.events.push(new VarEvent(VarEvent.equals,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.equals,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xB9:
-						track.events.push(new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xBA:
-						track.events.push(new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xBB:
-						track.events.push(new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xBC:
-						track.events.push(new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					case 0xBD:
-						track.events.push(new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),read3ByteInt(data)));
+						evt=new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),read3ByteInt(data));
 					break;
 					
 					case 0xC0:
-						track.events.push(new PanEvent(data.readUnsignedByte()));
+						evt=new PanEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xC1:
-						track.events.push(new VolumeEvent(data.readUnsignedByte(),false));
+						evt=new VolumeEvent(data.readUnsignedByte(),false);
 					break;
 					
 					case 0xC2:
-						track.events.push(new VolumeEvent(data.readUnsignedByte(),true));//master
+						evt=new VolumeEvent(data.readUnsignedByte(),true);//master
 					break;
 					
 					case 0xC3:
-						track.events.push(new TransposeEvent(data.readUnsignedByte()));
+						evt=new TransposeEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xC4:
-						track.events.push(new PitchBendEvent(data.readUnsignedByte(),false));
+						evt=new PitchBendEvent(data.readUnsignedByte(),false);
 					break;
 					
 					case 0xC5:
-						track.events.push(new PitchBendEvent(data.readUnsignedByte(),true));//range
+						evt=new PitchBendEvent(data.readUnsignedByte(),true);//range
 					break;
 					
 					case 0xC6:
-						track.events.push(new PriorityEvent(data.readUnsignedByte()));
+						evt=new PriorityEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xC7:
-						track.events.push(new MonoPolyEvent(data.readBoolean()));
+						evt=new MonoPolyEvent(data.readBoolean());
 					break;
 					
 					case 0xCA:
-						track.events.push(new ModulationEvent("depth",data.readUnsignedByte()));
+						evt=new ModulationEvent("depth",data.readUnsignedByte());
 					break;
 					
 					case 0xCB:
-						track.events.push(new ModulationEvent("speed",data.readUnsignedByte()));
+						evt=new ModulationEvent("speed",data.readUnsignedByte());
 					break;
 					
 					case 0xCC:
-						track.events.push(new ModulationEvent("type",data.readUnsignedByte()));
+						evt=new ModulationEvent("type",data.readUnsignedByte());
 					break;
 					
 					case 0xCD:
-						track.events.push(new ModulationEvent("range",data.readUnsignedByte()));
+						evt=new ModulationEvent("range",data.readUnsignedByte());
 					break;
 					
 					case 0xCE:
-						track.events.push(new PortamentoEvent(data.readBoolean()));
+						evt=new PortamentoEvent(data.readBoolean());
 					break;
 					
 					case 0xCF:
-						track.events.push(new PortamentoTimeEvent(data.readUnsignedByte()));
+						evt=new PortamentoTimeEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xD0:
-						track.events.push(new ADSREvent("A",data.readUnsignedByte()));
+						evt=new ADSREvent("A",data.readUnsignedByte());
 					break;
 					
 					case 0xD1:
-						track.events.push(new ADSREvent("D",data.readUnsignedByte()));
+						evt=new ADSREvent("D",data.readUnsignedByte());
 					break;
 					
 					case 0xD2:
-						track.events.push(new ADSREvent("S",data.readUnsignedByte()));
+						evt=new ADSREvent("S",data.readUnsignedByte());
 					break;
 					
 					case 0xD3:
-						track.events.push(new ADSREvent("R",data.readUnsignedByte()));
+						evt=new ADSREvent("R",data.readUnsignedByte());
 					break;
 					
 					case 0xE0:
-						track.events.push(new ModulationEvent("delay",data.readUnsignedShort()));
+						evt=new ModulationEvent("delay",data.readUnsignedShort());
 					break;
 					
 					case 0xE1:
-						track.events.push(new TempoEvent(data.readUnsignedShort()));
+						evt=new TempoEvent(data.readUnsignedShort());
 					break;
 					
 					case 0xE3:
-						track.events.push(new SweepPitchEvent(data.readUnsignedShort()));
+						evt=new SweepPitchEvent(data.readUnsignedShort());
 					break;
 					
 					case 0xD4:
-						track.events.push(new LoopStartEvent(data.readUnsignedByte()));
+						evt=new LoopStartEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xD5://Expression
-						track.events.push(new ExpressionEvent(data.readUnsignedByte()));
+						evt=new ExpressionEvent(data.readUnsignedByte());
 					break;
 					
 					case 0xD6://print var
@@ -211,21 +210,26 @@
 					break;
 					
 					case 0xFC:
-						track.events.push(new LoopEndEvent());
+						evt=new LoopEndEvent();
 					break;
 					
 					case 0xFD:
-						track.events.push(new ReturnEvent());
+						evt=new ReturnEvent();
 					break;
 					
 					case 0xFF:
-						track.events.push(new EndTrackEvent());
+						evt=new EndTrackEvent();
 						trackOver=true;
 					break;
 					
 					default:
-						//trace("unknown command: "+command.toString(16));
+						trace("unknown command: "+command.toString(16));
 					break;
+				}
+				
+				if(evt) {
+					track.events.push(evt);
+					trace(evt);
 				}
 				
 				if(trackOver) {
@@ -234,8 +238,6 @@
 					} else {
 						data.position=trackStarts.shift();
 						trackOver=false;
-						
-						commandIndex=0;
 						
 						track=new SequenceTrack();
 						tracks.push(track);
@@ -254,7 +256,7 @@
 				value<<=7;
 				value|=byte&0x7F;
 			} while(byte & 0x80);
-			return 0;
+			return value;
 		}
 		
 		private static function read3ByteInt(data:ByteArray):uint {

@@ -126,6 +126,9 @@
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
 				var jmpEvt:JumpEvent=evt as JumpEvent;
+				if(!(jmpEvt.target in track.offsets)) {
+					throw new Error("Jump to unknown address " +jmpEvt.target);
+				}
 				position=track.offsets[jmpEvt.target];
 				if(jmpEvt.isCall) callReturn=position+1;
 				normalFlow=false;
@@ -194,6 +197,7 @@
 			
 			do {
 				if(!active) break;
+				trace(position,track.events[position]);
 				executeEvent(track.events[position]);
 			} while(updateDelay==0);
 		}

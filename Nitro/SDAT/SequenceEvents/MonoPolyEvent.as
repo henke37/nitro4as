@@ -7,6 +7,10 @@
 		public function MonoPolyEvent(_mono:Boolean) {
 			mono=_mono;
 		}
+		
+		public function toString():String {
+			return "[MonoPolyEvent mono="+(mono?"true":"false")+"]";
+		}
 
 	}
 	

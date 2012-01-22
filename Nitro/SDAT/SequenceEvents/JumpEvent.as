@@ -9,6 +9,15 @@
 			target=_target;
 			isCall=_isCall;
 		}
+		
+		public function toString():String {
+			var targetStr:String=target.toString(16);
+			if(isCall) {
+				return "[CallEvent target="+targetStr+"]";
+			} else {
+				return "[JumpEvent target="+targetStr+"]";
+			}
+		}
 
 	}
 	

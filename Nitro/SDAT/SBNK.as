@@ -27,11 +27,11 @@
 				throw new ArgumentError("Invalid SBNK block, wrong type id "+sections.id);
 			}
 			
-			readDATA(sections.open("DATA"));
+			readDATA(sections.open("DATA"),sections.getDataOffsetForId("DATA"));
 			
 		}
 		
-		private function readDATA(section:ByteArray):void {
+		private function readDATA(section:ByteArray,baseOffset:uint):void {
 			
 			section.endian=Endian.LITTLE_ENDIAN;
 			
@@ -45,8 +45,10 @@
 			
 			var realInstruments:uint;
 			for(var i:uint;i<numInstruments;++i) {
+				section.position=padding+4+i*4;
 				var type:uint=section.readUnsignedByte();
 				var offset:uint=section.readUnsignedShort();
+				offset-=baseOffset;
 				var instrument:Instrument=makeInstrument(section,type,offset);
 				
 				if(instrument) {
@@ -112,7 +114,7 @@
 			var high:uint=section.readUnsignedByte();
 			
 			if(high<low) {
-				//throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
+				throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
 			}
 			
 			var range:uint=high-low;

@@ -57,6 +57,8 @@
 			
 			chanState.countDown=noteEvt.duration;
 			
+			trace("allocated new channel with a duration of ",noteEvt.duration);
+			
 			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
 			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
 			chanState.sustainLevel=Tables.cnvSustain(trackState.sustain!=-1?trackState.sustain:region.sustain);
@@ -152,7 +154,7 @@
 		private static const pcmChnArray:Vector.<uint> = new <uint> [ 4, 5, 6, 7, 2, 0, 3, 1, 8, 9, 10, 11, 14, 12, 15, 13 ];
 		private static const psgChnArray:Vector.<uint> = new <uint> [ 13, 12, 11, 10, 9, 8 ];
 		private static const noiseChnArray:Vector.<uint> = new <uint> [ 15, 14 ];
-		private static const chnArrayArray:Vector.<Vector.<uint>>=new Vector.<Vector.<uint>>([ pcmChnArray, psgChnArray, noiseChnArray ]);;
+		private static const chnArrayArray:Vector.<Vector.<uint>>=new Vector.<Vector.<uint>>();
 		{
 			initStatics();
 		}
@@ -161,11 +163,16 @@
 			pcmChnArray.fixed=true;
 			psgChnArray.fixed=true;
 			noiseChnArray.fixed=true;
+			chnArrayArray[0]=pcmChnArray;
+			chnArrayArray[1]=psgChnArray;
+			chnArrayArray[2]=noiseChnArray;
 			chnArrayArray.fixed=true;
 		}
 		
 		private function allocateChannel(type:uint,prio:uint):ChannelState {
 			var bestChannel:ChannelState;
+			
+			var arrs=chnArrayArray;
 			
 			var candidates:Vector.<uint>=chnArrayArray[type];
 			

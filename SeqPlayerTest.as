@@ -36,11 +36,21 @@
 			sdat=new SDAT();
 			sdat.parse(nds.fileSystem.openFileByReference(File(files[0])));
 			
+			var fr:FileReference=new FileReference();
+			//fr.save(sdat.openFileById(sdat.bankInfo[48].fatId),"t.sbnk");
+			
 			//trace(sdat.sequences);
 			//trace(sdat.seqSymbols);
 			
 			seqPlayer=new SeqPlayer(sdat);
 			seqPlayer.loadSeqByName("BGM01DS_REQ");
+			
+			trace("sequence loaded");
+			stage.addEventListener(MouseEvent.CLICK,clicked);
+		}
+		
+		private function clicked(e:MouseEvent):void {
+			seqPlayer.play();
 		}
 	}
 	

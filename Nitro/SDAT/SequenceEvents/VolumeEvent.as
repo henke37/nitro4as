@@ -9,6 +9,14 @@
 			volume=_volume;
 			master=_master;
 		}
+		
+		public function toString():String {
+			if(master) {
+				return "[MasterVolumeEvent vol="+volume+"]";
+			} else {
+				return "[VolumeEvent vol="+volume+"]";
+			}
+		}
 
 	}
 	

@@ -5,6 +5,10 @@
 		public function EndTrackEvent() {
 			// constructor code
 		}
+		
+		public function toString():String {
+			return "[EndTrackEvent]";
+		}
 
 	}
 	

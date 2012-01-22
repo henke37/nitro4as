@@ -12,6 +12,10 @@
 			type=_type;
 			value=_value;
 		}
+		
+		public function toString():String {
+			return "[ADSREvent type="+type+" value="+value+"]";
+		}
 
 	}
 	

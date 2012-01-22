@@ -8,6 +8,10 @@
 			bpm=_bpm;
 		}
 
+
+		public function toString():String {
+			return "[TempoEvent bpm="+bpm+"]";
+		}
 	}
 	
 }
