@@ -8,8 +8,6 @@
 	<p>SSAR files contains a set of sequences</p>*/
 	
 	public class SSAR extends SubFile {
-		
-		sequenceInternal var offset:uint;
 
 		public function SSAR() {
 			
