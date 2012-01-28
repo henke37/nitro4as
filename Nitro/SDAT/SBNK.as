@@ -101,6 +101,9 @@
 			section.position=offset;
 			var region:InstrumentRegion=new InstrumentRegion();
 			region.parse(section);
+			
+			region.lowEnd=region.highEnd=region.baseNote;
+			
 			instrument.regions[0]=region;
 			
 			return instrument;
@@ -117,16 +120,19 @@
 				throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
 			}
 			
-			var range:uint=high-low;
+			var range:uint=high-low+1;
 			
 			instrument.regions.length=range;
 			instrument.regions.fixed=true;
 			
 			for(var i:uint;i<range;++i) {
+				//base offset+lh bytes+indexed positon+skipping first two bytes of each record
 				section.position=offset+2+i*12+2;
 				
 				var region:InstrumentRegion=new InstrumentRegion();
 				region.parse(section);
+				
+				region.highEnd=region.lowEnd=i+low;
 				
 				instrument.regions[i]=region;
 			}
@@ -138,6 +144,7 @@
 		
 		private function parseSplitInstrument(section:ByteArray,offset:uint):Instrument {
 			var regionEnds:Vector.<uint>=new Vector.<uint>();
+			section.position=offset;
 			
 			for(;;) {
 				var regionEnd:uint=section.readUnsignedByte();
@@ -151,12 +158,11 @@
 			instrument.regions.length=regionEnds.length;
 			instrument.regions.fixed=true;
 			
-			section.position=8;
-			
 			var startPos:uint=0;
 			for(var i:uint=0;i<regionEnds.length;++i) {
-				
-				var region:ExtendedInstrumentRegion=new ExtendedInstrumentRegion();
+				//record length*record index+base offset+skipping the region end data
+				section.position=i*12+offset+8;
+				var region:InstrumentRegion=new InstrumentRegion();
 				region.parse(section);
 				region.lowEnd=startPos;
 				region.highEnd=regionEnds[i];

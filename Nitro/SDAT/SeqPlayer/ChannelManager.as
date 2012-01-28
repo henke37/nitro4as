@@ -75,7 +75,7 @@
 				
 				chanState.mixerChannel.loadWave(wave);
 				
-				chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.note);
+				chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.baseNote);
 			} else {
 				//TODO: watch further research on this part
 				chanState.freq = Tables.ADJUST_FREQ(-Tables.SOUND_FREQ(440*8), noteEvt.note, 69);

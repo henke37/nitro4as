@@ -12,7 +12,10 @@
 		/** The wave archive where in to find the sample for this region */
 		public var swar:uint;// the swar used. NB. cross-reference to "1.3.2 Info Block - Entry, Record 2 BANK"
 		
-		public var note:uint;
+		public var baseNote:uint;
+		
+		public var lowEnd:uint;//inclusive
+		public var highEnd:uint;//exclusive
 		
 		
 		public var attack:uint;// 0..127
@@ -30,7 +33,7 @@
 			swav=sdat.readUnsignedShort();
 			swar=sdat.readUnsignedShort();
 			
-			note=sdat.readUnsignedByte();
+			baseNote=sdat.readUnsignedByte();
 			
 			attack=sdat.readUnsignedByte();
 			decay=sdat.readUnsignedByte();
@@ -42,7 +45,7 @@
 		}
 		
 		public function matchesNote(n:uint):Boolean {
-			return n==note;
+			return n >= lowEnd && n <=highEnd;
 		}
 
 	}
