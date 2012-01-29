@@ -241,11 +241,13 @@
 					break;
 				}
 				
-				commandIndex++;
+				if(evt) {
+					commandIndex++;
 				
-				//must push null to keep indexes correct
-				seq.events.push(evt);
-				//trace(evt,commandIndex,data.position.toString(16));
+					//must push null to keep indexes correct
+					seq.events.push(evt);
+					//trace(evt,commandIndex,data.position.toString(16));
+				}
 				
 				if(newFlow && !(newFlow.rawOffset in flows)) {
 					unparsedFlows.push(newFlow);
