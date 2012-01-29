@@ -25,14 +25,10 @@
 			
 			var seq:Sequence=new Sequence();
 			
-			
-			
-			var trackStarts:Vector.<uint>=new Vector.<uint>();
-			
 			var newFlow:Flow;
 			
 			newFlow=new Flow(data.position);
-			trackStarts[0]=commandIndex;
+			seq.trackStarts[0]=commandIndex;
 			flows[data.position]=newFlow;
 			newFlow.parsed=true;
 			
@@ -63,7 +59,7 @@
 						var trackPos:uint=read3ByteInt(data);
 						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
 						newFlow=new Flow(trackPos);
-						trackStarts.push(trackPos);
+						newFlow.isTrack=true;
 					break;
 					
 					case 0x94:
@@ -247,10 +243,9 @@
 				
 				commandIndex++;
 				
-				if(evt) {
-					seq.events.push(evt);
-					//trace(evt,commandIndex,data.position.toString(16));
-				}
+				//must push null to keep indexes correct
+				seq.events.push(evt);
+				//trace(evt,commandIndex,data.position.toString(16));
 				
 				if(newFlow && !(newFlow.rawOffset in flows)) {
 					unparsedFlows.push(newFlow);
@@ -262,16 +257,16 @@
 						break;
 					} else {
 						var nextFlow:Flow=unparsedFlows.shift();
+						if(nextFlow.isTrack) {
+							seq.trackStarts.push(commandIndex);
+							trace("track");
+						}
 						data.position=nextFlow.rawOffset;
 						nextFlow.parsed=true;
 						nextFlow.commandIndex=commandIndex;
 						//trace("new flow at:",nextFlow.rawOffset.toString(16));
 					}
 				}
-			}
-			
-			for(var trackIndex:uint=0;trackIndex<trackStarts.length;++trackIndex) {
-				seq.trackStarts.push(flows[trackStarts[trackIndex]].commandIndex);
 			}
 			
 			return seq;
@@ -300,6 +295,7 @@ class Flow {
 	public var parsed:Boolean=false;
 	public var rawOffset:uint;
 	public var commandIndex:uint;
+	public var isTrack:Boolean;
 	
 	public function Flow(rawOffset:uint) {
 		this.rawOffset=rawOffset;
