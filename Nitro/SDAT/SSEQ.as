@@ -38,7 +38,9 @@
 			sequenceData.position=0;
 			sequenceData.endian=Endian.LITTLE_ENDIAN;
 			
-			sequence=SequenceDataParser.parse(sequenceData);
+			var parser:SequenceDataParser=new SequenceDataParser();
+			
+			sequence=parser.parse(sequenceData);
 		}
 
 	}

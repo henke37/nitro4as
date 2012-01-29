@@ -9,26 +9,32 @@
 	
 	public class SequenceDataParser {
 		
+		private var flows:Object;
+		private var unparsedFlows:Vector.<Flow>;
+		private var commandIndex:uint=0;
+		
+		public function SequenceDataParser() {
+			flows={};
+			unparsedFlows=new Vector.<Flow>();
+		}
+		
 		/** Parses sequence data
 		@param data The sequence data to parse
 		@return The parsed data*/
-		sequenceInternal static function parse(data:ByteArray):Sequence {
+		sequenceInternal function parse(data:ByteArray):Sequence {
 			
 			var seq:Sequence=new Sequence();
 			
-			var flows:Object={};
-			var unparsedFlows:Vector.<Flow>=new Vector.<Flow>();
+			
 			
 			var trackStarts:Vector.<uint>=new Vector.<uint>();
 			
 			var newFlow:Flow;
 			
-			newFlow=new Flow(0);
-			trackStarts[0]=0;
-			flows[0]=newFlow;
+			newFlow=new Flow(data.position);
+			trackStarts[0]=commandIndex;
+			flows[data.position]=newFlow;
 			newFlow.parsed=true;
-			
-			var commandIndex:uint=0;
 			
 			for(;;) {
 				
