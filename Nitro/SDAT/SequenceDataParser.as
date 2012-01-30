@@ -32,6 +32,9 @@
 			flows[data.position]=newFlow;
 			newFlow.parsed=true;
 			
+			var untranslatedJumps:Vector.<JumpEvent>=new Vector.<JumpEvent>();
+			var jmpEvt:JumpEvent;
+			
 			for(;;) {
 				
 				var flowOver:Boolean=false;
@@ -64,14 +67,16 @@
 					
 					case 0x94:
 						var jmpTarget:uint=read3ByteInt(data);
-						evt=new JumpEvent(jmpTarget,false);
+						evt=jmpEvt=new JumpEvent(jmpTarget,false);
+						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
 						flowOver=true;
 					break;
 					
 					case 0x95://call
 						jmpTarget=read3ByteInt(data);
-						evt=new JumpEvent(jmpTarget,true);
+						evt=jmpEvt=new JumpEvent(jmpTarget,true);
+						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
 					break;
 					
@@ -268,7 +273,12 @@
 						nextFlow.commandIndex=commandIndex;
 						//trace("new flow at:",nextFlow.rawOffset.toString(16));
 					}
-				}
+				}//end if flowOver
+			}//end forever
+			
+			for(var i:uint=0;i<untranslatedJumps.length;++i) {
+				jmpEvt=untranslatedJumps[i];
+				jmpEvt.target=flows[jmpEvt.target].commandIndex;
 			}
 			
 			return seq;
