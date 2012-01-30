@@ -266,7 +266,6 @@
 						var nextFlow:Flow=unparsedFlows.shift();
 						if(nextFlow.isTrack) {
 							seq.trackStarts.push(commandIndex);
-							trace("track");
 						}
 						data.position=nextFlow.rawOffset;
 						nextFlow.parsed=true;
