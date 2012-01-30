@@ -48,6 +48,7 @@
 		public function rend(b:ByteArray,s:uint):uint {
 			
 			var totalSamples:uint=0;
+			var samplesLeft:uint=s;
 			
 			do {
 				
@@ -55,9 +56,10 @@
 					callbackTimer=callback();
 				}
 				
-				var chunkSamples:uint=(s<callbackTimer?s:callbackTimer);
+				var chunkSamples:uint=(samplesLeft<callbackTimer?samplesLeft:callbackTimer);
 				var renderedSamples:uint=rendChunk(b,chunkSamples);
 				totalSamples+=renderedSamples;
+				samplesLeft-=renderedSamples;
 				
 				if(callbackTimer>0) {
 					callbackTimer-=renderedSamples;
