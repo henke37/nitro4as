@@ -72,6 +72,7 @@
 			ampl=-ADSR_THRESHOLD;
 			
 			active=true;
+			mixerChannel.enabled=true;
 			
 			modDelayCnt=0;
 			
@@ -156,7 +157,7 @@
 			if (pan < 0) pan = 0;
 			if (pan > 127) pan = 127;
 			
-			mixerChannel.volume=totalVolume;
+			mixerChannel.volume=1;//totalVolume;
 			mixerChannel.pan=(pan-64)/64.0;
 			
 			var totalTimer:uint=timer;
@@ -168,11 +169,15 @@
 			mixerChannel.timer=totalTimer;
 		}
 		
+		/** Starts the release phase of a note
+		
+		<p>Called by the ChannelManager when the note should cease to be sustained.</p>*/
 		public function endNote():void {
 			adsrState=STATE_RELEASE;
 			priority=1;
 		}
 		
+		/** Called when the adsr curve hits the end */
 		private function killSound():void {
 			active=false;
 			priority=1;

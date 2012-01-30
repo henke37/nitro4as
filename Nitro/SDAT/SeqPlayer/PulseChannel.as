@@ -15,6 +15,10 @@
 			pulseTimer=0;
 			super.reset();
 		}
+		
+		protected override function nextGenSample():Number {
+			return Math.random();
+		}
 
 	}
 	

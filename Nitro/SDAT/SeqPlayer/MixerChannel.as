@@ -66,13 +66,20 @@
 		
 		private function sampleGen(b:ByteArray,s:uint):uint {
 			
+			const startPos:uint=b.position;
+			
 			var generatedSamples:uint=resampler.generate(b,s);
 			
+			b.position=startPos;
+			
+			const left:Number=volume;
+			const right:Number=volume;
+
 			for(var i:uint;i<generatedSamples;++i) {
 				//left
 				var sample:Number=b.readFloat();
 				
-				sample*=volume;
+				sample*=left;
 				
 				b.position-=4;
 				b.writeFloat(sample);
@@ -80,7 +87,7 @@
 				//right
 				sample=b.readFloat();
 				
-				sample*=volume;
+				sample*=right;
 				
 				b.position-=4;
 				b.writeFloat(sample);
@@ -98,13 +105,15 @@
 		}
 		
 		private function psgGen(b:ByteArray,l:uint):void {
+			
+			const left:Number=volume;
+			const right:Number=volume;
+			
 			for(var i:uint=0;i<l;++i) {
 				var sample:Number=nextGenSample();
 				
-				sample*=volume;
-				
-				b.writeFloat(sample);
-				b.writeFloat(sample);
+				b.writeFloat(sample*left);
+				b.writeFloat(sample*right);
 			}
 		}
 		

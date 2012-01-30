@@ -66,6 +66,8 @@
 			
 			chanState.vel=noteEvt.velocity;
 			
+			chanState.priority=trackState.priority;
+			
 			chanState.instrumentPan=region.pan;
 			
 			chanState.mixerChannel.reset();
@@ -176,23 +178,36 @@
 			
 			var candidates:Vector.<uint>=chnArrayArray[type];
 			
+			var bestIndex:uint;
+			
 			for each(var candidateIndex:uint in candidates) {
 				var candidateChannel:ChannelState=channels[candidateIndex];
+				
+				if(!candidateChannel.active) {
+					bestChannel=candidateChannel;
+					bestIndex=candidateIndex;
+					break;
+				}
 				
 				if(bestChannel) {
 					if(bestChannel.priority>candidateChannel.priority) {
 						bestChannel=candidateChannel;
+						bestIndex=candidateIndex;
 					} else if(bestChannel.priority==candidateChannel.priority) {
 						if(bestChannel.ampl>candidateChannel.priority) {
 							bestChannel=candidateChannel;
+							bestIndex=candidateIndex;
 						}
 					}
 				} else {
 					if(prio>candidateChannel.priority) {
 						bestChannel=candidateChannel;
+						bestIndex=candidateIndex;
 					}
 				}
 			}
+			
+			trace(bestIndex);
 			
 			return bestChannel;
 		}

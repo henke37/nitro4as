@@ -77,7 +77,7 @@
 		private function rendChunk(b:ByteArray,s:uint):uint {
 			var i:uint;
 			var sample:Number;
-			var startOffset:uint=b.position;
+			const startOffset:uint=b.position;
 			
 			for(i=0;i<s;++i) {
 				b.writeFloat(0);
@@ -87,9 +87,11 @@
 			for each (var channel:MixerChannel in channels) {
 				if(!channel.enabled) continue;
 				
-				readScratchBuffer.position=0
+				readScratchBuffer.position=0;
 				
 				var readSamples:uint=channel.genSamples(readScratchBuffer,s);
+				
+				readScratchBuffer.position=0;
 				
 				var loopEnd:uint=readSamples*2;
 				b.position=startOffset;
