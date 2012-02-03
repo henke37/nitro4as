@@ -26,7 +26,9 @@
 		private var resampler:Resampler;
 		
 		private var _timer:uint;
-		private var freq:uint;
+		private var _freq:uint;
+		
+		private var _wave:Wave;
 		
 		public var enabled:Boolean;
 
@@ -36,9 +38,16 @@
 		
 		/** Loads an audio sample for playback into the channel
 		@param w The wave to load*/
-		public function loadWave(w:Wave):void {
-			decoder=new WaveDecoder(w);
-			resampler=new HoldResampler(freq,44100,decoder.render);
+		public function set wave(w:Wave):void {
+			_wave=w;
+			if(w) {
+				decoder=new WaveDecoder(w);
+				resampler=new HoldResampler(0,44100,decoder.render);
+				setResamplerInput();
+			} else {
+				decoder=null;
+				resampler=null;
+			}
 		}
 		
 		/** Resets the channel */
@@ -117,20 +126,27 @@
 			}
 		}
 		
-		protected function nextGenSample():Number { return 0; }
+		protected function nextGenSample():Number { return 0; }		
 		
-		public function set timer(t:int):void {
+		public function get freq():uint {return _freq;}
+		
+		public function set freq(f:uint):void {
 			
-			freq=-(33513982/2)/t;
+			if(f>22050) throw new RangeError("That's a silly high frequency!");
+			if(f<=0) throw new RangeError("The frequency must be higher than zero!");
 			
 			if(resampler) {
-				resampler.inputRate=freq;
+				setResamplerInput();
 			}
 			
-			_timer=t;
+			_freq=f;
 		}
 		
-		public function get timer():int { return _timer; }
+		private function setResamplerInput():void {
+			resampler.inputRate=_wave.samplerate;
+		}
+		
+		
 
 	}
 	

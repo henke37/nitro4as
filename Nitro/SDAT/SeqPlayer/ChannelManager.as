@@ -75,12 +75,12 @@
 			if(instrument.noteType==Instrument.NOTETYPE_PCM) {
 				var wave:Wave=waveArchives[region.swar].waves[region.swav];
 				
-				chanState.mixerChannel.loadWave(wave);
+				chanState.mixerChannel.wave=wave;
 				
-				chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.baseNote);
+				//chanState.freq = Tables.ADJUST_FREQ(wave.duration, noteEvt.note, region.baseNote);
 			} else {
 				//TODO: watch further research on this part
-				chanState.freq = Tables.ADJUST_FREQ(-Tables.SOUND_FREQ(440*8), noteEvt.note, 69);
+				//chanState.freq = Tables.ADJUST_FREQ(-Tables.SOUND_FREQ(440*8), noteEvt.note, 69);
 				chanState.mixerChannel.psgMode=true;
 				
 				if(instrument.noteType==Instrument.NOTETYPE_PULSE) {
@@ -89,7 +89,10 @@
 				}
 			} 
 			
-			chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+			//chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+			
+			chanState.pitch=noteEvt.note;
+			chanState.basePitch=region.baseNote;
 			
 			chanState.start();
 			
@@ -99,7 +102,7 @@
 			for each(var chanState:ChannelState in channels) {
 				if(chanState.track!=trackState) continue;
 				
-				chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+				//chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
 			}
 		}
 		
