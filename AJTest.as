@@ -59,6 +59,8 @@
 			transparent_mc.addEventListener(Event.CHANGE,change);
 			
 			ripall_mc.addEventListener(ComponentEvent.BUTTON_DOWN,startRip);
+			
+			//dumpArchive("cpac_3d.bin",0);
 		}
 		
 		private function loadSubArchive():void {
@@ -88,6 +90,8 @@
 		private function loadImage(subid:uint,transparent:Boolean):void {
 			
 			var subfile:ByteArray=subarchive.open(subid);
+			
+			if(!subfile) throw new Error("unused archive slot");
 			
 			var pict:IndexedBitmap=new IndexedBitmap();
 			pict.parse(subfile);
@@ -151,9 +155,11 @@
 			for(var subid:uint=0;subid<subarchive.length;++subid) {
 			
 				subfile=subarchive.open(subid);
+				
+				if(!subfile) continue;
 			
 				var fs:FileStream=new FileStream();
-				fs.open(new File("C:\\Users\\Henrik\\Desktop\\ds reverse engineering\\unpacked\\aj unpacked\\data\\cpack_2d\\"+id+"\\"+subid+".bin"),FileMode.WRITE);
+				fs.open(new File("C:\\Users\\Henrik\\Desktop\\ds reverse engineering\\unpacked\\aj unpacked\\data\\"+fileName.match(/^[^\.]+/)[0]+"\\"+id+"\\"+subid+".bin"),FileMode.WRITE);
 				
 				fs.writeBytes(subfile);
 				
