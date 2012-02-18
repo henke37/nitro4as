@@ -27,9 +27,12 @@
 		/** The samplerate of the sound, measured in Hz*/
 		public var samplerate:uint;
 		
-		public var duration:uint;
+		/** The period of the sound, expressed as a timer value */
+		public var timerLen:uint;
 		
+		/** The ByteArray where the audio data is stored */
 		public var sdat:ByteArray;
+		/** The position in the ByteArray where the data is stored */
 		public var dataPos:uint;
 
 		public function Wave() {
@@ -46,7 +49,7 @@
 			encoding=sdat.readByte();
 			loops=sdat.readBoolean();
 			samplerate=sdat.readUnsignedShort();
-			duration=sdat.readUnsignedShort();
+			timerLen=sdat.readUnsignedShort();
 			loopStart=sdat.readUnsignedShort();
 			nonLoopLength=sdat.readUnsignedInt();
 			
@@ -81,8 +84,8 @@
 		}
 		
 		public function toString():String {
-			var o:String="[Wave ";
-			o+=duration.toString()+" ";
+			var o:String="[Wave len=";
+			o+=sampleCount.toString()+" ";
 			if(loops) {
 				o+="loops: "+loopStart.toString()+"-"+nonLoopLength.toString()+" ";
 			}
