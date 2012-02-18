@@ -126,7 +126,13 @@
 			}
 		}
 		
-		protected function nextGenSample():Number { return 0; }		
+		protected function nextGenSample():Number { return 0; }
+		
+		public function set timer(t:int):void {
+			freq=Tables.timer2Freq(t);
+		}
+		
+		public function get timer():int { return Tables.freq2Timer(_freq); }
 		
 		public function get freq():uint {return _freq;}
 		

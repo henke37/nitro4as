@@ -42,8 +42,10 @@
 		private static const ADSR_K_AMP2VOL:uint=723;
 		private static const ADSR_THRESHOLD:uint=ADSR_K_AMP2VOL*128;
 		
-		public var pitch:uint,basePitch:uint;
-		public var baseFreq:Number;
+		/** The timer value, before pitch shifting*/
+		public var baseTimer:int;
+		/** The timer value, after pitch shifting*/
+		public var timer:int;
 		
 		/** The MixerChannel that is being controlled */
 		internal var mixerChannel:MixerChannel;
@@ -157,14 +159,14 @@
 			
 			mixerChannel.volume=1;//totalVolume;
 			mixerChannel.pan=(pan-64)/64.0;
-						
+			
+			var totalTimer:int=baseTimer;
+			
 			if(track.modType==MOD_FREQ) {
-				//totalTimer=Tables.AdjustFreq(totalTimer,modParam);
+				totalTimer=Tables.adjustTimer(totalTimer,modParam);
 			}
 			
-			var targetFreq:Number=Math.pow(2,(pitch-69)/12);
-			
-			mixerChannel.freq=targetFreq;
+			mixerChannel.timer=totalTimer;
 		}
 		
 		/** Starts the release phase of a note

@@ -29,8 +29,15 @@
 			return cnvSustain(vol>>7);
 		}
 		
-		public static function AdjustFreq(basefreq:uint, pitch:int):uint {
-			var freq:uint;
+		/** Adjusts a timer value to account for pitch shifting
+		@param baseTimer The original timer value for the sound
+		@param pitch The pitch
+		@return The adjusted timer value
+		
+		<p>This function was originally called "Adjustfreq", but that name was misleading.</p>
+		*/
+		public static function adjustTimer(baseTimer:uint, pitch:int):uint {
+			var timer:uint;
 			var shift:int = 0;
 			pitch = -pitch;
 			while (pitch < 0)
@@ -43,31 +50,43 @@
 				shift ++;
 				pitch -= 0x300;
 			}
-			freq = basefreq * (pitchTable[pitch] + 0x10000);
+			timer = baseTimer * (pitchTable[pitch] + 0x10000);
 			shift -= 16;
 			if (shift <= 0)
-				freq >>= -shift;
+				timer >>= -shift;
 			else if (shift < 32)
 			{
-				if (freq & ((0xFFFFFFFF) << (32-shift))) return 0xFFFF;
-				freq <<= shift;
+				if (timer & ((0xFFFFFFFF) << (32-shift))) return 0xFFFF;
+				timer <<= shift;
 			}else
 				return 0x10;
-			if (freq < 0x10) return 0x10;
-			if (freq > 0xFFFF) return 0xFFFF;
-			return freq & 0xFFFF;
+			if (timer < 0x10) return 0x10;
+			if (timer > 0xFFFF) return 0xFFFF;
+			return timer & 0xFFFF;
 		}
 		
-		public static function ADJUST_FREQ(basefreq:uint, noteN:int, baseN:int):uint {
-			return AdjustFreq(basefreq, ((noteN - baseN) * 64));
+		public static function adjustTimerForNote(baseTimer:int, noteN:int, baseN:int):int {
+			return adjustTimer(baseTimer, ((noteN - baseN) * 64));
 		}
 		
-		public static function ADJUST_PITCH_BEND(basefreq:uint, pitchb:int, pitchr:int):uint {
-			if (!pitchb) return basefreq;
-			return AdjustFreq(basefreq, (pitchb*pitchr) >> 1);
+		public static function adjustTimerForPitchBend(baseTimer:int, pitchb:int, pitchr:int):int {
+			if (!pitchb) return baseTimer;
+			return adjustTimer(baseTimer, (pitchb*pitchr) >> 1);
 		}
 		
-		public static function SOUND_FREQ(n:int):int {
+		/** Converts a frequency to the corresponding timer value
+		@param n The frequency in Hz
+		@return The timer value
+		*/
+		public static function freq2Timer(n:int):int {
+			return -0x1000000 / (n);
+		}
+		
+		/** Converts a timer value to the corresponding frequency
+		@param n The timer value
+		@return The frequency in Hz
+		*/
+		public static function timer2Freq(n:int):int {
 			return -0x1000000 / (n);
 		}
 		
