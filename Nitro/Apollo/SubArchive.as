@@ -64,6 +64,8 @@
 			
 			var entry:SubFileEntry=subfiles[id];
 			
+			if(!entry) return null;
+			
 			var out:ByteArray=new ByteArray();
 			
 			data.position=entry.offset;
