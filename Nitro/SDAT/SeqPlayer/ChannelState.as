@@ -167,12 +167,19 @@
 			}
 			
 			mixerChannel.timer=totalTimer;
+			
+			if(countDown) {
+				countDown--;
+			} else {
+				endNote();
+			}
+			
+			//trace(adsrState,ampl,totalVolume,sustainLevel);
 		}
 		
-		/** Starts the release phase of a note
-		
-		<p>Called by the ChannelManager when the note should cease to be sustained.</p>*/
-		public function endNote():void {
+		/** Called when the note has played long enough */
+		private function endNote():void {
+			//trace("Note released");
 			adsrState=STATE_RELEASE;
 			priority=1;
 		}

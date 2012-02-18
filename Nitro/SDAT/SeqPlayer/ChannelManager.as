@@ -57,7 +57,7 @@
 			
 			chanState.countDown=noteEvt.duration;
 			
-			trace("allocated new channel with a duration of",noteEvt.duration);
+			trace("allocated new channel with a duration of",noteEvt.duration,"update ticks");
 			
 			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
 			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
@@ -110,18 +110,6 @@
 			for each(var channel:ChannelState in channels) {
 				if(!channel.active) continue;
 				channel.tick();
-			}
-		}
-		
-		internal function countDownChannels():void {
-			for each(var channel:ChannelState in channels) {
-				if(!channel.active) continue;
-				
-				if(channel.countDown) {
-					channel.countDown--;
-				} else {
-					channel.endNote();
-				}
 			}
 		}
 		
