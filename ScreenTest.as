@@ -20,7 +20,7 @@
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,parse);
-			loader.load(new URLRequest("game.nds"));
+			loader.load(new URLRequest("gk2.nds"));
 			
 			stage.align=StageAlign.TOP_LEFT;
 		}
