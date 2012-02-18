@@ -138,7 +138,7 @@
 		
 		public function set freq(f:uint):void {
 			
-			if(f>22050) throw new RangeError("That's a silly high frequency!");
+			//if(f>44100) throw new RangeError("That's a silly high frequency!");
 			if(f<=0) throw new RangeError("The frequency must be higher than zero!");
 			
 			if(resampler) {

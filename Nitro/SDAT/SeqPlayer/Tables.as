@@ -36,7 +36,7 @@
 		
 		<p>This function was originally called "Adjustfreq", but that name was misleading.</p>
 		*/
-		public static function adjustTimer(baseTimer:uint, pitch:int):uint {
+		public static function adjustTimer(baseTimer:uint, pitch:int):int {
 			var timer:uint;
 			var shift:int = 0;
 			pitch = -pitch;
@@ -79,7 +79,7 @@
 		@return The timer value
 		*/
 		public static function freq2Timer(n:int):int {
-			return -0x1000000 / (n);
+			return 0x1000000 / (n);
 		}
 		
 		/** Converts a timer value to the corresponding frequency
@@ -87,7 +87,7 @@
 		@return The frequency in Hz
 		*/
 		public static function timer2Freq(n:int):int {
-			return -0x1000000 / (n);
+			return 0x1000000 / (n);
 		}
 		
 		public static const volTable:Vector.<uint> = new <uint> [
