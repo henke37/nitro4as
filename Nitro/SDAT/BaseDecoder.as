@@ -16,8 +16,8 @@
 		private static function byteToNumber(byte:int):Number {
 			return (Number(byte)/128);
 		}
-		private static function shortToNumber(short:uint):Number {
-			return Number(short)/(1<<16);
+		private static function shortToNumber(short:int):Number {
+			return Number(short)/0x8000;
 		}
 		
 		protected function decodePCM(ib:ByteArray,blockSamples:uint,encoding:uint,outBuf:Vector.<Number>):void {
@@ -26,7 +26,7 @@
 			
 			if(encoding==1) {
 				for(i=0;i<blockSamples;++i) {
-					sample=shortToNumber(ib.readUnsignedShort());
+					sample=shortToNumber(ib.readShort());
 					outBuf[i]=sample;
 				}
 			} else {

@@ -40,16 +40,18 @@
 				buf.fixed=true;
 				decodeBuffers.push(buf);
 			}
-			decoders.fixed=true;
+			decodeBuffers.fixed=true;
 			if(stream.encoding==Wave.ADPCM) {
-				decodeBuffers.fixed=true;
+				decoders.fixed=true;
+
 			}
 			
 		}
 		
 		/** The playback position, measured in samples */
 		public override function get playbackPosition():uint {
-			return blockNumber*stream.blockSamples+lastBlockSamplesUsed;
+			//trace(lastBlockSamplesUsed,blockNumber*stream.blockSamples,blockNumber,stream.blockSamples);
+			return (blockNumber-1)*stream.blockSamples+lastBlockSamplesUsed;
 		}
 		
 		/** Resets decoding to the initial state */
@@ -74,7 +76,7 @@
 			
 			var samplesLeftToDecode:uint=renderSize;
 			
-			while(true) {
+			do {
 	
 				//write leftovers from last call
 				var samplesLeftOver:uint=lastBlockSamplesTotal-lastBlockSamplesUsed;
@@ -154,10 +156,11 @@
 					
 				}// end for each channel
 				
+				
 				lastBlockSamplesUsed=0;
 				lastBlockSamplesTotal=blockSamples;
 				blockNumber++;
-			}// end until enough decoded
+			} while(true);// end until enough decoded
 			
 			return renderSize-samplesLeftToDecode;
 		}
