@@ -62,7 +62,7 @@
 		private function listWaveArchiveContent(swar:SWAR):void {
 			var i:uint;
 			for each(var wave:Wave in swar.waves) {
-				var o:String="  "+i+" "+Wave.encodingAsString(wave.encoding)+" "+wave.duration+" "+wave.loops;
+				var o:String="  "+i+" "+Wave.encodingAsString(wave.encoding)+" "+wave.timerLen+" "+wave.loops;
 				if(wave.loops) {
 					o+=" "+wave.loopStart+" "+wave.nonLoopLength;
 				}
