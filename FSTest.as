@@ -21,14 +21,14 @@
 		
 		private var loader:URLLoader;
 		
-		private var nds:NDS;
-		
 		private var status:TextField;
 		private var title:TextField;
 		private var playback:TextField;
 		
 		private static const iconZoom:Number=10;
 		private static const titleHeight:Number=40;
+		
+		private var sources:DataProvider;
 		
 		private var playingItem:Object;
 		private var player:BasePlayer;
@@ -38,10 +38,13 @@
 		public var source_mc:ComboBox;
 		
 		private var loopMark:Shape;
+		private var icon:Bitmap;
 		
 		public function FSTest() {
 			
 			//stage.align=StageAlign.TOP_LEFT;
+			
+			sources=new DataProvider();
 			
 			status=new TextField();
 			status.x=Banner.ICON_WIDTH*iconZoom;
@@ -85,6 +88,7 @@
 			source_mc.width=550-Banner.ICON_WIDTH*iconZoom;
 			source_mc.addEventListener(Event.CHANGE,sourceChange);
 			source_mc.visible=false;
+			source_mc.dataProvider=sources;
 			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
@@ -102,7 +106,14 @@
 			loopMark.graphics.lineTo(0,2);
 			loopMark.visible=false;
 			
+			icon=new Bitmap();
+			icon.scaleX=iconZoom;
+			icon.scaleY=iconZoom;
+			addChild(icon);
+			
 			addEventListener(Event.ENTER_FRAME,updatePosition);
+			
+			return;//explicit return to suppress harmful code that the flash IDE injects beyond this point.
 		}
 		
 		private function updatePosition(e:Event):void {
@@ -147,7 +158,7 @@
 			
 			fr=new FileReference();
 			fr.addEventListener(Event.SELECT,fileSelected);
-			fr.browse([new FileFilter("Nitro games","*.nds")]);
+			fr.browse([new FileFilter("Nitro games","*.nds"),new FileFilter("SDAT archives","*.sdat")]);
 		}
 		
 		private function fileSelected(e:Event):void {
@@ -160,24 +171,24 @@
 		}
 		
 		private function frLoaded(e:Event):void {
-			nds=new NDS();
-			nds.parse(fr.data);
-			setup();
+			if(RegExp(/\.nds$/i).test(fr.name)) {
+				loadNDS(fr.data);
+			} else if(RegExp(/\.sdat$/i).test(fr.name)) {
+				loadSDAT(fr.data,fr.name);
+				filesLoaded();
+			}
 		}
 		
 		private function loaded(e:Event):void {
-			nds=new NDS();
-			nds.parse(loader.data);
-			setup();
+			loadNDS(loader.data);
 		}
 		
-		private function setup():void {
+		private function loadNDS(data:ByteArray):void {
+			var nds:NDS=new NDS();
+			nds.parse(fr.data);
 			
 			if(nds.banner) {
-				var icon:Bitmap=new Bitmap(nds.banner.icon);
-				icon.scaleX=iconZoom;
-				icon.scaleY=iconZoom;
-				addChild(icon);
+				icon.bitmapData=nds.banner.icon;
 				
 				title.text=nds.banner.enTitle;
 			}
@@ -188,65 +199,72 @@
 				return;
 			}
 			
-			var sources:DataProvider=new DataProvider();
-			
 			var fileId:uint=0;
 			for each(var fileRef:File in files) {
 			
 				var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
-				var sdat:SDAT=new SDAT();
-				sdat.parse(fileContents);
+				
 				
 				var fileName:String=nds.fileSystem.getFullNameForFile(fileRef);
 				
-				if(sdat.streamInfo.length==0) {
-					status.text="No Streams";
-				} else {
-					var streamSource:Object={};
-					streamSource.dataProvider=listStreams(sdat);
-					streamSource.name="Streams";
-					streamSource.fileName=fileName;
-					streamSource.fileIndex=fileId;
-					sources.addItem(streamSource);
-				}
-				
-				if(sdat.waveArchiveInfo.length>0) {
-					for(var archiveIndex:uint=0;archiveIndex<sdat.waveArchiveInfo.length;++archiveIndex) {
-						var archive:SWAR=sdat.openSWAR(archiveIndex);
-						
-						var archiveSource:Object={};
-						var name:String;
-						
-						if(sdat.waveArchiveSymbols) {
-							name=sdat.waveArchiveSymbols[archiveIndex];
-						}
-						
-						if(!name) {
-							name="SWAR #"+archiveIndex;
-						}
-						archiveSource.name=name;
-						archiveSource.fileName=fileName;
-						archiveSource.fileIndex=fileId;
-						archiveSource.dataProvider=listSwar(archive);
-						sources.addItem(archiveSource);
-					}
-				}
+				loadSDAT(fileContents,fileName,fileId);
 				
 				++fileId;
 			}
 			
+			filesLoaded();
+
+		}
+		
+		private function filesLoaded():void {
 			if(sources.length>0) {			
 				list_mc.visible=true;
 				status.visible=false;
 				progress_mc.visible=true;
 				
-				source_mc.dataProvider=sources;
 				source_mc.selectedIndex=0;
 				source_mc.visible=sources.length>1;
 				
 				sourceChange(null);
 			}
-
+		}
+		
+		private function loadSDAT(fileContents:ByteArray,fileName:String,fileId:uint=0):void {
+			var sdat:SDAT=new SDAT();
+			sdat.parse(fileContents);
+			
+			if(sdat.streamInfo.length==0) {
+				status.text="No Streams";
+			} else {
+				var streamSource:Object={};
+				streamSource.dataProvider=listStreams(sdat);
+				streamSource.name="Streams";
+				streamSource.fileName=fileName;
+				streamSource.fileIndex=fileId;
+				sources.addItem(streamSource);
+			}
+			
+			if(sdat.waveArchiveInfo.length>0) {
+				for(var archiveIndex:uint=0;archiveIndex<sdat.waveArchiveInfo.length;++archiveIndex) {
+					var archive:SWAR=sdat.openSWAR(archiveIndex);
+					
+					var archiveSource:Object={};
+					var name:String;
+					
+					if(sdat.waveArchiveSymbols) {
+						name=sdat.waveArchiveSymbols[archiveIndex];
+					}
+					
+					if(!name) {
+						name="SWAR #"+archiveIndex;
+					}
+					archiveSource.name=name;
+					archiveSource.fileName=fileName;
+					archiveSource.fileIndex=fileId;
+					archiveSource.dataProvider=listSwar(archive);
+					sources.addItem(archiveSource);
+				}
+			}
 		}
 		
 		private function sourceChange(e:Event):void {
