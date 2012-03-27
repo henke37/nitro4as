@@ -22,26 +22,34 @@
 			type>>=4;
 			var length:uint=read3ByteUint(data);
 			
-			switch(type) {
+			var o:ByteArray;
+			
+			switch(type& ~8) {
 				
 				case 0://Uncompressed
-					var o:ByteArray=new ByteArray();
+					o=new ByteArray();
 					data.readBytes(o,0,length);
-					return o;
+					
 				break;
 				
 				case 1://LZ77
-					return ExtendedLZ77decoder.decode(data,length,variant==1);
+					o=ExtendedLZ77decoder.decode(data,length,variant==1);
 				break;
 				
 				case 2://Huffman
 				case 3://RLE
-				case 8://Delta coded
+				
 				
 				default:
 					throw new ArgumentError("unsupported compression format");
 				break;
 			}
+			
+			if((type&8)==8) {//Delta coded
+				diffUnFilter(o,8,length);
+			}
+			
+			return o;
 		}
 		
 		private static function read3ByteUint(data:ByteArray):uint {
