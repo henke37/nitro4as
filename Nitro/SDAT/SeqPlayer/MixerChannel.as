@@ -25,7 +25,6 @@
 		private var decoder:WaveDecoder;
 		private var resampler:Resampler;
 		
-		private var _timer:uint;
 		private var _freq:uint;
 		
 		private var _wave:Wave;
@@ -79,12 +78,15 @@
 			
 			var generatedSamples:uint=resampler.generate(b,s);
 			
+			if(generatedSamples>s) throw new Error("Generated too many samples!");
+			
 			b.position=startPos;
 			
+			//todo: acount for pan
 			const left:Number=volume;
 			const right:Number=volume;
 
-			for(var i:uint;i<generatedSamples;++i) {
+			for(var i:uint=0;i<generatedSamples;++i) {
 				//left
 				var sample:Number=b.readFloat();
 				
@@ -109,7 +111,7 @@
 				dispatchEvent(new Event(Event.COMPLETE));
 			}
 			
-			//todo: acount for pan and volume
+			
 			return generatedSamples;
 		}
 		

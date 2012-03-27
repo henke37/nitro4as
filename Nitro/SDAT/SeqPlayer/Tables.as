@@ -4,28 +4,30 @@
 	public class Tables {
 		
 		public static function soundSin(arg:uint):int {
-			if (arg < 1*soundSinTable.length) return soundSinTable[arg];
-			if (arg < 2*soundSinTable.length) return soundSinTable[2*soundSinTable.length - arg];
-			if (arg < 3*soundSinTable.length) return -soundSinTable[arg - 2*soundSinTable.length];
-			/*else*/ return -soundSinTable[4*soundSinTable.length - arg];
+			const quadrant_size:uint=32;
+			//trace(arg,soundSinTable.length);
+			if (arg < 1*quadrant_size) return soundSinTable[arg];
+			if (arg < 2*quadrant_size) return soundSinTable[2*quadrant_size - arg];
+			if (arg < 3*quadrant_size) return -soundSinTable[arg - 2*quadrant_size];
+			/*else*/ return -soundSinTable[4*quadrant_size - arg];
 		}
 		
-		public static function cnvFall(fall:uint):uint {
+		public static function cnvFall(fall:uint):int {
 			if (fall == 0x7F) return 0xFFFF;
 			else if (fall == 0x7E) return 0x3C00;
 			else if (fall < 0x32) return ((fall<<1)+1) & 0xFFFF;
 			else return (0x1E00/(0x7E - fall)) & 0xFFFF;
 		}
 		
-		public static function cnvAttack(attk:uint):uint {
+		public static function cnvAttack(attk:int):int {
 			return (attk >= 0x6D) ? attackTable[0x7F-attk] : (0xFF-attk);
 		}
 		
-		public static function cnvSustain(sust:uint):uint {
+		public static function cnvSustain(sust:int):int {
 			return (sust == 0x7F) ? 0 : -((0x10000-sustainTable[sust]) << 7);
 		}
 		
-		public static function cnvVol(vol:uint):uint {
+		public static function cnvVol(vol:int):int {
 			return cnvSustain(vol>>7);
 		}
 		

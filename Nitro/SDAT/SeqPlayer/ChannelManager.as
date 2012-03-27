@@ -99,7 +99,7 @@
 			for each(var chanState:ChannelState in channels) {
 				if(chanState.track!=trackState) continue;
 				
-				//chanState.timer = Tables.ADJUST_PITCH_BEND(chanState.freq, trackState.pitchBend, trackState.pitchBendRange);
+				chanState.timer = Tables.adjustTimerForPitchBend(chanState.baseTimer, trackState.pitchBend, trackState.pitchBendRange);
 			}
 		}
 		
@@ -161,8 +161,6 @@
 		
 		private function allocateChannel(type:uint,prio:uint):ChannelState {
 			var bestChannel:ChannelState;
-			
-			var arrs=chnArrayArray;
 			
 			var candidates:Vector.<uint>=chnArrayArray[type];
 			

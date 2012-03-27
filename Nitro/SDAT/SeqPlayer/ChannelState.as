@@ -25,14 +25,14 @@
 		/** The priority of the sound playing on the channel */
 		public var priority:uint;
 		
-		public var attackRate:uint;
-		public var decayRate:uint;
-		public var sustainLevel:uint;
-		public var releaseRate:uint;
+		public var attackRate:int;
+		public var decayRate:int;
+		public var sustainLevel:int;
+		public var releaseRate:int;
 		public var adsrState:uint;
 		
 		/** The ADSR attunuation */
-		internal var ampl:uint;
+		internal var ampl:int;
 
 		private static const STATE_ATTACK:uint=1;
 		private static const STATE_DECAY:uint=2;
@@ -138,7 +138,7 @@
 			totalvol += CONV_VOL(VEL);
 			totalvol += AMPL >> 7;*/
 			
-			var totalVolume:uint=Tables.cnvVol(127);
+			var totalVolume:int=Tables.cnvVol(127);
 			totalVolume+=Tables.cnvVol(track.volume);
 			totalVolume+=Tables.cnvVol(track.expression);
 			totalVolume+=Tables.cnvVol(vel);
@@ -146,6 +146,7 @@
 			
 			if(track.modType==MOD_VOL) {
 				totalVolume+=modParam;
+				if (totalVolume > 0) totalVolume = 0;
 			}
 			
 			totalVolume += 723;
@@ -157,7 +158,9 @@
 			if (pan < 0) pan = 0;
 			if (pan > 127) pan = 127;
 			
-			mixerChannel.volume=1;//totalVolume;
+			trace(totalVolume,ampl,ampl>>7);
+			
+			mixerChannel.volume=totalVolume/723.0;
 			mixerChannel.pan=(pan-64)/64.0;
 			
 			var totalTimer:int=baseTimer;
