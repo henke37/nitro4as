@@ -16,7 +16,7 @@
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,loaded);
-			loader.load(new URLRequest("game.nds"));
+			loader.load(new URLRequest("gk2.nds"));
 		}
 		
 		private function loaded(e:Event):void {
