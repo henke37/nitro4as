@@ -8,16 +8,16 @@
 	
 	public class CompressionTest extends MovieClip {
 		
-		[Embed(source="compression examples/my.img.raw", mimeType="application/octet-stream")]
+		[Embed(source="compression examples/img.raw.bin", mimeType="application/octet-stream")]
 		private const rawClass:Class;
 		
-		[Embed(source="compression examples/my.img.rle", mimeType="application/octet-stream")]
+		[Embed(source="compression examples/img.rle.bin", mimeType="application/octet-stream")]
 		private const rleClass:Class;
 		
-		[Embed(source="compression examples/my.img.lz", mimeType="application/octet-stream")]
+		[Embed(source="compression examples/img.lz.bin", mimeType="application/octet-stream")]
 		private const lzClass:Class;
 		
-		[Embed(source="compression examples/my.img.huf", mimeType="application/octet-stream")]
+		[Embed(source="compression examples/img.huf.bin", mimeType="application/octet-stream")]
 		private const huffmanClass:Class;
 		
 		public function CompressionTest() {
