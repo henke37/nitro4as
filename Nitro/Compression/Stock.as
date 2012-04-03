@@ -29,7 +29,6 @@
 				case 0://Uncompressed
 					o=new ByteArray();
 					data.readBytes(o,0,length);
-					
 				break;
 				
 				case 1://LZ77
@@ -37,8 +36,12 @@
 				break;
 				
 				case 2://Huffman
-				case 3://RLE
+					o=huffmanDecode(data,length,variant);
+				break;
 				
+				case 3://RLE
+					o=rleDecode(data,length);
+				break;
 				
 				default:
 					throw new ArgumentError("unsupported compression format");
