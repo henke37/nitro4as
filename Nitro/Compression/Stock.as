@@ -48,8 +48,11 @@
 				break;
 			}
 			
+			o.position=0;
+			
 			if((type&8)==8) {//Delta coded
 				diffUnFilter(o,8,length);
+				o.position=0;
 			}
 			
 			return o;
