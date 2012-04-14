@@ -1,6 +1,8 @@
 ﻿package Nitro.Compression {
 	import flash.utils.ByteArray;
 	
+	import Nitro.*;
+	
 	/** Processor for DS SDK stock compression blocks.
 	
 	<p>It will detect the compression type based on the block header.</p>*/
@@ -54,16 +56,6 @@
 				diffUnFilter(o,8,length);
 				o.position=0;
 			}
-			
-			return o;
-		}
-		
-		private static function read3ByteUint(data:ByteArray):uint {
-			var o:uint;
-			
-			o=data.readUnsignedByte();
-			o|=data.readUnsignedByte() << 8;
-			o|=data.readUnsignedByte() << 16;
 			
 			return o;
 		}
