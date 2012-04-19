@@ -2,6 +2,7 @@
 	
 	import flash.utils.*;
 	import Nitro.*;
+	import Nitro.Compression.*;
 	
 	/** A NDS file
 	
@@ -146,6 +147,65 @@
 			var o:ByteArray=new ByteArray();
 			o.writeBytes(nds,arm7Offset,arm7Len);
 			return o;
+		}
+		
+		/** Reads an overlay
+		@param cpu The cpu the overlay is for, either 7 or 9.
+		@param id The id of the overlay to read
+		@return A new ByteArray containing the plaintext contents of the overlay
+		*/
+		public function openOverlayById(cpu:uint,id:uint):ByteArray {
+			if(cpu!=9 && cpu!=7) throw new ArgumentError("CPU has to be either 7 or 9!");
+			
+			var overlay:Overlay=findOverlay(cpu,id);
+			return openOverlayByReference(overlay);
+		}
+		
+		/** Reads an overlay
+		@param overlay The overlay to read
+		@return A new ByteArray containing the plaintext contents of the overlay
+		*/
+		public function openOverlayByReference(overlay:Overlay):ByteArray {
+			if(!overlay) throw new ArgumentError("No overlay with that id!");
+			
+			var rawData:ByteArray=fileSystem.openFileById(overlay.fileId);
+			rawData.endian=Endian.LITTLE_ENDIAN;
+			
+			if(overlay.compressed) {
+				rawData=ReverseLZ.unpack(rawData);
+				rawData.endian=Endian.LITTLE_ENDIAN;
+			}
+			
+			rawData.position=0;
+			
+			return rawData;
+		}
+		
+		/** Finds an overlay entry by id
+		@param cpu The cpu the overlay is for, either 7 or 9.
+		@param id The id of the overlay to read
+		@return The overlay entry for the given id, or null if not found
+		*/
+		public function findOverlay(cpu:uint,id:uint):Overlay {
+			var list:Vector.<Overlay>;
+			
+			if(cpu==9) {
+				list=arm9Overlays;
+			} else if(cpu==7) {
+				list=arm7Overlays;
+			} else {
+				throw new ArgumentError("CPU has to be either 7 or 9!");
+			}
+			
+			if(!list) return null;//the cpu might not even have overlays at all!
+			
+			for each(var overlay:Overlay in list) {
+				if(overlay.id==id) {
+					return overlay;
+				}
+			}
+			
+			return null;
 		}
 		
 		private function readOVT(offset:uint,size:uint):Vector.<Overlay> {
