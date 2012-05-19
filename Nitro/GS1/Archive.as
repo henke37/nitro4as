@@ -42,7 +42,8 @@
 			var entry:ArchiveEntry=entries[id];
 			
 			var ob:ByteArray=new ByteArray();
-			ob.writeBytes(data,entry.offset+baseOffset,entry.size);
+			data.position=entry.offset+baseOffset;
+			data.readBytes(ob,0,entry.size);
 			
 			ob.position=0;
 			return ob;
