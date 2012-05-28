@@ -309,18 +309,33 @@
 		}
 		
 		private function extractPatches():void {
-			outputPatch("locations/case2/basementPatches/1a.png",1603424,4779860,6,4);
-			outputPatch("locations/case2/basementPatches/1b.png",1603424,4781312,6,4);
-			outputPatch("locations/case2/basementPatches/1c.png",1603424,4782600,6,3);
-			outputPatch("locations/case2/basementPatches/2a.png",1603424,4783540,5,5);
-			outputPatch("locations/case2/basementPatches/2b.png",1603424,4784964,5,5);
+			outputPatch("locations/case2/patches/1a.png",1603424,4779860,6,4);
+			outputPatch("locations/case2/patches/1b.png",1603424,4781312,6,4);
+			outputPatch("locations/case2/patches/1c.png",1603424,4782600,6,3);
+			outputPatch("locations/case2/patches/2a.png",1603424,4783540,5,5);
+			outputPatch("locations/case2/patches/2b.png",1603424,4784964,5,5);
+			outputPatch("locations/case2/patches/3.png",1603424,4786328,6,2);//24.bin
+			outputPatch("locations/case2/patches/4.png",1603424,4786964,5,4);//25.bin
+			outputPatch("locations/case2/patches/5a.png",1667988,4787732,6,4);//26.bin
+			outputPatch("locations/case2/patches/5b.png",1667988,4789044,6,4);//27.bin
+			outputPatch("locations/case2/patches/6.png",1740132,4790060,8,3);//28.bin
+			outputPatch("locations/case2/patches/7.png",1740132,4791160,3,1);//29.bin
 			
+			outputPatch("locations/case3/patches/1a.png",2642948,4791328,6,2);//30.bin
+			outputPatch("locations/case3/patches/1b.png",2642948,4791880,9,3);//31.bin
+			outputPatch("locations/case3/patches/1c.png",2642948,4793328,9,3);//32.bin
+			outputPatch("locations/case3/patches/2.png",2606080,4794724,3,1);//33.bin
+			outputPatch("locations/case3/patches/3.png",2606080,4794900,2,1);//34.bin
+			outputPatch("locations/case3/patches/4.png",2818868,4795024,2,4);//35.bin
+			
+			
+			/*
 			archiveData.position=4786328;
 			for(var i:uint=24;archiveData[archiveData.position]==0x10;++i) {
 				trace(archiveData.position,i);
 				saveDecodedChunk("unknownPatches/"+i+".bin",archiveData.position);
 				archiveData.position=alignedOffset;
-			}
+			}*/
 		}		
 
 		private function experiment():void {

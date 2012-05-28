@@ -67,6 +67,15 @@
 			trace(archiveData.position,alignedOffset);
 		}
 		
+		public function outputEvidence(evidenceBase:uint,evidenceEnd:uint):void {
+			const evidenceSize:uint=16*2+8*8*8*8*0.5;
+			var evidencePos:uint=evidenceBase;
+			var i:uint;
+			for(i=0;evidencePos<evidenceEnd;evidencePos+=evidenceSize,++i) {
+				outputSingleImage("evidence/"+i+".png",evidencePos,8,8,4,false);
+			}
+		}
+		
 		public function outputPatch(fileName:String,baseOffset:uint,patchOffset,xTiles:uint,yTiles:uint,singleImage:uint=0,transparent:Boolean=false):void {
 			archiveData.position=baseOffset;
 			
@@ -189,7 +198,7 @@
 			fs.close();
 		}
 		
-		public function outputAnim(subDir:String,offset:uint,xTiles:uint,yTiles:uint):void {
+		public function outputVideo(subDir:String,offset:uint,xTiles:uint=32,yTiles:uint=24):void {
 			archiveData.position=offset;
 			
 			var archive:Archive=new Archive();

@@ -10,10 +10,20 @@
 		
 		protected override function outDirSelected(e:Event):void {
 			
-			outputAnim("badger",0,32,20);
-			outputAnim("15intro",1823768,32,24);
-			outputAnim("securityVideo",2677052,32,24);
-			outputAnim("epiloge",25266104,32,24);
+			extractVideos();
+			extractBase();
+			
+			traceCurrentOffset();
+		}
+		
+		private function extractVideos():void {
+			outputVideo("badger",0,32,20);
+			outputVideo("15intro",1823768);
+			outputVideo("securityVideo",2677052);
+			outputVideo("epiloge",25266104);
+		}
+		
+		private function extractBase():void {
 			//outputBin("archive5",27669216);//useless junk, a bunch of way too content free files
 			//outputBin("archive6",27727316);/more junk
 			//outputBin("archive7",27731420);//junk
@@ -37,24 +47,11 @@
 			//outputBin("archive12",28356876);//japanese profile titles, no palette
 			//outputBin("archive13",28395640);//english profile titles, no palette
 			
-			dumpEvidence();
+			outputEvidence(28433332,0x1BBC2B4);
 			
 			//outputSingleImage("stuff.png",0x1BBC2B4,
 			
 			outputSingleImage("bottomBg.png",29401108,32,24);
-			
-			trace(archiveData.position);
-		}
-		
-		private function dumpEvidence():void {
-			const evidenceBase:uint=28433332;
-			const evidenceEnd:uint=0x1BBC2B4;
-			const evidenceSize:uint=16*2+8*8*8*8*0.5;
-			var evidencePos:uint=evidenceBase;
-			var i:uint;
-			for(i=0;evidencePos<evidenceEnd;evidencePos+=evidenceSize,++i) {
-				outputSingleImage("evidence/"+i+".png",evidencePos,8,8,4,false);
-			}
 		}
 	}
 	
