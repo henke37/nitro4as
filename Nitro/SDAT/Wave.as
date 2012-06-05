@@ -31,7 +31,7 @@
 		public var timerLen:uint;
 		
 		/** The ByteArray where the audio data is stored */
-		public var sdat:ByteArray;
+		public var data:ByteArray;
 		/** The position in the ByteArray where the data is stored */
 		public var dataPos:uint;
 
@@ -39,19 +39,20 @@
 			
 		}
 		
-		public function parse(wavePos:uint,_sdat:ByteArray):void {
-			sdat=_sdat;
-			if(!sdat) {
-				throw new ArgumentError("sdat can not be null!");
+		public function parse(wavePos:uint,_data:ByteArray):void {
+			data=_data;
+			if(!data) {
+				throw new ArgumentError("data can not be null!");
 			}
 			
-			sdat.position=wavePos;
-			encoding=sdat.readByte();
-			loops=sdat.readBoolean();
-			samplerate=sdat.readUnsignedShort();
-			timerLen=sdat.readUnsignedShort();
-			loopStart=sdat.readUnsignedShort();
-			nonLoopLength=sdat.readUnsignedInt();
+			data.endian=Endian.LITTLE_ENDIAN;
+			data.position=wavePos;
+			encoding=data.readByte();
+			loops=data.readBoolean();
+			samplerate=data.readUnsignedShort();
+			timerLen=data.readUnsignedShort();
+			loopStart=data.readUnsignedShort();
+			nonLoopLength=data.readUnsignedInt();
 			
 			if(encoding==PCM8) {
 				loopStart*=4;

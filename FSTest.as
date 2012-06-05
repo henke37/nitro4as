@@ -192,12 +192,7 @@
 				
 				title.text=nds.banner.enTitle;
 			}
-			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.sdat$/i,true,false);
-			
-			if(files.length==0) {
-				status.text="No sdat found";
-				return;
-			}
+			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.(?:sdat|dsxe)$/i,true,false);
 			
 			var fileId:uint=0;
 			for each(var fileRef:File in files) {
@@ -210,6 +205,17 @@
 				loadSDAT(fileContents,fileName,fileId);
 				
 				++fileId;
+			}
+			
+			files=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.(?:adpcm|swav)$/i,true);
+			
+			if(files.length) {
+				listSwavs(files,nds);
+			}
+			
+			if(sources.length==0) {
+				status.text="No files found";
+				return;
 			}
 			
 			filesLoaded();
@@ -269,6 +275,40 @@
 		
 		private function sourceChange(e:Event):void {
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
+		}
+		
+		private function listSwavs(files:Vector.<AbstractFile>,nds:NDS):void {
+			var dp:DataProvider=new DataProvider();
+			var typeItem:Object= { name: "SWAVS", fileIndex: 0, dataProvider: dp };
+			
+			sources.addItem(typeItem);
+			
+			var fileId:uint=0;
+			for each(var fileRef:File in files) {
+			
+				var fileContents:ByteArray=nds.fileSystem.openFileByReference(fileRef);
+				
+				var swav:SWAV=new SWAV();
+				swav.parse(fileContents);
+				
+				var wave:Wave=swav.wave;
+				
+				var item:Object={index: fileId, type: "wave"};
+				
+				item.length=wave.sampleCount;
+				item.loops=wave.loops;
+				item.loopPoint=wave.loopStart;
+				item.sampleRate=wave.samplerate;
+				item.stereo=false;
+				item.encoding=wave.encoding;
+				item.wave=wave;
+				
+				item.name=fileRef.name;
+				
+				dp.addItem(item);
+				
+				++fileId;
+			}
 		}
 		
 		private function listStreams(sdat:SDAT):DataProvider {

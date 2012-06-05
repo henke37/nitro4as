@@ -34,19 +34,19 @@
 		
 		private function decode():void {
 				
-			wave.sdat.position=wave.dataPos;
+			wave.data.position=wave.dataPos;
 			
 			if(wave.encoding==Wave.ADPCM) {
 				//trace("block init "+blockNumber+","+position+","+blockStartOffset);
 				
-				var predictor:uint=wave.sdat.readShort();
-				var stepIndex:uint=wave.sdat.readShort();
+				var predictor:uint=wave.data.readShort();
+				var stepIndex:uint=wave.data.readShort();
 				
 				decoder.init(predictor,stepIndex);
 				
-				decoder.decodeBlock(wave.sdat,numSamples,decodeBuffer);
+				decoder.decodeBlock(wave.data,numSamples,decodeBuffer);
 			} else {					
-				decodePCM(wave.sdat,numSamples,wave.encoding,decodeBuffer);
+				decodePCM(wave.data,numSamples,wave.encoding,decodeBuffer);
 			}
 		}
 		
@@ -64,7 +64,7 @@
 			
 			if(renderSize==0) return 0;
 			
-			wave.sdat.endian=Endian.LITTLE_ENDIAN;
+			wave.data.endian=Endian.LITTLE_ENDIAN;
 			
 			var samplesLeftToDecode:uint=renderSize;
 			
