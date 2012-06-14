@@ -28,7 +28,9 @@
 		private static const blockSize:uint=8;
 		private static const blockCount:uint=4;
 		
+		/** The width of the icon for the game */
 		public static const ICON_WIDTH:uint=blockSize*blockCount;
+		/** The height of the icon for the game */
 		public static const ICON_HEIGHT:uint=blockSize*blockCount;
 
 		public function Banner() {

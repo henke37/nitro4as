@@ -1,6 +1,7 @@
-﻿package Nitro.GS1 {
+﻿package Nitro.GS {
 	import flash.utils.*;
 	
+	/** A reader for the Ace Attorney game engine custom archive file format */
 	public class Archive {
 		
 		private var entries:Vector.<ArchiveEntry>;

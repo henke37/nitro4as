@@ -85,6 +85,23 @@
 		private static function colorScaleUp(x:uint):uint {
 			return x<<3 | x >>> 2;
 		}
+		
+		/** Reads in a palette from a ByteArray
+		@param data The ByteArray to read from
+		@param bpp The bit depth for the corresponding pixel data
+		@return A new vector holding the palette entries in RGB888 format
+		*/
+		public static function readPalette(data:ByteArray,bpp:uint):Vector.<uint> {
+			var palette:Vector.<uint>=new Vector.<uint>();
+			
+			const paletteSize:uint=bpp==4?16:256;
+			
+			for(var i:uint=0;i<paletteSize;++i) {
+				palette[i]=RGB555.read555Color(data);
+			}
+			
+			return palette;
+		}
 
 	}
 	

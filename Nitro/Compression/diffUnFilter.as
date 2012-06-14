@@ -2,6 +2,8 @@
 	
 	import flash.utils.*;
 	
+	/** A filter to undo delta encoding */
+	
 	public function diffUnFilter(inBuff:ByteArray,bits:uint=8,len:uint=0):void {
 		
 		const valLen:uint=bits/8;

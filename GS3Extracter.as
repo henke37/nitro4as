@@ -3,6 +3,8 @@
 	import flash.events.*;
 	import flash.utils.*;
 	
+	import Nitro.GS.*;
+	
 	public class GS3Extracter extends GSBaseExtractor {
 		
 		public function GS3Extracter() {

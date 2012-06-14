@@ -2,6 +2,8 @@
 	
 	import flash.events.*;
 	import flash.utils.*;
+	
+	import Nitro.GS.*;
 
 	public class GS2Extracter extends GSBaseExtractor {
 		

@@ -3,6 +3,7 @@
 	import flash.display.*;
 	import flash.utils.*;
 	
+	/** Utility class that converts a BitmapData into a palette and NCGR file */
 	public class NCGRCreator {
 		
 		private var picture:BitmapData;

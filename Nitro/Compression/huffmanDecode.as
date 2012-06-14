@@ -1,6 +1,10 @@
 ﻿package Nitro.Compression {
 	import flash.utils.*;
 	
+	/** Decodes Huffman encoded data
+	@param inBuff The ByteArray holding the compressed data stream
+	@param length The length of the decoded data
+	@return A new ByteArray holding the decoded data*/	
 	public function huffmanDecode(inBuff:ByteArray,length:uint,dataSize:uint):ByteArray {
 		var outBuff:ByteArray=new ByteArray();
 		

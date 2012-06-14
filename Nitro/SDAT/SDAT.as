@@ -15,10 +15,15 @@
 		
 		sdatInternal var sdat:ByteArray;
 		
+		/** The info records for all standalone sequences stored in the SDAT file */
 		public var sequenceInfo:Vector.<SequenceInfoRecord>;
+		/** The info records for all audio streams stored in the SDAT file */
 		public var streamInfo:Vector.<StreamInfoRecord>;
+		/** The info records for all archived sequences stored in the SDAT file */
 		public var sequenceArchiveInfo:Vector.<BaseInfoRecord>;
+		/** The info records for all wave archives stored in the SDAT file */
 		public var waveArchiveInfo:Vector.<BaseInfoRecord>;
+		/** The info records for all instrument banks stored in the SDAT file */
 		public var bankInfo:Vector.<BankInfoRecord>;
 		
 		private var files:Vector.<FATRecord>;
@@ -104,6 +109,10 @@
 			return o;
 		}
 		
+		/** Opens a subfile by it's FAT index
+		@param fatId The orginal index into the FAT table
+		@return A new ByteArray containing the data of the subfile
+		*/
 		public function openFileById(fatId:uint):ByteArray {
 			if(fatId>=files.length) throw new RangeError("Can't open a file id higher than the file count!");
 			
@@ -117,6 +126,9 @@
 			return o;
 		}
 		
+		/** Opens a standalone sequence file
+		@param seqId The id of the sequence to open
+		@return The opened standalone sequence file*/
 		public function openSSEQ(seqId:uint):SSEQ {
 			var seq:SSEQ=new SSEQ();
 			seq.parse(openFileById(sequenceInfo[seqId].fatId));
@@ -124,6 +136,9 @@
 			return seq;
 		}
 		
+		/** Opens an audio stream file
+		@param strmId The id of the stream to open
+		@return The opened stream file*/
 		public function openSTRM(strmId:uint):STRM {
 			var strm:STRM=new STRM();
 			strm.parse(openFileById(streamInfo[strmId].fatId));
@@ -131,6 +146,9 @@
 			return strm;
 		}
 		
+		/** Opens a wave bank file
+		@param swarId The id of the wave archive file
+		@return The opened wave archive file*/
 		public function openSWAR(swarId:uint):SWAR {
 			var swar:SWAR=new SWAR();
 			swar.parse(openFileById(waveArchiveInfo[swarId].fatId));
@@ -138,6 +156,9 @@
 			return swar;
 		}
 		
+		/** Opens an instrument bank file
+		@param bankId The id of the instrument bank file
+		@return The opened instrument bank file*/
 		public function openBank(bankId:uint):SBNK {
 			var bank:SBNK=new SBNK();
 			bank.parse(openFileById(bankInfo[bankId].fatId));
@@ -411,7 +432,7 @@ class FATRecord {
 	public var size:uint,pos:uint;
 	
 	public function FATRecord(s:uint,p:uint) {
-		if(s<4) throw new ArgumentError("Files has a minimum size");
+		if(s<4) throw new ArgumentError("Files have a minimum size");
 		size=s;pos=p;
 	}
 }

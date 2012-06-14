@@ -6,12 +6,18 @@
 	
 	public class CellOam extends OamTile {
 		
+		/** The y position of the object, in pixels */
 		public var y:int;
+		/** The yx position of the object, in pixels */
 		public var x:int;
+		/** If the object should be hidden */
 		public var hide:Boolean;
+		/** If the object should be displayed at double size */
 		public var doubleSize:Boolean;
 		
+		/** If the object should be flipped along the X axis when displayed */
 		public var xFlip:Boolean;
+		/** If the object should be flipped along the Y axis when displayed */
 		public var yFlip:Boolean;
 		
 		public var priority:uint;
@@ -27,7 +33,7 @@
 		@param useTransparency If the tiles should be rendered using transparency
 		@return A DisplayObject that represents the tile group
 		*/
-		public override function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+		public override function rend(palette:Vector.<uint>,tiles:GraphicsBank,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
 			var oamR:DisplayObject=super.rend(palette,tiles,useSubImages,useTranparency);
 				
 			oamR.x=x;

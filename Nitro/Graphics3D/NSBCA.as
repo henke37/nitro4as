@@ -4,6 +4,7 @@
 	
 	import Nitro.*;
 	
+	/** Parser for NSBCA files */
 	public class NSBCA {
 
 		public function NSBCA() {

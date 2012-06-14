@@ -1,4 +1,4 @@
-﻿package  {
+﻿package Nitro.GS {
 	import flash.display.*;
 	import flash.net.*;
 	import flash.filesystem.*;
@@ -7,12 +7,13 @@
 	import flash.utils.*;
 	import flash.geom.*;
 	
-	import Nitro.FileSystem.*;
-	import Nitro.GS1.*;
+	import Nitro.FileSystem.NDS;
 	import Nitro.Compression.*;
 	import Nitro.Graphics.*;
 	
 	import com.adobe.images.PNGEncoder;
+	
+	/** Base class for Ace Attorney game extractors */
 	
 	public class GSBaseExtractor extends MovieClip {
 		
@@ -76,7 +77,7 @@
 			}
 		}
 		
-		public function outputPatch(fileName:String,baseOffset:uint,patchOffset,xTiles:uint,yTiles:uint,singleImage:uint=0,transparent:Boolean=false):void {
+		public function outputPatch(fileName:String,baseOffset:uint,patchOffset:uint,xTiles:uint,yTiles:uint,singleImage:uint=0,transparent:Boolean=false):void {
 			archiveData.position=baseOffset;
 			
 			if(!singleImage) {
@@ -92,7 +93,7 @@
 				subFile=Stock.decompress(archiveData);
 			}
 			
-			var palette:Vector.<uint>=readPalette(subFile,bpp);
+			var palette:Vector.<uint>=RGB555.readPalette(subFile,bpp);
 			
 			archiveData.position=patchOffset;
 			subFile=Stock.decompress(archiveData);
@@ -112,7 +113,7 @@
 			
 			const bpp:uint=(subFile.length==16*2)?4:8;
 			
-			var palette:Vector.<uint>=readPalette(subFile,bpp);
+			var palette:Vector.<uint>=RGB555.readPalette(subFile,bpp);
 			
 			var o:BitmapData=new BitmapData(xTiles*8,(archive.length-1)*yTiles*8,false);
 			
@@ -220,21 +221,9 @@
 		protected function readTiledFrame(data:ByteArray,xTiles:uint,yTiles:uint,bpp:uint=4,transparent:Boolean=false):BitmapData {
 			data.endian=Endian.LITTLE_ENDIAN;
 			
-			var palette:Vector.<uint>=readPalette(data,bpp);
+			var palette:Vector.<uint>=RGB555.readPalette(data,bpp);
 			
 			return readTiles(palette,data,xTiles,yTiles,bpp,transparent);
-		}
-		
-		protected function readPalette(data:ByteArray,bpp):Vector.<uint> {
-			var palette:Vector.<uint>=new Vector.<uint>();
-			
-			const paletteSize:uint=bpp==4?16:256;
-			
-			for(var i:uint=0;i<paletteSize;++i) {
-				palette[i]=RGB555.read555Color(data);
-			}
-			
-			return palette;
 		}
 			
 		protected function readTiles(palette:Vector.<uint>,data:ByteArray,xTiles:uint,yTiles:uint,bpp:uint=4,transparent:Boolean=false):BitmapData {

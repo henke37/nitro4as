@@ -5,7 +5,8 @@
 	
 	import Nitro.Graphics.*;
 	
-	
+	/** A reader for the indexed bitmaps found in cpac_2d.bin/4
+	*/
 	public class IndexedBitmap {
 		
 		private var tiles:Vector.<Tile>;

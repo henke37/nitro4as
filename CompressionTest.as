@@ -9,16 +9,16 @@
 	public class CompressionTest extends MovieClip {
 		
 		[Embed(source="compression examples/img.raw.bin", mimeType="application/octet-stream")]
-		private const rawClass:Class;
+		private var rawClass:Class;
 		
 		[Embed(source="compression examples/img.rle.bin", mimeType="application/octet-stream")]
-		private const rleClass:Class;
+		private var rleClass:Class;
 		
 		[Embed(source="compression examples/img.lz.bin", mimeType="application/octet-stream")]
-		private const lzClass:Class;
+		private var lzClass:Class;
 		
 		[Embed(source="compression examples/img.huf.bin", mimeType="application/octet-stream")]
-		private const huffmanClass:Class;
+		private var huffmanClass:Class;
 		
 		public function CompressionTest() {
 			var raw:ByteArray=new rawClass();

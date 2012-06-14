@@ -81,12 +81,12 @@
 		}
 		
 		/** Renders the screen to a new Sprite
-		@param tiles The NCGR from which to read the tiles
+		@param tiles The GraphicsBank from which to read the tiles
 		@param convertedPalette The palette to use when rendering the tiles, in RGB888 format
 		@param useTransparency If the screen should be rendered using transparency
 		@return A new Sprite with the tiles of the screen correctly laid out
 		*/
-		public function render(tiles:NCGR,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
+		public function render(tiles:GraphicsBank,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
 			var spr:Sprite=new Sprite();
 			
 			var tileCache:Object={};

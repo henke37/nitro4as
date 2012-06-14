@@ -6,12 +6,16 @@
 	/** A basic tile group that can be used for storing just the data about the tile in general */
 	public class OamTile {
 		
+		/** The sub palette index to use for rendering the tiles */
 		public var paletteIndex:uint;
+		/** The start index of the tiles in the associated GraphicsBank*/
 		public var tileIndex:uint;
 		
 		public var colorDepth:uint;
 		
+		/** The width of the tile group, in pixels */
 		public var width:uint;
+		/** The height of the tile group, in pixels*/
 		public var height:uint;
 
 		public function OamTile() {
@@ -25,7 +29,7 @@
 		@param useTransparency If the tiles should be rendered using transparency
 		@return A DisplayObject that represents the tile group
 		*/
-		public function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+		public function rend(palette:Vector.<uint>,tiles:GraphicsBank,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
 			var oamR:DisplayObject=tiles.renderOam(this,palette,useSubImages,useTranparency);
 			
 			return oamR;

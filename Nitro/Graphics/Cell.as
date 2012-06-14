@@ -15,11 +15,11 @@
 		
 		/** Draws the cell
 		@param palette The pallete to use when rendering the tiles, in RGB888 format
-		@param tiles The NCGR where the tiles are stored
+		@param tiles The GraphicsBank where the tiles are stored
 		@param subImages True if the tiles are aranged in a big grid or false if they are aranged in one grid per oam
 		@param useTransparence If the tiles should be rendered using transparency
 		@return A new DisplayObject that represents the cell */
-		public function rend(palette:Vector.<uint>,tiles:NCGR,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
+		public function rend(palette:Vector.<uint>,tiles:GraphicsBank,useSubImages:Boolean,useTranparency:Boolean=true):DisplayObject {
 			var spr:Sprite=new Sprite();
 			
 			for each(var oam:CellOam in oams) {

@@ -1,6 +1,10 @@
 ﻿package Nitro.Compression {
 	import flash.utils.*;
 	
+	/** Decodes RLE encoded data
+	@param inBuff The ByteArray holding the compressed data stream
+	@param length The length of the decoded data
+	@return A new ByteArray holding the decoded data*/	
 	public function rleDecode(inBuf:ByteArray,length:uint):ByteArray {
 		var outBuf:ByteArray=new ByteArray();
 		

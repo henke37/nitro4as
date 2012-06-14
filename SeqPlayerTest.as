@@ -3,6 +3,7 @@
 	import flash.display.*;
 	import flash.events.*;
 	import flash.net.*;
+	import flash.text.*
 	
 	import Nitro.FileSystem.*;
 	import Nitro.SDAT.*;
@@ -17,6 +18,8 @@
 		private var sdat:SDAT;
 		
 		private var seqPlayer:SeqPlayer;
+		
+		public var status_txt:TextField;
 		
 		public function SeqPlayerTest() {
 			
@@ -37,7 +40,7 @@
 			stage.align=StageAlign.TOP_LEFT;
 		}
 		
-		var fr:FileReference;
+		private var fr:FileReference;
 		
 		private function manualLoad(e:MouseEvent):void {
 			fr=new FileReference();

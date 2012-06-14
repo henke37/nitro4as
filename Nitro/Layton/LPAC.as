@@ -3,6 +3,7 @@
 	
 	import Nitro.*;
 	
+	/** Layton package parser */
 	public class LPAC {
 		
 		private static const fatEntryLength:uint=12;
@@ -15,7 +16,7 @@
 			files=new Vector.<FileEntry>();
 		}
 		
-		/** Parses a X from a ByteArray
+		/** Parses a Layton package file from a ByteArray
 		@param data The ByteArray*/
 		public function parse(data:ByteArray):void {
 			if(!data) throw new ArgumentError("The data can not be null!");

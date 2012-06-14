@@ -6,7 +6,7 @@
 	<p>Can be reused for multiple frames in an animation.</p> */
 
 	public class NANRPosition {
-		/** The position to display the cell at. */
+		/** The transformation to display the cell with. */
 		public var transform:Matrix;
 		/** The cell to display. */
 		public var cellIndex:uint;

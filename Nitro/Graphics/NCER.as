@@ -169,10 +169,10 @@
 		/** Rends a single cell
 		@param cellId The id of the cell to rend
 		@param palette The pallete to use when rendering the tiles, in RGB888 format
-		@param tiles The NCGR where the tiles are stored
+		@param tiles The GraphicsBank where the tiles are stored
 		@param useTransparence If the tiles should be rendered using transparency
 		@return A DisplayObject that represents the cell */
-		public function rend(cellId:uint,palette:Vector.<uint>,tiles:NCGR,useTransparency:Boolean=true):DisplayObject {
+		public function rend(cellId:uint,palette:Vector.<uint>,tiles:GraphicsBank,useTransparency:Boolean=true):DisplayObject {
 			var cell:Cell=cells[cellId];
 			return cell.rend(palette,tiles,subImages,useTransparency);
 		}

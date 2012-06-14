@@ -4,6 +4,7 @@
 	
 	import Nitro.*;
 	
+	/** Parser for NSBMD files */
 	public class NSBMD {
 		
 		private var internalTexture:NSBTX;
