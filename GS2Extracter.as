@@ -13,14 +13,14 @@
 		
 		protected override function outDirSelected(e:Event):void {
 			var time:uint=getTimer();
-			//extractBase();
+			extractBase();
 			
-			//extractCase1();
-			//extractCase2();
-			//extractCase3();
-			//extractCase4();
+			extractCase1();
+			extractCase2();
+			extractCase3();
+			extractCase4();
 			
-			//extractSplashes();
+			extractSplashes();
 			extractMisc();
 			
 			traceCurrentOffset();
@@ -161,7 +161,7 @@
 			//outputSlicedImage("locations/case3/a.png",);
 			
 			outputSlicedImage("case3/lionMouthA.png",3352960,32,8);
-			outputSlicedImage("case3/lionMouthB.png",3376804);
+			outputSlicedImage("case3/lionMouthB.png",3376804,32,8);
 			outputSlicedImage("case3/circusOverheadJP.png",3398904,64);
 			outputSlicedImage("case3/circusOverheadEN.png",3474516,64);
 			outputSlicedImage("case3/max.png",3547396);
