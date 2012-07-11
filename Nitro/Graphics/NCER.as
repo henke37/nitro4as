@@ -114,49 +114,8 @@
 					
 					var oam:CellOam=new CellOam();
 					cell.oams[j]=oam;
-				
-					oam.y=section.readByte();
-					var atts0:uint=section.readUnsignedByte();
 					
-					var rs:Boolean=(atts0 & 1) == 1;
-					
-					if(rs) {
-						oam.doubleSize=(atts0 & 2) ==2;
-					} else {
-						oam.hide=(atts0 & 2) ==2;
-					}
-					
-					oam.colorDepth=atts0 >> 5 & 0x1;
-					
-					var shape:uint=atts0 >> 6;
-					
-					var atts1:uint=section.readUnsignedShort();
-					
-					oam.x=atts1 & 0x1FF;
-					
-					if(oam.x>=0x100) {
-						oam.x-=0x200;
-					}
-					
-					if(!rs) {
-						oam.xFlip=(atts1 & 0x1000)==0x1000;
-						oam.yFlip=(atts1 & 0x2000)==0x2000;
-					}
-					
-					var objSize:uint=atts1 >> 14;
-					
-					var atts2:uint=section.readUnsignedShort();
-					
-					oam.tileIndex=(atts2 & 0x3FF);
-					
-					oam.tileIndex <<= tileIndexShift;
-					oam.tileIndex += sectionNudge;
-					
-					oam.paletteIndex= atts2 >> 12;
-					
-					oam.priority=atts2 >> 10 & 0x3;
-					
-					oam.setSize(objSize,shape);
+					oam.parse(section,tileIndexShift,sectionNudge);
 				}
 			}
 			
@@ -286,19 +245,12 @@
 			var oamOut:ByteArray=new ByteArray();
 			oamOut.endian=Endian.LITTLE_ENDIAN;
 			
-			
-			
-			
-			
 			for each(var cell:Cell in cells) {
 				cellOut.writeShort(cell.oams.length);
 				cellOut.writeShort(0);
 				cellOut.writeUnsignedInt(oamOut.length);
 				for each(var oam:CellOam in cell.oams) {
-					oamOut.writeByte(oam.y);
-					oamOut.writeByte(att0(oam));
-					oamOut.writeShort(att1(oam));
-					oamOut.writeShort(att2(oam,shift));
+					oam.writeEntry(oamOut,shift);
 				}
 				
 			}
@@ -306,57 +258,6 @@
 			o.writeBytes(oamOut);
 			
 			return o;
-		}
-		
-		private function att0(oam:CellOam):uint {
-			var o:uint=0;
-			
-			if(oam.doubleSize) {
-				o|=0x30;
-			} else if(oam.hide) {
-				o|=0x20;
-			}
-			
-			o|=oam.colorDepth<<5;
-			
-			if(oam.width==oam.height) {
-				o|=0;
-			} else if(oam.width<oam.height) {
-				o|=0x80;
-			} else if(oam.width>oam.height) {
-				o|=0x40;
-			} else {
-				o|=0xC0;
-			}
-			
-			return o;
-		}
-		
-		private function att1(oam:CellOam):uint {
-			var o:uint=0;
-			
-			o|=oam.x&0x1FF;
-			
-			if(oam.xFlip) {
-				o|=0x1000;
-			}
-			if(oam.yFlip) {
-				o|=0x2000;
-			}
-			
-			o|=oam.getSize()<<14;
-			
-			return o;
-		}
-		
-		private function att2(oam:CellOam,shift:uint):uint {
-			var o:uint=0;
-			
-			var shiftedTileIndex:uint=oam.tileIndex;
-			if(shift>0) {
-				shiftedTileIndex>>>=shift;
-			}
-			return shiftedTileIndex | oam.paletteIndex << 12;
 		}
 		
 		private function bestShift():uint {
