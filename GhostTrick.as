@@ -62,6 +62,9 @@
 			mainPack=new CPAC();
 			mainPack.parse(nds.fileSystem.openFileByName("cpac_2d.bin"));
 			
+			/*var fr:FileReference=new FileReference();
+			fr.save(mainPack.open(5),"5.bin");*/
+			
 			subArchive=new SubArchive();
 			subArchive.parse(mainPack.open(4));
 			
@@ -80,6 +83,8 @@
 			ripAll_mc.addEventListener(MouseEvent.CLICK,ripAllClick);
 			
 			ripSingle_mc.addEventListener(MouseEvent.CLICK,ripSingleClick);
+			
+			//dumpArchive("cpac_2d.bin",0);
 		}
 		
 		private function ripSingleClick(e:MouseEvent):void {
@@ -174,6 +179,8 @@
 			
 			var subarchive:SubArchive=new SubArchive();
 			subarchive.parse(subfile);
+			
+			trace(subarchive.length);
 			
 			for(var subid:uint=0;subid<subarchive.length;++subid) {
 			
