@@ -14,6 +14,7 @@
 	import fl.controls.*;
 	import fl.data.*;
 	
+	import HTools.Audio.WaveWriter;
 	
 	use namespace strmInternal;
 	
@@ -21,12 +22,12 @@
 		
 		private var loader:URLLoader;
 		
-		private var status:TextField;
-		private var title:TextField;
-		private var playback:TextField;
+		public var status_txt:TextField;
+		public var title_txt:TextField;
+		public var playback_txt:TextField;
 		
 		private static const iconZoom:Number=10;
-		private static const titleHeight:Number=40;
+		private static const title_txtHeight:Number=40;
 		
 		private var sources:DataProvider;
 		
@@ -36,6 +37,7 @@
 		public var progress_mc:Slider;
 		public var list_mc:List;
 		public var source_mc:ComboBox;
+		public var export_mc:Button;
 		
 		private var loopMark:Shape;
 		private var icon:Bitmap;
@@ -46,44 +48,41 @@
 			
 			sources=new DataProvider();
 			
-			status=new TextField();
-			status.x=Banner.ICON_WIDTH*iconZoom;
-			status.y=titleHeight;
-			status.width=550-Banner.ICON_WIDTH*iconZoom;
-			status.wordWrap=true;
-			status.multiline=true;
-			status.autoSize=TextFieldAutoSize.LEFT;
-			addChild(status);
+			//status_txt=new TextField();
+			status_txt.x=Banner.ICON_WIDTH*iconZoom;
+			status_txt.y=title_txtHeight;
+			status_txt.width=550-Banner.ICON_WIDTH*iconZoom;
+			status_txt.wordWrap=true;
+			status_txt.multiline=true;
+			status_txt.autoSize=TextFieldAutoSize.LEFT;
 			
-			title=new TextField();
-			title.x=Banner.ICON_WIDTH*iconZoom;
-			title.width=550-Banner.ICON_WIDTH*iconZoom;
-			title.wordWrap=true;
-			title.height=titleHeight;
-			title.text="Nitro SDAT Stream player WIP";
-			addChildAt(title,0);
+			//title_txt=new TextField();
+			title_txt.x=Banner.ICON_WIDTH*iconZoom;
+			title_txt.width=550-Banner.ICON_WIDTH*iconZoom;
+			title_txt.wordWrap=true;
+			title_txt.height=title_txtHeight;
+			title_txt.text="Nitro SDAT Stream player WIP";
 			
-			playback=new TextField();
-			playback.y=Banner.ICON_HEIGHT*iconZoom;
-			playback.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
-			playback.width=Banner.ICON_WIDTH*iconZoom;
-			playback.selectable=false;
-			addChild(playback);
+			//playback_txt=new TextField();
+			playback_txt.y=Banner.ICON_HEIGHT*iconZoom;
+			playback_txt.height=stage.stageHeight-Banner.ICON_HEIGHT*iconZoom;
+			playback_txt.width=Banner.ICON_WIDTH*iconZoom;
+			playback_txt.selectable=false;
 			
 			if(loaderInfo.url.match(/^file:/) && false) {
-				status.text="Loading data";
+				status_txt.text="Loading data";
 				loader=new URLLoader();
 				loader.addEventListener(Event.COMPLETE,loaded);
 				loader.dataFormat=URLLoaderDataFormat.BINARY;
 				loader.load(new URLRequest("game.nds"));
 			} else {
-				status.text="Click to load game from disk";
+				status_txt.text="Click to load game from disk";
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
 			
 			//source_mc.visible=false;
 			source_mc.x=Banner.ICON_WIDTH*iconZoom;
-			source_mc.y=title.y+title.height;
+			source_mc.y=title_txt.y+title_txt.height;
 			source_mc.labelFunction=sourceLabeler;
 			source_mc.width=550-Banner.ICON_WIDTH*iconZoom;
 			source_mc.addEventListener(Event.CHANGE,sourceChange);
@@ -99,6 +98,10 @@
 			
 			progress_mc.width=Banner.ICON_WIDTH*iconZoom-20;
 			progress_mc.visible=false;
+			
+			export_mc.visible=false;
+			export_mc.label="Export";
+			export_mc.addEventListener(MouseEvent.CLICK,exportClick);
 			
 			loopMark=new Shape();
 			loopMark.graphics.lineStyle(1,0xFF0000);
@@ -130,7 +133,7 @@
 				ptext+=" Loop:"+formatTime(playingItem.loopPoint/playingItem.sampleRate);
 			}
 			
-			playback.text=ptext;
+			playback_txt.text=ptext;
 		}
 		
 		private static function formatTime(t:Number):String {
@@ -165,7 +168,7 @@
 			stage.removeEventListener(MouseEvent.CLICK,stageClick);
 			
 			fr.addEventListener(Event.COMPLETE,frLoaded);
-			status.text="Loading data";
+			status_txt.text="Loading data";
 			fr.load();
 			
 		}
@@ -190,7 +193,7 @@
 			if(nds.banner) {
 				icon.bitmapData=nds.banner.icon;
 				
-				title.text=nds.banner.enTitle;
+				title_txt.text=nds.banner.enTitle;
 			}
 			var files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(nds.fileSystem.rootDir,/\.(?:sdat|dsxe)$/i,true,false);
 			
@@ -214,7 +217,7 @@
 			}
 			
 			if(sources.length==0) {
-				status.text="No files found";
+				status_txt.text="No files found";
 				return;
 			}
 			
@@ -225,7 +228,7 @@
 		private function filesLoaded():void {
 			if(sources.length>0) {			
 				list_mc.visible=true;
-				status.visible=false;
+				status_txt.visible=false;
 				progress_mc.visible=true;
 				
 				source_mc.selectedIndex=0;
@@ -240,7 +243,7 @@
 			sdat.parse(fileContents);
 			
 			if(sdat.streamInfo.length==0) {
-				status.text="No Streams";
+				status_txt.text="No Streams";
 			} else {
 				var streamSource:Object={};
 				streamSource.dataProvider=listStreams(sdat);
@@ -363,7 +366,7 @@
 			return provider;
 		}
 		
-		private function listLabeler(item:Object):String {
+		private function listLabeler(item:Object,includeTime:Boolean=true):String {
 			var name:String="";
 			
 			name=item.name;
@@ -372,7 +375,11 @@
 				name=String(item.type).toLocaleUpperCase()+" #"+item.index;
 			}
 			
-			return name +" - "+formatTime(item.length/item.sampleRate) + (item.loops?(" - Loop: "+formatTime(item.loopPoint/item.sampleRate)):"");
+			if(includeTime) {
+				name+=" - "+formatTime(item.length/item.sampleRate) + (item.loops?(" - Loop: "+formatTime(item.loopPoint/item.sampleRate)):"");
+			}
+			
+			return name;
 		}
 		
 		private function sourceLabeler(item:Object):String {
@@ -392,7 +399,42 @@
 				player=new WavePlayer(playingItem.wave);
 			}
 			
+			export_mc.visible=true;
+			
 			player.play();
+		}
+		
+		private function exportClick(e:MouseEvent):void {
+			var fr:FileReference=new FileReference();
+			
+			var wave:WaveWriter=new WaveWriter(true,32,playingItem.sampleRate);
+			var decoder:BaseDecoder;
+			
+			if(playingItem.type=="stream") {
+				decoder=new STRMDecoder(playingItem.stream);
+			} else if(playingItem.type=="wave") {
+				decoder=new WaveDecoder(playingItem.wave);
+			}
+			
+			decoder.loopAllowed=false;
+			
+			var sampleBuff:ByteArray=new ByteArray();
+			sampleBuff.endian=Endian.LITTLE_ENDIAN;
+			
+			const renderSize:uint=10000;
+			var rendered:uint;
+			do {
+				sampleBuff.length=0;
+				rendered=decoder.render(sampleBuff,renderSize);
+				wave.addSamples(sampleBuff);
+			} while(rendered==renderSize);
+			
+			wave.finalize();
+			
+			var fileName:String=listLabeler(playingItem,false);
+			fileName=fileName.replace(/#/,"");
+			
+			fr.save(wave.outBuffer,fileName+".wav");
 		}
 		
 		/*
