@@ -93,6 +93,10 @@
 						ob.writeFloat(decodeBuffers[0][i]);
 						ob.writeFloat(decodeBuffers[1][i]);
 					}
+				} else if(rendAsMono) {
+					for(i=lastBlockSamplesUsed;i<endSample;++i) {
+						ob.writeFloat(decodeBuffers[0][i]);
+					}
 				} else {
 					for(i=lastBlockSamplesUsed;i<endSample;++i) {
 						ob.writeFloat(decodeBuffers[0][i]);

@@ -6,6 +6,9 @@
 
 		/** If looping streams should loop */
 		public var loopAllowed:Boolean=true;
+		
+		/** If mono tracks should be rendered as mono */
+		public var rendAsMono:Boolean;
 
 		public function reset():void {}
 		public function render(ob:ByteArray,samples:uint):uint { return 0;}

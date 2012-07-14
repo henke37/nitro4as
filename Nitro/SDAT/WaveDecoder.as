@@ -78,9 +78,16 @@
 				var samplesToOutput:uint=endSample-startSample;
 				
 				var i:uint;
-				for(i=startSample;i<endSample;++i) {
-					ob.writeFloat(decodeBuffer[i]);
-					ob.writeFloat(decodeBuffer[i]);
+				
+				if(rendAsMono) {
+					for(i=startSample;i<endSample;++i) {
+						ob.writeFloat(decodeBuffer[i]);
+					}
+				} else {
+					for(i=startSample;i<endSample;++i) {
+						ob.writeFloat(decodeBuffer[i]);
+						ob.writeFloat(decodeBuffer[i]);
+					}
 				}
 				
 				//trace(samplesToOutput);

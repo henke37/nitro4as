@@ -407,7 +407,9 @@
 		private function exportClick(e:MouseEvent):void {
 			var fr:FileReference=new FileReference();
 			
-			var wave:WaveWriter=new WaveWriter(true,32,playingItem.sampleRate);
+			var stereo:Boolean=playingItem.type=="stream" && playingItem.stereo;
+			
+			var wave:WaveWriter=new WaveWriter(stereo,32,playingItem.sampleRate);
 			var decoder:BaseDecoder;
 			
 			if(playingItem.type=="stream") {
@@ -417,6 +419,7 @@
 			}
 			
 			decoder.loopAllowed=false;
+			decoder.rendAsMono=!stereo;
 			
 			var sampleBuff:ByteArray=new ByteArray();
 			sampleBuff.endian=Endian.LITTLE_ENDIAN;
