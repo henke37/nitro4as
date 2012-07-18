@@ -26,7 +26,7 @@
 		/** The info records for all instrument banks stored in the SDAT file */
 		public var bankInfo:Vector.<BankInfoRecord>;
 		
-		private var files:Vector.<FATRecord>;
+		sdatInternal var files:Vector.<FATRecord>;
 		
 		public var seqSymbols:Vector.<String>;
 		public var bankSymbols:Vector.<String>;
@@ -35,6 +35,8 @@
 		public var groupSymbols:Vector.<String>;
 		public var player2Symbols:Vector.<String>;
 		public var streamSymbols:Vector.<String>;
+		
+		public var hasSymbols:Boolean;
 		
 		private static const infoSubSectionCount:uint=8;
 		
@@ -81,7 +83,8 @@
 			
 			parseInfo(infoPos,infoSize);
 			
-			if(hasSymb) {			
+			if(hasSymb) {
+				hasSymbols=true;
 				parseSymb(symbPos,symbSize);
 			}
 			
@@ -190,8 +193,6 @@
 			}
 			
 			
-			
-			
 			//read the sequence info
 			info.position=infoSectionOffsets[0];
 			var sequenceCount:uint=info.readUnsignedInt();
@@ -211,9 +212,9 @@
 				info.position+=2;
 				seqRecord.bankId=info.readUnsignedShort();
 				seqRecord.vol=info.readUnsignedByte();
-				seqRecord.cpr=info.readUnsignedByte();
-				seqRecord.ppr=info.readUnsignedByte();
-				seqRecord.ply=info.readUnsignedByte();
+				seqRecord.channelPressure=info.readUnsignedByte();
+				seqRecord.polyPressure=info.readUnsignedByte();
+				seqRecord.player=info.readUnsignedByte();
 				info.position+=2;
 				
 				//trace(seqRecord);
@@ -266,7 +267,7 @@
 				info.position+=2;
 				
 				for(var j:uint=0;j<4;++j) {
-					bankRecord.swars[j]=info.readUnsignedShort();
+					bankRecord.swars[j]=info.readShort();
 				}
 				
 				//trace(bankRecord);
@@ -297,9 +298,6 @@
 			}
 			waveArchiveInfo.fixed=true;
 			
-			
-			
-			
 			//read the stream info
 			info.position=infoSectionOffsets[7];
 			var streamCount:uint=info.readUnsignedInt();
@@ -318,8 +316,8 @@
 				streamRecord.fatId=info.readUnsignedShort();
 				info.position+=2;
 				streamRecord.vol=info.readUnsignedByte();
-				streamRecord.pri=info.readUnsignedByte();
-				streamRecord.ply=info.readUnsignedByte();
+				streamRecord.priority=info.readUnsignedByte();
+				streamRecord.player=info.readUnsignedByte();
 				info.position+=5;
 				
 				//trace(streamRecord);
@@ -426,13 +424,4 @@
 		}
 	}
 	
-}
-
-class FATRecord {
-	public var size:uint,pos:uint;
-	
-	public function FATRecord(s:uint,p:uint) {
-		if(s<4) throw new ArgumentError("Files have a minimum size");
-		size=s;pos=p;
-	}
 }

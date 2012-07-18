@@ -3,10 +3,10 @@
 	public class BankInfoRecord extends BaseInfoRecord {
 		
 		/** A list of the SWAR files belonging to the corresponding intstrument bank */
-		public var swars:Vector.<uint>;
+		public var swars:Vector.<int>;
 
 		public function BankInfoRecord() {
-			swars=new Vector.<uint>();
+			swars=new Vector.<int>();
 			swars.length=4;
 			swars.fixed=true;
 		}

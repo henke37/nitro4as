@@ -94,6 +94,20 @@
 			
 			return o;
 		}
+		
+		public function toXML():XML {
+			var o:XML=<wave
+				sampleCount={sampleCount}
+				encoding={encodingAsString(encoding)}
+				samplerate={samplerate}
+				timerLen={timerLen}
+			/>;
+			if(loops) {
+				o.@loopStart=loopStart.toString();
+				o.@nonLoopLength=nonLoopLength.toString();
+			}
+			return o;
+		}
 
 	}
 	

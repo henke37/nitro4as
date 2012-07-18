@@ -9,19 +9,20 @@
 		public var vol:uint;
 		
 		/** The channel preasure */
-		public var cpr:uint;
+		public var channelPressure:uint;
 		
 		/** The polyphonic preasure */
-		public var ppr:uint;
+		public var polyPressure:uint;
 		
-		public var ply:uint;
+		/** The player to use to play this sequence */
+		public var player:uint;
 
 		public function SequenceInfoRecord() {
 			// constructor code
 		}
 		
 		public function toString():String {
-			return "[SequenceInfoRecord fatId="+fatId+" bankId="+bankId+" vol="+vol+" cpr="+cpr+" ppr="+ppr+" ply="+ply+"]";
+			return "[SequenceInfoRecord fatId="+fatId+" bankId="+bankId+" vol="+vol+" cpr="+channelPressure+" ppr="+polyPressure+" ply="+player+"]";
 		}
 
 	}

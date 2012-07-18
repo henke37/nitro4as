@@ -47,6 +47,23 @@
 		public function matchesNote(n:uint):Boolean {
 			return n >= lowEnd && n <=highEnd;
 		}
+		
+		public function toXML():XML {
+			var o:XML=<instrumentRegion
+				swav={swav}
+				swar={swar}
+				baseNote={baseNote}
+				lowEnd={lowEnd}
+				highEnd={highEnd}
+				attack={attack}
+				decay={decay}
+				sustain={sustain}
+				release={release}
+				pan={pan}
+			/>;
+			
+			return o;
+		}
 
 	}
 	

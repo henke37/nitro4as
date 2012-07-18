@@ -31,6 +31,22 @@
 			
 			return null;
 		}
+		
+		public static function noteTypeAsString(type:uint):String {
+			if(type==NOTETYPE_PCM) return "PCM";
+			if(type==NOTETYPE_PULSE) return "Pulse";
+			if(type==NOTETYPE_NOISE) return "Noise";
+			return "INVALID";
+		}
+		
+		public function toXML():XML {
+			var o:XML=<instrument noteType={noteTypeAsString(noteType)} />;
+			
+			for each(var region:InstrumentRegion in regions) {
+				o.appendChild(region.toXML());
+			}
+			return o;
+		}
 
 	}
 	
