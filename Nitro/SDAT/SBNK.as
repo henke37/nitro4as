@@ -102,7 +102,8 @@
 			var region:InstrumentRegion=new InstrumentRegion();
 			region.parse(section);
 			
-			region.lowEnd=region.highEnd=region.baseNote;
+			region.lowEnd=0;
+			region.highEnd=127;
 			
 			instrument.regions[0]=region;
 			
