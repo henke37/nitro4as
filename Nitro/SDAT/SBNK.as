@@ -111,6 +111,7 @@
 		
 		private function parseDrumInstrument(section:ByteArray,offset:uint):Instrument {
 			var instrument:Instrument=new Instrument();
+			instrument.drumset=true;
 			section.position=offset;
 			
 			var low:uint=section.readUnsignedByte();

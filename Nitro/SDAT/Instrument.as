@@ -15,6 +15,8 @@
 		public static const NOTETYPE_NOISE:uint=2;
 		
 		public var noteType:uint;
+		
+		public var drumset:Boolean;
 
 		public function Instrument() {
 			regions=new Vector.<InstrumentRegion>();
@@ -40,7 +42,7 @@
 		}
 		
 		public function toXML():XML {
-			var o:XML=<instrument noteType={noteTypeAsString(noteType)} />;
+			var o:XML=<instrument noteType={noteTypeAsString(noteType)} drumset={drumset?"true":"false"} />;
 			
 			for each(var region:InstrumentRegion in regions) {
 				o.appendChild(region.toXML());
