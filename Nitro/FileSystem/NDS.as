@@ -77,7 +77,7 @@
 			
 			var romVersion:uint=nds.readUnsignedByte();
 			
-			var flags:uint=nds.nds.readUnsignedByte();
+			var flags:uint=nds.readUnsignedByte();
 			
 			arm9Offset=nds.readUnsignedInt();
 			arm9ExecuteStart=nds.readUnsignedInt();
