@@ -199,6 +199,18 @@
 						evt=new ADSREvent("R",data.readUnsignedByte());
 					break;
 					
+					case 0xD4:
+						evt=new LoopStartEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xD5://Expression
+						evt=new ExpressionEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xD6://print var
+						data.position+=1;
+					break;	
+					
 					case 0xE0:
 						evt=new ModulationEvent("delay",data.readUnsignedShort());
 					break;
@@ -210,18 +222,6 @@
 					case 0xE3:
 						evt=new SweepPitchEvent(data.readUnsignedShort());
 					break;
-					
-					case 0xD4:
-						evt=new LoopStartEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xD5://Expression
-						evt=new ExpressionEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xD6://print var
-						data.position+=1;
-					break;					
 					
 					case 0xFE://Multitrack marker op
 						data.position+=2;//unknown data

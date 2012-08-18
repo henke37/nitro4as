@@ -201,6 +201,7 @@
 		@return A new ByteArray holding the contents of the file
 		*/
 		public function openFileById(id:uint):ByteArray {
+			//used by overlays, don't remove
 			
 			nds.position=id*8+FATPos;
 			
