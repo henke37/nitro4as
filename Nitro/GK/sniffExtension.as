@@ -1,7 +1,7 @@
 ﻿package Nitro.GK {
 	import flash.utils.*;
 	
-	/** Tries to estimate the correct file extension for a file based on the contents of the time.
+	/** Tries to guess the correct file extension for a file based on the contents of the file.
 	@param data The contents of the file
 	@param name The name of the file
 	@return The file extension, without a leading dot*/

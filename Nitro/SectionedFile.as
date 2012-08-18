@@ -10,6 +10,7 @@
 		
 		protected var mainId:String;
 		
+		/** The size of a section header */
 		public static const sectionHeaderSize:uint=8;
 		protected static const headerSize:uint=0x10;
 

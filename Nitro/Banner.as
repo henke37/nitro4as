@@ -15,7 +15,7 @@
 		public var enTitle:String;
 		/** The French title of the game. */
 		public var frTitle:String;
-		/** The Deutch title of the game. */
+		/** The German title of the game. */
 		public var deTitle:String;
 		/** The Italian title of the game. */
 		public var itTitle:String;

@@ -183,7 +183,7 @@
 			return openFileByReference(file);
 		}
 		
-		/** Opens a file by refernce
+		/** Opens a file by reference
 		@param file The reference to the file
 		@return A new ByteArray holding the contents of the file
 		*/

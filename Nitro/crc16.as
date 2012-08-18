@@ -2,6 +2,13 @@
 	
 	import flash.utils.*;
 	
+	/** Computes a CRC16 checksum like the BIOS does
+	@param ba The data to checksum
+	@param start The start position of the data to checksum
+	@param end The end position of the data to checksum (exclusive)
+	@param crc The CRC seed value
+	@return The computed CRC value
+	*/
 	public function crc16(ba:ByteArray,start:uint=0,end:uint=0xFFFFFFFF,crc:uint=0xFFFF):uint {
 		
 		if(end==0xFFFFFFFF) end=ba.length;

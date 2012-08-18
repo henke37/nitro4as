@@ -14,6 +14,9 @@
 			// constructor code
 		}
 		
+		/** Parses a ByteArray
+		@argument d The ByteArray to parse
+		*/
 		public function parse(d:ByteArray):void {
 			var fileCount:uint;
 			
@@ -37,8 +40,12 @@
 			}
 		}
 		
+		/** The number of files in the archive */
 		public function get length():uint { return entries.length }
 		
+		/** Opens a file in the archive
+		@argument id The numerical id of the file to open
+		@return A new ByteArray with the contents of the file*/
 		public function open(id:uint):ByteArray {
 			var entry:ArchiveEntry=entries[id];
 			

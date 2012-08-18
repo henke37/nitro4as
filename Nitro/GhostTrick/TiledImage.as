@@ -5,6 +5,7 @@
 	
 	import Nitro.Graphics.*;
 	
+	/** A reader for the tiled images found in cpac_2d.bin/4 */
 	public class TiledImage {
 		
 		private var width:uint;
@@ -17,6 +18,9 @@
 			// constructor code
 		}
 		
+		/** Parses a tiled image
+		@param data The ByteArray containing the tiled image
+		*/
 		public function parse(data:ByteArray):void {
 			
 			data.endian=Endian.LITTLE_ENDIAN;
@@ -50,6 +54,9 @@
 			
 		}
 		
+		/** Converts the tiled image to a normal BitmapData object
+		@param transparent If the image is transparent or not
+		@return A new BitmapData object holding the converted image */
 		public function toBMD(transparent:Boolean):BitmapData {
 			var out:BitmapData=new BitmapData(width,height,transparent);
 			

@@ -31,7 +31,8 @@
 			picture=p;
 		}
 		
-		/** Computes the optimal palette for the current picture */
+		/** Computes the optimal palette for the current picture
+		@throws ArgumentError The picture has too many colors*/
 		public function findPalette(useTransparency:Boolean=true):void {
 			
 			var color:uint;

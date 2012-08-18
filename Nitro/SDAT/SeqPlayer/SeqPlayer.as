@@ -68,13 +68,13 @@
 		}
 		
 		private function loadBank(bankId:uint):void {
-			var swars:Vector.<uint>=sdat.bankInfo[bankId].swars;
+			var swars:Vector.<int>=sdat.bankInfo[bankId].swars;
 			
 			var waveArchives:Vector.<SWAR>=new Vector.<SWAR>();
 			
 			for(var i:uint=0;i<4;++i) {
 				var swarId:uint=swars[i];
-				if(swarId!=0x0000FFFF) {
+				if(swarId!=-1) {
 					waveArchives[i]=sdat.openSWAR(swarId);
 				}
 			}
