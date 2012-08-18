@@ -73,8 +73,11 @@
 			
 			cardSize=2<<(nds.readUnsignedByte()+20);
 			
-			nds.position+=10;//card info
-			nds.position+=1;//flags
+			nds.position+=9;//card info
+			
+			var romVersion:uint=nds.readUnsignedByte();
+			
+			var flags:uint=nds.nds.readUnsignedByte();
 			
 			arm9Offset=nds.readUnsignedInt();
 			arm9ExecuteStart=nds.readUnsignedInt();
@@ -118,6 +121,8 @@
 			
 			var logoCRC:uint=nds.readUnsignedShort();
 			var headerCRC:uint=nds.readUnsignedShort();
+			var calcCRC:uint=crc16(nds,0,0x15D);
+			if(calcCRC!=headerCRC) throw new ArgumentError("Header CRC fail. Expected 0x"+headerCRC.toString(16)+" got 0x"+calcCRC+"!");
 			
 			if(bannerOffset) {
 				try {
