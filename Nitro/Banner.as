@@ -48,6 +48,8 @@
 			if(version!=1) throw new ArgumentError("Invalid banner version "+version);
 			
 			var bannerCRC:uint=nds.readUnsignedShort();
+			var calcCRC:uint=crc16(nds,bannerOffset+0x020,bannerOffset+0x83F);
+			if(bannerCRC!=calcCRC) throw new ArgumentError("Banner CRC failure! Expected "+bannerCRC.toString(16)+", but got "+calcCRC.toString(16)+"!");
 			
 			nds.position=544+bannerOffset;//pallete data
 			
