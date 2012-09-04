@@ -10,6 +10,10 @@
 	import Nitro.GK.*;
 	import Nitro.Graphics.*;
 	
+	import fl.controls.*;
+	
+	import com.adobe.images.PNGEncoder;
+	
 	public class GKTest extends MovieClip {
 		
 		private var loader:URLLoader;
@@ -17,6 +21,20 @@
 		private var masterArchive:MasterArchive;
 		
 		private var outDir:File;
+		
+		/** @private */
+		public var dumpBins_mc:Button;
+		/** @private */
+		public var dumpScreen_mc:Button;
+		
+		private static const screens:Array=[
+			{palId:4527,gfxId:4529,scrnId:4528,bpp:8},
+			{palId:4531,gfxId:4532,scrnId:4530,bpp:8}
+		];
+		
+		private static const bitmaps:Array=[
+			{palId:4525,gfxId:4526,bpp:8}
+		];
 		
 		public function GKTest() {
 			loader=new URLLoader();
@@ -45,8 +63,11 @@
 		}
 		
 		private function screenDumpClick(e:MouseEvent):void {
-			var screen:DisplayObject=decodeScreen(4531,8,4532,4530);
+			var screen:DisplayObject=decodeScreen(0);
 			addChild(screen);
+			
+			var fr:FileReference=new FileReference();
+			fr.save(encodeImage(screen),"screen.png");
 		}
 		
 		private function selected(e:Event):void {
@@ -71,7 +92,23 @@
 			
 		}
 		
-		private function decodeScreen(palId:uint,bpp:uint,gfxId:uint,scrnId:uint):DisplayObject {
+		private function decodeScreen(id:uint):DisplayObject {
+			var scrn:Object=screens[id];
+			return decodeScreenInternal(scrn.palId,scrn.bpp,scrn.gfxId,scrn.scrnId);
+		}
+		
+		private function decodeBitmap(id:uint):DisplayObject {
+			var pic:Object=bitmaps[id];
+			return decodeBitmapInternal(pic.palId,pic.bpp,pic.gfxId);
+		}
+		
+		private function encodeImage(drawable:DisplayObject):ByteArray {
+			var bmd:BitmapData=new BitmapData(drawable.width,drawable.height);
+			bmd.draw(drawable);
+			return PNGEncoder.encode(bmd);
+		}
+		
+		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,scrnId:uint):DisplayObject {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
 			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
@@ -86,6 +123,19 @@
 			scrn.loadEntries(scrnData,32,24,true);
 			
 			return scrn.render(gfx,decodedPal,false);
+		}
+		
+		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint):DisplayObject {
+			var palData:ByteArray=masterArchive.open(palId);
+			palData.endian=Endian.LITTLE_ENDIAN;
+			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
+			
+			var gfxData:ByteArray=masterArchive.open(gfxId);
+			var gfx:GraphicsBank=new GraphicsBank();
+			gfx.bitDepth=bpp;
+			gfx.parseTiled(gfxData,0,gfxData.length);
+			
+			return gfx.render(decodedPal,0,false);
 		}
 		
 		private function saveFile(path:String,data:ByteArray):void {

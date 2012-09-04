@@ -16,9 +16,17 @@
 			// constructor code
 		}
 		
+		/** The height of the screen data, measured in pixels. */
 		public function get height():uint { return Tile.height*rows; }
+		/** The width of the screen data, measured in pixels */
 		public function get width():uint { return Tile.width*cols; }
 		
+		/** Loads tile entries from a ByteArray
+		@param data The ByteArray to load entries from 
+		@param cols The number of colums in the screen
+		@param rows The number of rows in the screen
+		@param advanced If the advanced tilemap fomat is used
+		*/
 		public function loadEntries(data:ByteArray,cols:uint,rows:uint,advanced:Boolean):void {
 			this.cols=cols;
 			this.rows=rows;

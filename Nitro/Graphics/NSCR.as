@@ -32,8 +32,8 @@
 			var section:ByteArray=sections.open("NRCS");
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			const width=section.readUnsignedShort();
-			const height=section.readUnsignedShort();
+			const width:uint=section.readUnsignedShort();
+			const height:uint=section.readUnsignedShort();
 			
 			if(width % Tile.width || height % Tile.height) throw new ArgumentError("Width and height must be evenly divdeable by the tile size!");
 			
