@@ -29,8 +29,11 @@
 		public function parseTiled(data:ByteArray,dataOffset:uint,dataSize:uint):void {
 			var index:uint;
 			
+			const endPos:uint=dataSize+dataOffset;
+			data.position=dataOffset;
+			
 			tiles=new Vector.<Tile>();
-			while(data.position<dataSize+dataOffset) {
+			while(data.position<endPos) {
 				
 				var tile:Tile=new Tile();
 				tile.readTile(bitDepth,data);
