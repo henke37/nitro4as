@@ -1,4 +1,4 @@
-﻿package Nitro.GK {
+﻿package Nitro.GK2 {
 	import flash.utils.*;
 	
 	/** Reader and writer for GK 2 subarchives */

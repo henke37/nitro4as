@@ -1,4 +1,4 @@
-﻿package Nitro.GK {
+﻿package Nitro.GK2 {
 	import flash.utils.*;
 	
 	import Nitro.Compression.*;

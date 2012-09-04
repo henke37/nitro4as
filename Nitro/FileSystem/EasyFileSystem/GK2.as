@@ -3,7 +3,7 @@
 	import flash.utils.*;
 	
 	import Nitro.FileSystem.*;
-	import Nitro.GK.*;
+	import Nitro.GK2.*;
 	
 	public class GK2 extends Basic {
 

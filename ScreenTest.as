@@ -8,7 +8,7 @@
 	import Nitro.FileSystem.*;
 	import Nitro.Graphics.*;
 	import Nitro.*;
-	import Nitro.GK.*;
+	import Nitro.GK2.*;
 	
 	public class ScreenTest extends MovieClip {
 		

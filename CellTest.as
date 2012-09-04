@@ -4,12 +4,13 @@
 	import flash.net.*;
 	import flash.events.*;	
 	import flash.utils.*;
+	import flash.geom.*;
 	
 	import Nitro.FileSystem.*;
 	import Nitro.Graphics.*;
 	import Nitro.*;
-	import Nitro.GK.*;
-	import flash.geom.Rectangle;
+	import Nitro.GK2.*;
+	
 	
 	public class CellTest extends MovieClip {
 		

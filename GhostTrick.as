@@ -85,6 +85,8 @@
 			ripSingle_mc.addEventListener(MouseEvent.CLICK,ripSingleClick);
 			
 			//dumpArchive("cpac_2d.bin",0);
+			
+			//dumpFile(3,21288);
 		}
 		
 		private function ripSingleClick(e:MouseEvent):void {
@@ -168,6 +170,15 @@
 				ripSingle_mc.enabled=false;
 				status_txt.text=err.getStackTrace();
 			}
+		}
+		
+		private function dumpFile(archive:uint,id:uint):void {
+			var subArchive:SubArchive=new SubArchive();
+			subArchive.parse(mainPack.open(archive));
+			
+			var data:ByteArray=subArchive.open(id);
+			var fr:FileReference=new FileReference();
+			fr.save(data,id+".bin");
 		}
 		
 		private function dumpArchive(fileName:String,id:uint):void {

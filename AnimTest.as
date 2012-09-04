@@ -10,7 +10,7 @@
 	import Nitro.Graphics.*;
 	import Nitro.Animation.*;
 	import Nitro.*;
-	import Nitro.GK.*;
+	import Nitro.GK2.*;
 	
 	
 	public class AnimTest extends MovieClip {

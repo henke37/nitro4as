@@ -1,4 +1,4 @@
-﻿package Nitro.GK {
+﻿package Nitro.GK2 {
 	import flash.utils.*;
 	
 	/** Tries to guess the correct file extension for a file based on the contents of the file.

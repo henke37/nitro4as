@@ -6,7 +6,7 @@
 	import flash.utils.*;
 	
 	import Nitro.FileSystem.*;
-	import Nitro.GK.*;
+	import Nitro.GK2.*;
 	
 	public class PackerTest extends MovieClip {
 		
