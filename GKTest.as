@@ -5,18 +5,22 @@
 	import flash.events.*;
 	import flash.utils.*;
 	import flash.filesystem.*;
+	import flash.text.*;
 	
 	import Nitro.FileSystem.NDS;
 	import Nitro.GK.*;
 	import Nitro.Graphics.*;
 	
 	import fl.controls.*;
+	import fl.events.*;
+	import fl.containers.*;
 	
 	import com.adobe.images.PNGEncoder;
 	
+	
 	public class GKTest extends MovieClip {
 		
-		private var loader:URLLoader;
+		private var romSelector:File;
 		
 		private var masterArchive:MasterArchive;
 		
@@ -26,6 +30,23 @@
 		public var dumpBins_mc:Button;
 		/** @private */
 		public var dumpScreen_mc:Button;
+		
+		public var tilemapEnable_mc:CheckBox;
+		
+		public var screen_mc:NumericStepper;
+		public var palette_mc:NumericStepper;
+		public var graphics_mc:NumericStepper;
+		
+		public var cols_mc:NumericStepper;
+		public var rows_mc:NumericStepper;
+		
+		public var bpp_mc:ComboBox;
+		
+		public var loadRom_mc:Button;
+		public var decode_mc:Button;
+		public var save_mc:Button;
+		
+		public var output_mc:ScrollPane;
 		
 		private static const screens:Array=[
 			{palId:4527,gfxId:4529,scrnId:4528,bpp:8},
@@ -37,23 +58,118 @@
 		];
 		
 		public function GKTest() {
-			loader=new URLLoader();
-			loader.dataFormat=URLLoaderDataFormat.BINARY;
-			loader.addEventListener(Event.COMPLETE,loaded);
-			loader.load(new URLRequest("gk1.nds"));
+			loadRom_mc.addEventListener(ComponentEvent.BUTTON_DOWN,loadClick);
 		}
 		
-		private function loaded(e:Event):void {
+		private function loadClick(e:Event):void {
+			romSelector=new File();
+			romSelector.addEventListener(Event.SELECT,romSelected);
+			romSelector.browseForOpen("Select rom to load",[ new FileFilter("NDS rom","*.nds") ]);
+		}
+		
+		private function romSelected(e:Event):void {
+			var fs:FileStream=new FileStream();
+			fs.open(romSelector,FileMode.READ);
+			
+			var romData:ByteArray=new ByteArray();
+			
+			fs.readBytes(romData);
+			fs.close();
+			
+			loaded(romData);
+		}
+		
+		private function loaded(data:ByteArray):void {
 			var nds:NDS=new NDS();
-			nds.parse(loader.data);
+			nds.parse(data);
 			
 			var archiveData:ByteArray=nds.fileSystem.openFileByName("files/romfile.bin");
 			
 			masterArchive=new MasterArchive();
 			masterArchive.parse(archiveData);
 			
+			enableUI();
+		}
+		
+		private function enableUI():void {
+			dumpBins_mc.enabled=true;
 			dumpBins_mc.addEventListener(MouseEvent.CLICK,binDumpClick);
-			dumpScreen_mc.addEventListener(MouseEvent.CLICK,screenDumpClick);
+			
+			const maxFileId:uint=masterArchive.length-1;
+			
+			screen_mc.enabled=true;
+			screen_mc.maximum=maxFileId;
+			
+			graphics_mc.enabled=true;
+			graphics_mc.maximum=maxFileId;
+			
+			palette_mc.enabled=true;
+			palette_mc.maximum=maxFileId;
+			
+			cols_mc.enabled=true;
+			rows_mc.enabled=true;
+			bpp_mc.enabled=true;
+			
+			tilemapEnable_mc.enabled=true;
+			tilemapEnable_mc.addEventListener(Event.CHANGE,tilemapEnableChange);
+			
+			loadRom_mc.enabled=false;
+			
+			decode_mc.addEventListener(MouseEvent.CLICK,decodeClick);
+			decode_mc.enabled=true;
+			
+			
+			save_mc.addEventListener(ComponentEvent.BUTTON_DOWN,saveClick);
+		}
+		
+		private function tilemapEnableChange(e:Event):void {
+			screen_mc.enabled=tilemapEnable_mc.selected;
+		}
+		
+		private function decodeClick(e:Event):void {
+			try {
+				var content:DisplayObject;
+				
+				if(tilemapEnable_mc.selected) {
+				
+					content=decodeScreenInternal(
+						palette_mc.value,
+						bpp_mc.selectedItem.data,
+						graphics_mc.value,
+						screen_mc.value,
+						cols_mc.value,
+						rows_mc.value
+					);
+				} else {
+					content=decodeBitmapInternal(
+						palette_mc.value,
+						bpp_mc.selectedItem.data,
+						graphics_mc.value,
+						cols_mc.value,
+						rows_mc.value
+					);
+				}
+				
+				save_mc.enabled=true;
+				
+				output_mc.source=content;
+			} catch(err:Error) {
+				var tf:TextField=new TextField();
+				tf.text=err.message;
+				tf.autoSize=TextFieldAutoSize.LEFT;
+				output_mc.source=tf;
+				
+				save_mc.enabled=false;
+			}
+			
+			output_mc.refreshPane();
+		}
+		
+		private function saveClick(e:Event):void {
+			var png:ByteArray=encodeImage(DisplayObject(output_mc.source));
+			
+			outDir=new File();
+			outDir.save(png,graphics_mc.value+".png");
 		}
 		
 		private function binDumpClick(e:MouseEvent):void {
@@ -108,7 +224,7 @@
 			return PNGEncoder.encode(bmd);
 		}
 		
-		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,scrnId:uint):DisplayObject {
+		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,scrnId:uint,cols:uint=32,rows:uint=24):DisplayObject {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
 			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
@@ -120,12 +236,12 @@
 			
 			var scrnData:ByteArray=masterArchive.open(scrnId);
 			var scrn:TileMappedScreen=new TileMappedScreen();
-			scrn.loadEntries(scrnData,32,24,true);
+			scrn.loadEntries(scrnData,cols,rows,true);
 			
 			return scrn.render(gfx,decodedPal,false);
 		}
 		
-		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint):DisplayObject {
+		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint,cols:uint=32,rows:uint=24):DisplayObject {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
 			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
@@ -133,6 +249,8 @@
 			var gfxData:ByteArray=masterArchive.open(gfxId);
 			var gfx:GraphicsBank=new GraphicsBank();
 			gfx.bitDepth=bpp;
+			gfx.tilesX=cols;
+			gfx.tilesY=rows;
 			gfx.parseTiled(gfxData,0,gfxData.length);
 			
 			return gfx.render(decodedPal,0,false);
