@@ -322,18 +322,23 @@
 		@param palette The palette to use when rendering, in RGB888 format
 		@param paletteIndex The subpalette index to use
 		@param useTransparency If the tiles should be rendered using transparency
+		@return A new DisplayObject that represents the bank
 		*/
-		public function render(palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true):Sprite {
+		public function render(palette:Vector.<uint>,paletteIndex:uint=0,useTransparency:Boolean=true):DisplayObject {
+			var x:uint;
+			var y:uint;
+			var index:uint;
+			var bmd:BitmapData
 			
 			if(tiles) {
 			
 				var spr:Sprite=new Sprite();
-				for(var y:uint=0;y<tilesY;++y) {
-					for(var x:uint=0;x<tilesX;++x) {
-						var index:uint=x+y*tilesX;
+				for(y=0;y<tilesY;++y) {
+					for(x=0;x<tilesX;++x) {
+						index=x+y*tilesX;
 						var tile:Tile=tiles[index];
 						
-						var bmd:BitmapData=tile.toBMD(palette,paletteIndex,useTransparency);
+						bmd=tile.toBMD(palette,paletteIndex,useTransparency);
 						var bitmap:Bitmap=new Bitmap(bmd);
 						bitmap.x=x*Tile.width;
 						bitmap.y=y*Tile.height;
@@ -343,7 +348,26 @@
 				}
 				return spr;
 			} else {
-				throw Error("unimplemented");
+				const w:uint=tilesX*Tile.width;
+				const h:uint=tilesY*Tile.height;
+				bmd=new BitmapData(w,h,useTransparency);
+				bmd.lock();
+				
+				for(y=0;y<h;++y) {
+					for(x=0;x<w;++x) {
+						var color:uint=picture[x+y*w];
+						if(color==0 && useTransparency) {
+							bmd.setPixel32(x,y,0x00FFF00F);
+						} else {
+							color=palette[color+paletteIndex*16];
+							bmd.setPixel(x,y,color);
+						}
+					}
+				}
+				
+				bmd.unlock();
+				
+				return new Bitmap(bmd);
 			}
 		}
 		

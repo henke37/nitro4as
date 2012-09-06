@@ -10,6 +10,7 @@
 	import Nitro.FileSystem.NDS;
 	import Nitro.GK.*;
 	import Nitro.Graphics.*;
+	import Nitro.Compression.*;
 	
 	import fl.controls.*;
 	import fl.events.*;
@@ -32,6 +33,7 @@
 		public var dumpScreen_mc:Button;
 		
 		public var tilemapEnable_mc:CheckBox;
+		public var graphicsCompressed_mc:CheckBox;
 		
 		public var screen_mc:NumericStepper;
 		public var palette_mc:NumericStepper;
@@ -41,6 +43,7 @@
 		public var rows_mc:NumericStepper;
 		
 		public var bpp_mc:ComboBox;
+		public var graphicsMode_mc:ComboBox;
 		
 		public var loadRom_mc:Button;
 		public var decode_mc:Button;
@@ -97,7 +100,7 @@
 			
 			const maxFileId:uint=masterArchive.length-1;
 			
-			screen_mc.enabled=true;
+			//screen_mc.enabled=true;
 			screen_mc.maximum=maxFileId;
 			
 			graphics_mc.enabled=true;
@@ -109,6 +112,7 @@
 			cols_mc.enabled=true;
 			rows_mc.enabled=true;
 			bpp_mc.enabled=true;
+			graphicsCompressed_mc.enabled=true;
 			
 			tilemapEnable_mc.enabled=true;
 			tilemapEnable_mc.addEventListener(Event.CHANGE,tilemapEnableChange);
@@ -118,24 +122,37 @@
 			decode_mc.addEventListener(MouseEvent.CLICK,decodeClick);
 			decode_mc.enabled=true;
 			
+			graphicsMode_mc.enabled=true;
+			graphicsMode_mc.addEventListener(Event.CHANGE,graphicsModeChange);
 			
 			save_mc.addEventListener(ComponentEvent.BUTTON_DOWN,saveClick);
 		}
 		
+		private function get useTilemap():Boolean {
+			return tilemapEnable_mc.selected && graphicsMode_mc.selectedItem.data=="tiled";
+		}
+		
 		private function tilemapEnableChange(e:Event):void {
-			screen_mc.enabled=tilemapEnable_mc.selected;
+			screen_mc.enabled=useTilemap;
+			graphicsMode_mc.enabled=!tilemapEnable_mc.selected;
+		}
+		
+		private function graphicsModeChange(e:Event):void {
+			screen_mc.enabled=useTilemap;
+			tilemapEnable_mc.enabled=graphicsMode_mc.selectedItem.data=="tiled";
 		}
 		
 		private function decodeClick(e:Event):void {
 			try {
 				var content:DisplayObject;
 				
-				if(tilemapEnable_mc.selected) {
+				if(useTilemap) {
 				
 					content=decodeScreenInternal(
 						palette_mc.value,
 						bpp_mc.selectedItem.data,
 						graphics_mc.value,
+						graphicsCompressed_mc.selected,
 						screen_mc.value,
 						cols_mc.value,
 						rows_mc.value
@@ -145,6 +162,8 @@
 						palette_mc.value,
 						bpp_mc.selectedItem.data,
 						graphics_mc.value,
+						graphicsCompressed_mc.selected,
+						graphicsMode_mc.selectedItem.data=="linear",
 						cols_mc.value,
 						rows_mc.value
 					);
@@ -210,12 +229,12 @@
 		
 		private function decodeScreen(id:uint):DisplayObject {
 			var scrn:Object=screens[id];
-			return decodeScreenInternal(scrn.palId,scrn.bpp,scrn.gfxId,scrn.scrnId);
+			return decodeScreenInternal(scrn.palId,scrn.bpp,scrn.gfxId,scrn.compressedGfx,scrn.scrnId);
 		}
 		
 		private function decodeBitmap(id:uint):DisplayObject {
 			var pic:Object=bitmaps[id];
-			return decodeBitmapInternal(pic.palId,pic.bpp,pic.gfxId);
+			return decodeBitmapInternal(pic.palId,pic.bpp,pic.gfxId,pic.compressedGfx,pic.linear,pic.cols,pic.rows);
 		}
 		
 		private function encodeImage(drawable:DisplayObject):ByteArray {
@@ -224,12 +243,17 @@
 			return PNGEncoder.encode(bmd);
 		}
 		
-		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,scrnId:uint,cols:uint=32,rows:uint=24):DisplayObject {
+		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,compressedGfx:Boolean,scrnId:uint,cols:uint=32,rows:uint=24):DisplayObject {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
 			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
 			
 			var gfxData:ByteArray=masterArchive.open(gfxId);
+			gfxData.endian=Endian.LITTLE_ENDIAN;
+			if(compressedGfx) {
+				gfxData=Stock.decompress(gfxData);
+			}
+			
 			var gfx:GraphicsBank=new GraphicsBank();
 			gfx.bitDepth=bpp;
 			gfx.parseTiled(gfxData,0,gfxData.length);
@@ -241,17 +265,27 @@
 			return scrn.render(gfx,decodedPal,false);
 		}
 		
-		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint,cols:uint=32,rows:uint=24):DisplayObject {
+		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint,compressedGfx:Boolean,linearMode:Boolean=false,cols:uint=32,rows:uint=24):DisplayObject {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
 			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
 			
 			var gfxData:ByteArray=masterArchive.open(gfxId);
+			gfxData.endian=Endian.LITTLE_ENDIAN;
+			if(compressedGfx) {
+				gfxData=Stock.decompress(gfxData);
+			}
+			
 			var gfx:GraphicsBank=new GraphicsBank();
 			gfx.bitDepth=bpp;
 			gfx.tilesX=cols;
 			gfx.tilesY=rows;
-			gfx.parseTiled(gfxData,0,gfxData.length);
+			
+			if(linearMode) {
+				gfx.parseScaned(gfxData,0,gfxData.length);
+			} else {
+				gfx.parseTiled(gfxData,0,gfxData.length);
+			}
 			
 			return gfx.render(decodedPal,0,false);
 		}
