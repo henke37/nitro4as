@@ -46,6 +46,8 @@
 		public var graphicsMode_mc:ComboBox;
 		public var tilemapMode_mc:ComboBox;
 		
+		public var subPalette_mc:NumericStepper;
+		
 		public var loadRom_mc:Button;
 		public var decode_mc:Button;
 		public var save_mc:Button;
@@ -112,7 +114,10 @@
 			
 			cols_mc.enabled=true;
 			rows_mc.enabled=true;
+			
 			bpp_mc.enabled=true;
+			bpp_mc.addEventListener(Event.CHANGE,bppChange);
+			
 			graphicsCompressed_mc.enabled=true;
 			
 			tilemapMode_mc.enabled=true;
@@ -129,20 +134,32 @@
 			transparent_mc.enabled=true;
 			
 			save_mc.addEventListener(ComponentEvent.BUTTON_DOWN,saveClick);
+			
+			subPalette_mc.enabled=useSubPal;
 		}
 		
 		private function get useTilemap():Boolean {
 			return tilemapMode_mc.selectedItem.data!="off" && graphicsMode_mc.selectedItem.data=="tiled";
 		}
 		
+		private function get useSubPal():Boolean {
+			return !useTilemap && bpp_mc.selectedItem.data=="4";
+		}
+		
+		private function bppChange(e:Event):void {
+			subPalette_mc.enabled=useSubPal;
+		}
+		
 		private function tilemapModeChange(e:Event):void {
 			screen_mc.enabled=useTilemap;
 			graphicsMode_mc.enabled=tilemapMode_mc.selectedItem.data=="off";
+			subPalette_mc.enabled=useSubPal;
 		}
 		
 		private function graphicsModeChange(e:Event):void {
 			screen_mc.enabled=useTilemap;
 			tilemapMode_mc.enabled=graphicsMode_mc.selectedItem.data=="tiled";
+			subPalette_mc.enabled=useSubPal;
 		}
 		
 		private function decodeClick(e:Event):void {
@@ -163,9 +180,11 @@
 						tilemapMode_mc.selectedItem.data=="advanced"
 					);
 				} else {
+					const subPal:uint=((bpp_mc.selectedItem.data==4)?subPalette_mc.value:0);
 					content=decodeBitmapInternal(
 						palette_mc.value,
 						bpp_mc.selectedItem.data,
+						subPal,
 						graphics_mc.value,
 						graphicsCompressed_mc.selected,
 						transparent_mc.selected,
@@ -240,7 +259,7 @@
 		
 		private function decodeBitmap(id:uint):DisplayObject {
 			var pic:Object=bitmaps[id];
-			return decodeBitmapInternal(pic.palId,pic.bpp,pic.gfxId,pic.compressedGfx,pic.transparent,pic.linear,pic.cols,pic.rows);
+			return decodeBitmapInternal(pic.palId,pic.bpp,pic.subPal,pic.gfxId,pic.compressedGfx,pic.transparent,pic.linear,pic.cols,pic.rows);
 		}
 		
 		private function encodeImage(drawable:DisplayObject):ByteArray {
@@ -249,10 +268,18 @@
 			return PNGEncoder.encode(bmd);
 		}
 		
-		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,compressedGfx:Boolean,transparent:Boolean,scrnId:uint,cols:uint=32,rows:uint=24,advanced:Boolean=true):DisplayObject {
+		private function loadPalette(palId:uint):Vector.<uint> {
 			var palData:ByteArray=masterArchive.open(palId);
 			palData.endian=Endian.LITTLE_ENDIAN;
-			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
+			var decodedPal:Vector.<uint>=new Vector.<uint>();
+			while(palData.bytesAvailable>=2) {
+				decodedPal.push(RGB555.read555Color(palData));
+			}
+			return decodedPal;
+		}
+		
+		private function decodeScreenInternal(palId:uint,bpp:uint,gfxId:uint,compressedGfx:Boolean,transparent:Boolean,scrnId:uint,cols:uint=32,rows:uint=24,advanced:Boolean=true):DisplayObject {
+			var decodedPal:Vector.<uint>=loadPalette(palId);
 			
 			var gfxData:ByteArray=masterArchive.open(gfxId);
 			gfxData.endian=Endian.LITTLE_ENDIAN;
@@ -271,10 +298,8 @@
 			return scrn.render(gfx,decodedPal,transparent);
 		}
 		
-		private function decodeBitmapInternal(palId:uint,bpp:uint,gfxId:uint,compressedGfx:Boolean,transparent:Boolean=false,linearMode:Boolean=false,cols:uint=32,rows:uint=24):DisplayObject {
-			var palData:ByteArray=masterArchive.open(palId);
-			palData.endian=Endian.LITTLE_ENDIAN;
-			var decodedPal:Vector.<uint>=RGB555.readPalette(palData,bpp);
+		private function decodeBitmapInternal(palId:uint,bpp:uint,subPal:uint,gfxId:uint,compressedGfx:Boolean,transparent:Boolean=false,linearMode:Boolean=false,cols:uint=32,rows:uint=24):DisplayObject {
+			var decodedPal:Vector.<uint>=loadPalette(palId);
 			
 			var gfxData:ByteArray=masterArchive.open(gfxId);
 			gfxData.endian=Endian.LITTLE_ENDIAN;
@@ -293,7 +318,7 @@
 				gfx.parseTiled(gfxData,0,gfxData.length);
 			}
 			
-			return gfx.render(decodedPal,0,transparent);
+			return gfx.render(decodedPal,subPal,transparent);
 		}
 		
 		private function saveFile(path:String,data:ByteArray):void {
