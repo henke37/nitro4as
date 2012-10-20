@@ -75,10 +75,11 @@
 			
 			bmd.lock();
 			
+			var index:uint=0;
+			
 			for(var y:uint=0;y<height;++y) {
 				for(var x:uint=0;x<width;++x) {
-					var index:uint=x+y*width;
-					var color:uint=pixels[index];
+					var color:uint=pixels[index++];
 					if(color==0 && useTransparency) {
 						bmd.setPixel32(x,y,0x00FFFF00);
 					} else {

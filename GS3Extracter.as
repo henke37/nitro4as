@@ -41,6 +41,8 @@
 			outputSingleImage("bottomScreen1C.png",446284);
 			outputSingleImage("bottomScreen1D.png",456488);
 			
+			outputEvidence(0x00AD55E0,0x00B28A60);
+			
 			//saveDecodedChunk("10.bin",456488);
 			//outputBin("archive1",467012,false);
 			

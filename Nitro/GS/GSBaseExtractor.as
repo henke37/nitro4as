@@ -63,8 +63,6 @@
 		}
 		
 		protected function traceCurrentOffset():void {
-			
-			
 			trace(archiveData.position,alignedOffset);
 		}
 		
@@ -80,6 +78,8 @@
 		public function outputPatch(fileName:String,baseOffset:uint,patchOffset:uint,xTiles:uint,yTiles:uint,singleImage:uint=0,transparent:Boolean=false):void {
 			archiveData.position=baseOffset;
 			
+			var bpp:uint
+			
 			if(!singleImage) {
 				var archive:Archive=new Archive();
 				archive.parse(archiveData);
@@ -87,7 +87,7 @@
 				var subFile:ByteArray=archive.open(0);
 				subFile.endian=Endian.LITTLE_ENDIAN;
 				
-				var bpp:uint=(subFile.length==16*2)?4:8;
+				bpp=(subFile.length==16*2)?4:8;
 			} else {
 				bpp=singleImage;
 				subFile=Stock.decompress(archiveData);
@@ -183,8 +183,14 @@
 			saveImage(frame,fileName);
 		}
 		
+		private static const encodingOptions:PNGEncoderOptions=new PNGEncoderOptions();
+		
 		protected function saveImage(img:BitmapData,fileName:String):void {
-			var png:ByteArray=PNGEncoder.encode(img);
+			
+			var png:ByteArray;
+			
+			//png=PNGEncoder.encode(img);
+			png=img.encode(new Rectangle(0,0,img.width,img.height),encodingOptions);
 			
 			saveFile(png,fileName);
 		}

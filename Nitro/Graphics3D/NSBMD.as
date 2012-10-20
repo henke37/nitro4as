@@ -7,7 +7,7 @@
 	/** Parser for NSBMD files */
 	public class NSBMD {
 		
-		private var internalTexture:NSBTX;
+		public var internalTexture:NSBTX;
 
 		public function NSBMD() {
 		}
