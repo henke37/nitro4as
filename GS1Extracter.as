@@ -123,7 +123,7 @@
 			outputSlicedImage("demo end top.png",34763920);
 			outputSlicedImage("demo end bottom.png",34798240);
 			
-			outputSlicedImage("caseposters/locked 2.png",34858768,8);
+			outputSlicedImage("case posters/locked 2.png",34858768,32,8);
 		}
 		
 		private function extractCase1():void {
@@ -277,8 +277,8 @@
 			outputSlicedImage("locations/case 5/police station 1 jp.png",32402008);
 			outputSlicedImage("locations/case 5/police station 1 en.png",32437496);
 			outputSlicedImage("locations/case 5/edgeworths office.png",32473524);
-			outputSlicedImage("locations/case 5/parking lot jp.png",32512148,64);
-			outputSlicedImage("locations/case 5/parking lot en.png",32581488,64);
+			outputSlicedImage("locations/case 5/parking lot.png",32512148,64);
+			outputSlicedImage("locations/case 5/gants office.png",32581488,64);
 			outputSlicedImage("locations/case 5/locker room jp.png",32651436,64);
 			outputSlicedImage("locations/case 5/locker room en.png",32711384,64);
 			outputSlicedImage("locations/case 5/security station.png",32771424);
@@ -302,7 +302,7 @@
 			outputSlicedImage("case 5/locker handprint 3.png",32938508);
 			outputSlicedImage("case 5/locker handprint 4.png",32948828);
 			outputSlicedImage("case 5/locker handprint 5.png",33465544);
-			outputSlicedImage("case 5/locket handprint 6.png",33483832);
+			outputSlicedImage("case 5/locker handprint 6.png",33483832);
 			outputSlicedImage("case 5/locker handprint 7.png",33496372);
 			
 			outputSingleImage("case 5/jacket handprint.png",29476624);
