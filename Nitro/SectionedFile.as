@@ -1,12 +1,13 @@
-﻿package Nitro {
+package Nitro {
 	import flash.utils.*;
 	
 	/** A Nitro SDK standard sectioned file. */
 	
 	public class SectionedFile {
 		
-		protected var sections:Object;
-		protected var _data:ByteArray;
+		protected var sectionList:Vector.<Section>;
+		protected var sectionMap:Object;
+		protected var data:ByteArray;
 		
 		protected var mainId:String;
 		
@@ -23,9 +24,9 @@
 		public function parse(d:ByteArray):void {
 			if(!d) throw new ArgumentError("Data can not be null");
 			
-			_data=d;
+			data=d;
 			
-			_data.endian=Endian.LITTLE_ENDIAN;
+			data.endian=Endian.LITTLE_ENDIAN;
 			
 			mainId=d.readUTFBytes(4);
 			
@@ -41,7 +42,8 @@
 			
 			var subSectionCount:uint=d.readUnsignedShort();
 			
-			sections={};
+			sectionMap={};
+			sectionList=new Vector.<Section>(subSectionCount);
 			
 			var sectionOffset:uint=d.position;
 			
@@ -52,7 +54,8 @@
 				section.size=d.readUnsignedInt();
 				section.offset=sectionOffset;
 				
-				sections[section.id]=section;
+				sectionMap[section.id]=section;
+				sectionList[i]=section;
 				
 				sectionOffset+=section.size;
 			}
@@ -61,8 +64,6 @@
 		
 		/** The main id of the file. */
 		public function get id():String { return mainId; }
-		
-		public function get data():ByteArray { return _data; }
 		
 		/** Returns the position in the raw data where a section is located.
 		@param id The id of the section
@@ -80,11 +81,22 @@
 			if(!id) throw new ArgumentError("Id can not be null!");
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
 			
-			if(!id in sections) throw new ArgumentError("Section id \""+id+"\" does not exist.");
+			if(!id in sectionMap) throw new ArgumentError("Section id \""+id+"\" does not exist.");
 			
-			var section:Section=sections[id];
+			var section:Section=sectionMap[id];
 			return section;
 		}
+
+		/**
+		Finds a section by position
+		@param number The numerical position of the section
+		@return The section
+		*/
+		public function getSectionAt(number:uint):Section {
+			return sectionList[number];
+		}
+		
+		public function get length():uint { return sectionList.length; }
 																				
 		/** Opens a named section
 		@param id The four letter id of the section
@@ -93,8 +105,15 @@
 		public function open(id:String):ByteArray {			
 			var section:Section=findSection(id);
 			
+			return openSection(section);
+		}
+		
+		/** Opens a named section
+		@param section The section to open
+		@return The contents of the section*/
+		public function openSection(section:Section):ByteArray {
 			var o:ByteArray=new ByteArray();
-			o.writeBytes(_data,section.offset+sectionHeaderSize,section.size-sectionHeaderSize);
+			o.writeBytes(data,section.offset+sectionHeaderSize,section.size-sectionHeaderSize);
 			o.position=0;
 			return o;
 		}
@@ -106,15 +125,16 @@
 			if(!id) throw new ArgumentError("Id can not be null!");
 			if(id.length>4) throw new ArgumentError("Section names are 4 characters long!");
 			
-			return id in sections;
+			return id in sectionMap;
 		}
 		
 		/** Builds a file from the given
 		@param id The new main id of the file
-		@param sectionList An Object containing ByteArrays for the sections in the file. */
-		public function build(id:String,sectionList:Object):void {
-			_data=new ByteArray();
-			_data.endian=Endian.LITTLE_ENDIAN;
+		@param sectionList An Object containing ByteArrays for the sections in the file.
+		@return The built file*/
+		public static function build(id:String,sectionList:Object):void {
+			var data:ByteArray=new ByteArray();
+			data.endian=Endian.LITTLE_ENDIAN;
 			
 			var totalSize:uint=headerSize;
 			
@@ -126,17 +146,17 @@
 			}
 			totalSize+=sectionHeaderSize*sectionCount;
 			
-			_data.writeUTFBytes(id);
-			_data.writeUnsignedInt(0x0100FEFF);
-			_data.writeUnsignedInt(totalSize);
-			_data.writeShort(headerSize);
-			_data.writeShort(sectionCount);
+			data.writeUTFBytes(id);
+			data.writeUnsignedInt(0x0100FEFF);
+			data.writeUnsignedInt(totalSize);
+			data.writeShort(headerSize);
+			data.writeShort(sectionCount);
 			
 			for(var sectionID:String in sectionList) {
-				_data.writeUTFBytes(sectionID);
+				data.writeUTFBytes(sectionID);
 				sectionData=sectionList[sectionID];
-				_data.writeUnsignedInt(sectionData.length+sectionHeaderSize);
-				_data.writeBytes(sectionData);
+				data.writeUnsignedInt(sectionData.length+sectionHeaderSize);
+				data.writeBytes(sectionData);
 			}
 		}
 

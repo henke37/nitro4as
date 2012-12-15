@@ -1,5 +1,6 @@
-﻿package Nitro.Compression {
+package Nitro.Compression {
 	import flash.utils.*;
+	import HTools.ByteArrayBitStream;
 	
 	/** Decodes Huffman encoded data
 	@param inBuff The ByteArray holding the compressed data stream
@@ -86,31 +87,6 @@ class HuffmanTreeNode {
 	}
 }
 
-class ByteArrayBitStream {
-		
-	public var ba:ByteArray;
-	
-	private var bytePos:uint;
-	private var bitsLeft:uint;
-	private var bits:uint;
 
-	public function ByteArrayBitStream(ba:ByteArray) {
-		this.ba=ba;
-	}
-	
-	public function readBit():Boolean {
-		if(bitsLeft==0) {
-			bitsLeft=32;
-			bits=ba.readUnsignedInt();
-		}
-		
-		var bit:Boolean=Boolean(bits & 0x80000000);
-		bits<<=1;
-		bitsLeft--;
-		
-		return bit;
-	}
-
-}
 
 
