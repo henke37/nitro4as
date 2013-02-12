@@ -1,4 +1,4 @@
-﻿package Nitro.SDAT {
+package Nitro.SDAT {
 	
 	import flash.utils.*;
 	
@@ -29,6 +29,7 @@
 		sdatInternal var files:Vector.<FATRecord>;
 		
 		public var seqSymbols:Vector.<String>;
+		public var seqArchiveSymbols:Vector.<SeqArcSymbRecord>;
 		public var bankSymbols:Vector.<String>;
 		public var waveArchiveSymbols:Vector.<String>;
 		public var playerSymbols:Vector.<String>;
@@ -137,6 +138,16 @@
 			seq.parse(openFileById(sequenceInfo[seqId].fatId));
 			
 			return seq;
+		}
+		
+		/** Opens a sequence archie file
+		@param archId The id of the archive to open
+		@return The opened archive file */
+		public function openSSAR(archId:uint):SSAR {
+			var ssar:SSAR=new SSAR();
+			ssar.parse(openFileById(sequenceArchiveInfo[archId].fatId));
+			
+			return ssar;
 		}
 		
 		/** Opens an audio stream file
@@ -369,12 +380,39 @@
 			groupSymbols       = parseSymbSubRec(symbPos,groupPos);
 			player2Symbols     = parseSymbSubRec(symbPos,player2Pos);
 			streamSymbols      = parseSymbSubRec(symbPos,strmPos);
+			seqArchiveSymbols  = parseSymbNestSubRec(symbPos,seqarcPos);
 		}
 		
-		private function parseSymbNestSubRec(symbPos:uint,recPos:uint):Vector.<Vector.<String>> {
-			var o:Vector.<Vector.<String>>=new Vector.<Vector.<String>>();
+		private function parseSymbNestSubRec(symbPos:uint,recPos:uint):Vector.<SeqArcSymbRecord> {
+			sdat.position=recPos;
+			var numRecs:uint=sdat.readUnsignedInt();
 			
+			var o:Vector.<SeqArcSymbRecord>=new Vector.<SeqArcSymbRecord>(numRecs);
+			
+			for(var i:uint;i<numRecs;++i) {
+				sdat.position=recPos+4+8*i;
+				
+				var arcRec:SeqArcSymbRecord=new SeqArcSymbRecord();
+				
+				var stringPos:uint=symbPos+sdat.readUnsignedInt();
+				if(stringPos==symbPos) {
+					arcRec.symbol=null;
+				} else {
+					arcRec.symbol=readNullString(sdat,stringPos);
+				}
+				
+				sdat.position=recPos+4+8*i+4;
+				
+				var subPos:uint=sdat.readUnsignedInt()
+				
+				if(subPos) {
+					arcRec.subSymbols=parseSymbSubRec(symbPos,subPos+symbPos);
+				}
+				
+				o[i]=arcRec;
+			}
 			return o;
+			
 		}
 		
 		private function parseSymbSubRec(symbPos:uint,recPos:uint):Vector.<String> {

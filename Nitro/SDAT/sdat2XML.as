@@ -1,4 +1,4 @@
-﻿package Nitro.SDAT {
+package Nitro.SDAT {
 	
 	import Nitro.SDAT.InfoRecords.*;
 	
@@ -101,6 +101,38 @@
 				seqXML.@symbol=sdat.seqSymbols[i];
 			}
 			seqRootXML.appendChild(seqXML);
+		}
+		
+		var seqArcRootXML=<sequenceArchives />;
+		rootXML.appendChild(seqArcRootXML);
+		for(i=0;i<sdat.sequenceArchiveInfo.length;++i) {
+			var archiveXML:XML=<sequenceArchive />;
+			var symb:SeqArcSymbRecord=sdat.seqArchiveSymbols[i];
+			var archive:SSAR=sdat.openSSAR(i);
+			
+			if(sdat.hasSymbols) {
+				archiveXML.@symbol=symb.symbol;
+			}
+			
+			for(j=0;j<archive.length;++j) {
+				seqInfo=archive.sequenceInfo[j];
+				seqXML=<sequence
+					instrumentBank={seqInfo.bankId}
+					volume={seqInfo.vol}
+					channelPressure={seqInfo.channelPressure}
+					polyPreasure={seqInfo.polyPressure}
+					player={seqInfo.player}
+					fatId={seqInfo.fatId}
+				/>;
+				
+				if(sdat.hasSymbols) {
+					seqXML.@symbol=symb.subSymbols[j];
+				}
+				archiveXML.appendChild(seqXML);
+			}
+			
+			
+			seqArcRootXML.appendChild(archiveXML);
 		}
 		
 		var streamRootXML:XML=<streams />;
