@@ -135,6 +135,22 @@ package Nitro.SDAT {
 			seqArcRootXML.appendChild(archiveXML);
 		}
 		
+		var groupRootXML:XML=<groups />;
+		rootXML.appendChild(groupRootXML);
+		for(i=0;i<sdat.groupInfo.length;++i) {
+			var group:GroupInfoRecord=sdat.groupInfo[i];
+			var groupXML:XML=<group />;
+			
+			if(sdat.hasSymbols) {
+				groupXML.@symbol=sdat.groupSymbols[i];
+			}
+			
+			for(j=0;j<group.entries.length;++j) {
+				groupXML.appendChild(group.entries[j].toXML());
+			}
+			groupRootXML.appendChild(groupXML);
+		}
+		
 		var streamRootXML:XML=<streams />;
 		rootXML.appendChild(streamRootXML);
 		for(i=0;i<sdat.streamInfo.length;++i) {

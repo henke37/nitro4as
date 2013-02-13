@@ -1,4 +1,4 @@
-﻿package  {
+package  {
 	
 	import flash.display.*;
 	import flash.net.*;
@@ -18,7 +18,7 @@
 			loader=new URLLoader();
 			loader.dataFormat=URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE,loaded);
-			loader.load(new URLRequest("aj.nds"));
+			loader.load(new URLRequest("gk1.nds"));
 		}
 		
 		private function loaded(e:Event):void {

@@ -25,6 +25,8 @@ package Nitro.SDAT {
 		public var waveArchiveInfo:Vector.<BaseInfoRecord>;
 		/** The info records for all instrument banks stored in the SDAT file */
 		public var bankInfo:Vector.<BankInfoRecord>;
+		/** The info records for all groups stored in the SDAT file */
+		public var groupInfo:Vector.<GroupInfoRecord>;
 		
 		sdatInternal var files:Vector.<FATRecord>;
 		
@@ -181,7 +183,7 @@ package Nitro.SDAT {
 		}
 		
 		private function parseInfo(infoPos:uint,infoSize:uint):void {
-			var i:uint;
+			var i:uint,j:uint;
 			var offset:uint;
 			
 			var info:ByteArray=new ByteArray();
@@ -277,7 +279,7 @@ package Nitro.SDAT {
 				bankRecord.fatId=info.readUnsignedShort();
 				info.position+=2;
 				
-				for(var j:uint=0;j<4;++j) {
+				for(j=0;j<4;++j) {
 					bankRecord.swars[j]=info.readShort();
 				}
 				
@@ -308,6 +310,29 @@ package Nitro.SDAT {
 				waveArchiveInfo.push(waveArchiveRecord);
 			}
 			waveArchiveInfo.fixed=true;
+			
+			//read the group info
+			info.position=infoSectionOffsets[5];
+			const groupCount:uint=info.readUnsignedInt();
+			
+			const groupInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,groupCount);
+			groupInfo=new Vector.<GroupInfoRecord>();
+			for(i=0;i<groupCount;++i) {
+				offset=groupInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;
+				
+				var groupInfoRecord:GroupInfoRecord=new GroupInfoRecord();
+				groupInfo.push(groupInfoRecord);
+				
+				var groupElementCount:uint=info.readUnsignedInt();
+				for(j=0;j<groupElementCount;++j) {
+					var groupInfoSubRecord:GroupInfoSubRecord=new GroupInfoSubRecord();
+					groupInfoSubRecord.type=info.readUnsignedInt();
+					groupInfoSubRecord.id=info.readUnsignedInt();
+					groupInfoRecord.entries.push(groupInfoSubRecord);
+				}
+			}
 			
 			//read the stream info
 			info.position=infoSectionOffsets[7];
