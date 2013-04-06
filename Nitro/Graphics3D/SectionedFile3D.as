@@ -73,7 +73,7 @@
 		/** Builds a file from the given sections
 		@param id The new main id of the file
 		@param sectionList An Object containing ByteArrays for the sections in the file. */
-		public override function build(id:String,sectionList:Object):void {
+		public function build(id:String,sectionList:Object):void {
 			throw new Error("Not implemented!");
 		}
 

@@ -77,12 +77,10 @@
 		/** Writes the palette data of the file to a new ByteArray
 		@return The new ByteArray*/
 		public function save():ByteArray {
-			var sections:SectionedFile=new SectionedFile();
 			
 			var sectionList:Object={ TTLP:writeTTLP() };
 			
-			sections.build("RLCN",sectionList);
-			return sections.data;
+			return SectionedFile.build("RLCN",sectionList);
 		}
 		
 		private function writeTTLP():ByteArray {

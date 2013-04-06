@@ -1,4 +1,4 @@
-package Nitro {
+﻿package Nitro {
 	import flash.utils.*;
 	
 	/** A Nitro SDK standard sectioned file. */
@@ -132,7 +132,7 @@ package Nitro {
 		@param id The new main id of the file
 		@param sectionList An Object containing ByteArrays for the sections in the file.
 		@return The built file*/
-		public static function build(id:String,sectionList:Object):void {
+		public static function build(id:String,sectionList:Object):ByteArray {
 			var data:ByteArray=new ByteArray();
 			data.endian=Endian.LITTLE_ENDIAN;
 			
@@ -158,6 +158,8 @@ package Nitro {
 				data.writeUnsignedInt(sectionData.length+sectionHeaderSize);
 				data.writeBytes(sectionData);
 			}
+			
+			return data;
 		}
 
 	}

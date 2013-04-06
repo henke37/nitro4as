@@ -180,13 +180,10 @@
 		@param version The version to use when writing
 		*/
 		public function save(version:uint=0):ByteArray {
-			var sections:SectionedFile=new SectionedFile();
 			
 			var sectionList:Object={ KBEC: writeKBEC(version), LBAL: writeLBAL() };
 			
-			sections.build("RECN",sectionList);
-			
-			return sections.data;
+			return SectionedFile.build("RECN",sectionList);
 		}
 		
 		private function writeLBAL():ByteArray {
