@@ -17,9 +17,9 @@
 		public override function parse(d:ByteArray):void {
 			if(!d) throw new ArgumentError("Data can not be null");
 			
-			_data=d;
+			data=d;
 			
-			_data.endian=Endian.LITTLE_ENDIAN;
+			data.endian=Endian.LITTLE_ENDIAN;
 			
 			mainId=d.readUTFBytes(4);
 			
@@ -35,7 +35,7 @@
 			
 			var subSectionCount:uint=d.readUnsignedShort();
 			
-			sections={};
+			sectionMap={};
 			
 			var sectionTablePos:uint=d.position;
 			
@@ -50,7 +50,7 @@
 				section.size=d.readUnsignedInt();
 				section.offset=sectionOffset;
 				
-				sections[section.id]=section;
+				sectionMap[section.id]=section;
 				
 				sectionOffset+=section.size;
 			}
@@ -65,7 +65,7 @@
 			var section:Section=findSection(id);
 			
 			var o:ByteArray=new ByteArray();
-			o.writeBytes(_data,section.offset,section.size);
+			o.writeBytes(data,section.offset,section.size);
 			o.position=0;
 			return o;
 		}

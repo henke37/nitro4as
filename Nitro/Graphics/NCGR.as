@@ -66,13 +66,10 @@
 		/** Writes the contents of the file to a new ByteArray
 		@return A new ByteArray*/
 		public function save():ByteArray {
-			var sections:SectionedFile=new SectionedFile();
 			
 			var sectionList:Object={ RAHC: writeRAHC() };
 			
-			sections.build("RGCN",sectionList);
-			
-			return sections.data;
+			return SectionedFile.build("RGCN",sectionList);
 		}
 		
 		private function writeRAHC():ByteArray {
