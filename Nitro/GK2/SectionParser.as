@@ -118,9 +118,26 @@
 					return <wait time={section.readShort()} />;
 				break;
 					
+				case 0xE10D:
+					return commandE10D();
+				break;
+					
 				case 0xE12F:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
 				break;
+					
+				case 0xE13A:
+					return <spriteCTL command="0xA13a" a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} e={section.readShort()} />;
+				break;
+					
+				case 0xE13E:
+					return <waitAnim a={section.readShort()} />;
+				break;
+					
+				case 0xE144:
+					return <loadScene scene={section.readShort()} />;
+				break;
+					
 				case 0xE150:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE150"/>;
 				break
@@ -132,16 +149,20 @@
 					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE155"/>;
 				break;
 					
+				case 0xE15A:
+					return <syncCtrl enable={section.readShort()} />;
+				break;
+					
 				case 0xE188:
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
 				
 				case 0xE1D1: return <screenShake strength="mild" />;
-				case 0xE1D5: return <flash length="medium" />;
-				case 0xE1DA: return <screenShake strength="moderate" />;
+				case 0xE1D5: return <flashAndSoundEffect />;
+				case 0xE1DA: return <flashShakeAndPlaySound command="0xE1DA" />;
 				
 				case 0xE20D: return <center/>;
-				case 0xE280: return <flashAndShake strength="medium" command="0xE280" />;
+				case 0xE280: return <flashShakeAndPlaySound command="0xE280" />;
 				case 0xE281: return <flashAndShake strength="moderate" command="0xE281" />;
 				case 0xE285: return <flash length="short" />;
 				
@@ -150,15 +171,21 @@
 				break;
 				
 				//guessed but not confirmed commands
+					
+				case 0xE172: //more music?
+					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
+				break;
 				
 				case 0xE173:
-					return <playSoundEffectAndStopMusic a={section.readShort(); } confirmed="educated guess" />;
+					return <stopMusic a={section.readShort() } />;
 				break;
 
 				case 0xE17A:
-					return <musicThingy />;//music enable/select
+					return <music a={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE17A"/>;//music enable/select
 				break;
+				
 					
+				
 				//case 0xE175:
 					//return <music confirmed="just a guess"/>;//music change?
 					//not music change
@@ -195,6 +222,17 @@
 					return <unknownCommand commandType={commandType.toString(16)}  />;
 				break;
 			}
+		}
+		
+		private function commandE10D():XML {
+			var a:uint=section.readShort();
+			var screenFlags:uint=section.readShort();
+			var fadeTime:uint=section.readShort();
+			
+			var lowerScreen:String=(Boolean(screenFlags & 1)?"Off":"On");
+			var upperScreen:String=(Boolean(screenFlags & 2)?"Off":"On");
+			
+			return <screenActivator a={a} lowerScreen={lowerScreen} upperScreen={upperScreen} fadeTime={fadeTime} />;
 		}
 		
 		private function speakerBadge():XML {
