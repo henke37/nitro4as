@@ -12,10 +12,10 @@
 		
 		internal static const entryLength:uint=8;
 		
-		public function loadScript(script:XML,table:Table):void {
+		public function loadScript(script:XML):void {
 			_script=script;
 			
-			_encodedScript=SPT.buildSection(script,table);
+			_encodedScript=SPT.buildSection(script);
 		}
 		
 		internal function get encodedScript():ByteArray { return _encodedScript; }

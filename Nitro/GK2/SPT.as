@@ -11,6 +11,8 @@
 		private var version:uint;
 		private var sizeThing:uint;
 		private var unknownHeader:uint;
+		
+		private static const scramblingKey:uint=0x55AA;
 
 		public function SPT() {
 			// constructor code
@@ -123,13 +125,13 @@
 			}
 		}
 		
-		public function loadSection(sectionID:uint,sectionXML:XML,table:Table):void {
+		public function loadSection(sectionID:uint,sectionXML:XML):void {
 			if(sectionID>=sections.length) throw new ArgumentError("SectionID is larger than the list of sections!");
 			if(!sectionXML) throw new ArgumentError("SectionXML can not be null!");
 			
 			var section:SPTEntry=sections[sectionID];
 			
-			section.loadScript(sectionXML,table);
+			section.loadScript(sectionXML);
 		}
 		
 		private static function bytesToSize(bytes:uint):uint {
@@ -138,160 +140,38 @@
 		
 		private function readSection(id:uint):ByteArray {
 			if(id>=sections.length) throw new RangeError("id is too high, max is "+sections.length+" but tried to read "+id+".");
+			
 			var o:ByteArray=new ByteArray();
+			o.endian=Endian.LITTLE_ENDIAN;
+			
 			var entry:SPTEntry=sections[id];
-			//_data.positon=entry.offset;
-			o.writeBytes(_data,entry.offset,(entry.size+1)*2);
+			
+			_data.endian=Endian.LITTLE_ENDIAN;
+			_data.position=entry.offset;
+			const length:uint=entry.size;
+			for(var i:uint=0;i<length;++i) {
+				var v:uint=_data.readUnsignedShort();
+				v^=scramblingKey;
+				o.writeShort(v);
+			}
 			o.position=0;
 			return o;
 		}
 		
-		public function parseSection(id:uint,table:Table=null):XML {
-			
+		public function parseSection(id:uint):XML {
 			var section:ByteArray=readSection(id);
 			section.endian=Endian.LITTLE_ENDIAN;
 			
-			var cBuff:Vector.<uint>=new Vector.<uint>();
-			var cBuffPos:uint=0;
-			var inCommand:Boolean=false;
+			var parser:SectionParser=new SectionParser(section);
 			
-			var o:XML=<scriptSection id={id} />;
-			var lastCommand:XML;//used to dodge a Flash bug
+			var sectionXML:XML=parser.parse();
 			
-			while(section.position<section.length) {
-				var word:uint=section.readUnsignedShort();
-				
-				var type:uint=word >> 8;
-				
-				switch(type) {
-					case 0x55:
-					case 0x54:
-						if(inCommand) {
-							cBuff[cBuffPos++]=word & 0xFF;
-							break;
-						}
-					//not break
-					case 0xB7:
-					case 0xB6:
-					case 0xB5:
-					case 0xB4:
-						if(inCommand) {
-							lastCommand=parseCommand(cBuff);
-							o.appendChild(lastCommand);
-							cBuff.length=0;
-							cBuffPos=0;
-						}
-						inCommand=true;
-						cBuff[cBuffPos++]=word;
-					break;
-					
-					default:
-						if(cBuffPos) {
-							lastCommand=parseCommand(cBuff)
-							o.appendChild(lastCommand);
-							inCommand=false;
-							cBuff.length=0;
-							cBuffPos=0;
-						}
-						
-						if(table) {
-							var text:String=((word & 0xFF)<<8|type).toString(16);//byte order swap and hex encoding
-							text=pad(text,false,4,"0");
-							text=table.matchEntry(text);
-							if(lastCommand) {
-								o.insertChildAfter(lastCommand,text);
-								lastCommand=null;
-							} else {
-								o.appendChild(text);
-							}
-						}
-					break;
-				}
-				//trace(word.toString(16));
-			}
-			if(cBuffPos) {
-				lastCommand=parseCommand(cBuff);
-				o.appendChild(lastCommand);
-			}
+			sectionXML.@id=id;
 			
-			o.normalize();
-			
-			return o;
+			return sectionXML;
 		}
 		
-		private function parseCommand(commandData:Vector.<uint>):XML {
-			var commandType:uint=commandData.shift();
-			
-			var args:String="";
-			
-			for(var i:uint=0;i<commandData.length;++i) {
-				args+=commandData[i].toString(16)+",";
-			}
-			args=args.substr(0,-1);
-			
-			switch(commandType) {
-				
-				case 0x55A0: return <newline/>;
-				
-				case 0xB422:
-					return <sound args={args}/>;
-				break;
-				
-				case 0xB47F: return <flash/>;
-				
-				case 0xB4A2:
-					return <wait time={commandData[0]} />;
-				break;
-				
-				case 0xB4AA:
-					switch(commandData[0]) {
-						case 0xAA:
-							return <textWindow show="1"/>;
-						break;
-						
-						case 0xAB:
-							return <textWindow show="0"/>;
-						break;
-						
-						default:
-							return <unknownCommand commandType={commandType.toString(16)} args={args} />;
-						break;
-					}
-				break;
-				
-				case 0xB4AB:
-					return <speakerBadge args={args} />;
-				break;
-				
-				case 0xB4A8: return <ack/>;
-				
-				case 0xB4AD:
-					return <textSpeed speed={commandData[0]} />;
-				break;
-				
-				case 0xB4AE: return <clear/>;
-				
-				case 0xB4FA:
-					return <charAnim char={commandData[0]} anim={commandData[1]} />;
-				break;
-				
-				case 0xB5E8: return <blue/>;
-				case 0xB5E9: return <green/>;
-				case 0xB5EA: return <white/>;
-				case 0xB5EB: return <orange/>;
-				case 0xB7A7: return <center/>;
-				
-				case 0xB7FE:
-					return <fade args={args}/>;
-				break;
-			
-				default:
-					return <unknownCommand commandType={commandType.toString(16)} args={args} />;
-				break;
-			}
-		}
-		
-		internal static function buildSection(script:XML,table:Table):ByteArray {
+		internal static function buildSection(script:XML):ByteArray {
 			var o:ByteArray=new ByteArray();
 			o.endian=Endian.LITTLE_ENDIAN;
 			
@@ -302,7 +182,7 @@
 					break;
 					
 					case "text":
-						writeText(o,table,String(child));
+						writeText(o,String(child));
 					break;
 					
 					case "comment":
@@ -317,27 +197,14 @@
 			return o;
 		}
 		
-		private static function writeText(o:ByteArray,table:Table,text:String):void {
+		private static function writeText(o:ByteArray,text:String):void {
 			
 			for(var pos:uint=0;pos<text.length;++pos) {
-				var char:String=text.substr(pos,1);
+				var char:uint=text.charCodeAt(pos);
 				
-				var hexString:String;
+				char^=scramblingKey;
 				
-				if(char=="<") {
-					if(text.substr(pos+1,1)=="$") {
-						var endPos:int=text.indexOf(">",pos+2);
-						hexString=text.substring(pos+2,endPos);
-						pos=endPos;
-					}
-				} else {
-					hexString=table.matchReverseEntry(char);
-				}
-				
-				hexString=hexString.substr(2,2)+hexString.substr(0,2);
-				
-				var toWrite:uint=parseInt(hexString,16);
-				o.writeShort(toWrite);
+				o.writeShort(char);
 			}
 		}
 		
