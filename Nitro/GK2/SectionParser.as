@@ -5,6 +5,8 @@
 	public class SectionParser {
 		
 		private var section:ByteArray;
+		
+		public static var unknownCommands:Object={};
 
 		public function SectionParser(section:ByteArray) {
 			this.section=section;
@@ -121,13 +123,34 @@
 				case 0xE10D:
 					return commandE10D();
 				break;
+				
 					
 				case 0xE12F:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
 				break;
 					
 				case 0xE13A:
-					return <spriteCTL command="0xA13a" a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} e={section.readShort()} />;
+					return <miniWalk
+						command="0xA13A"
+						a={section.readShort()}
+						b={section.readShort()}
+						c={section.readShort()}
+						d={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+					/>;
+				break;
+					
+				case 0xE13C:
+					return <miniWalk
+						command="0xE13C"
+						char={section.readShort()}
+						b={section.readShort()}
+						c={section.readShort()}
+						d={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+					/>;
 				break;
 					
 				case 0xE13E:
@@ -138,13 +161,20 @@
 					return <loadScene scene={section.readShort()} />;
 				break;
 					
+					
 				case 0xE150:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE150"/>;
 				break
 					
 				case 0xE151:
 					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE151"/>;
-				break;					
+				break;
+					
+
+				case 0xE153:
+					return <fullscreenImage a={section.readShort()} b={section.readShort()} command="0xE153" />;
+				break;
+					
 				case 0xE155:
 					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE155"/>;
 				break;
@@ -153,26 +183,8 @@
 					return <syncCtrl enable={section.readShort()} />;
 				break;
 					
-				case 0xE188:
-					return <sound a={section.readShort()} b={section.readShort()} />;
-				break;
-				
-				case 0xE1D1: return <screenShake strength="mild" />;
-				case 0xE1D5: return <flashAndSoundEffect />;
-				case 0xE1DA: return <flashShakeAndPlaySound command="0xE1DA" />;
-				
-				case 0xE20D: return <center/>;
-				case 0xE280: return <flashShakeAndPlaySound command="0xE280" />;
-				case 0xE281: return <flashAndShake strength="moderate" command="0xE281" />;
-				case 0xE285: return <flash length="short" />;
-				
-				case 0xE254:
-					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
-				break;
-				
-				//guessed but not confirmed commands
 					
-				case 0xE172: //more music?
+				case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
 				break;
 				
@@ -182,6 +194,51 @@
 
 				case 0xE17A:
 					return <music a={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE17A"/>;//music enable/select
+				break;
+					
+					
+				case 0xE188:
+					return <sound a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+				
+				case 0xE1D1: return <screenShake strength="mild" />;
+				case 0xE1D2: return <screenShake strength="moderate" />;
+				case 0xE1D5: return <flash />;
+				case 0xE1DA: return <flashShakeAndPlaySound command="0xE1DA" />;
+					
+					
+
+				case 0xE1EA:
+					return <interjection a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+				
+				case 0xE20D: return <center/>;
+				
+				case 0xE280: return <flashShakeAndSound sfx="Slash" command="0xE280" />;
+				case 0xE281: return <flashShakeAndSound sfx="Klash" command="0xE281" />;
+				case 0xE282: return <flashShakeAndSound sfx="Punch" command="0xE282" />;
+				case 0xE283: return <flashShakeAndSound sfx="Slam" command="0xE283" />;
+				case 0xE284: return <flashAndSound sfx="DingL" command="0xE284" />;
+				case 0xE285: return <flashAndSound sfx="DingH" command="0xE285" />;
+				
+				case 0xE254:
+					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+				break;
+				
+				//guessed but not confirmed commands
+					
+				case 0xE112:
+					return <fadeChar char={section.readShort()} confirm="guess" />;
+				break;
+					
+				case 0xE122:
+					return <tweenChar confirm="guess" />;
+				break;
+					
+				case 0xE12B:
+					return <fadeToBlack confirm="guess" />;
 				break;
 				
 					
@@ -201,6 +258,8 @@
 				case 0xE10F://court record button
 				
 				
+				case 0xE106://one of these is the flash logic button
+				case 0xE1E0://and wait for it to be pressed command
 				
 					
 				case 0xE153://one is show fullscreen image
@@ -219,6 +278,11 @@
 				case 0xE1CF://screen click command
 			
 				default:
+					if(commandType in unknownCommands) {
+						unknownCommands[commandType]++;
+					} else {
+						unknownCommands[commandType]=1;
+					}
 					return <unknownCommand commandType={commandType.toString(16)}  />;
 				break;
 			}
@@ -239,7 +303,7 @@
 			var flags:uint=section.readShort();
 			var speakerId:uint=section.readShort();
 			
-			var windowPos:String=(flags==-1?"top":"bottom");
+			var windowPos:String=flags.toString(16);//(flags==-1?"top":"bottom");
 			
 			var speaker:String;
 			
