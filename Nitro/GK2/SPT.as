@@ -10,9 +10,8 @@
 		
 		private var version:uint;
 		private var sizeThing:uint;
-		private var unknownHeader:uint;
 		
-		private static const scramblingKey:uint=0x55AA;
+		private var scramblingKey:uint=0x55AA;
 
 		public function SPT() {
 			// constructor code
@@ -42,7 +41,7 @@
 			
 			//trace(sizeThing,d.length);
 			
-			unknownHeader=d.readUnsignedShort();
+			scramblingKey=d.readUnsignedShort();
 			
 			sections=new Vector.<SPTEntry>();
 			sections.length=sectionCount;
@@ -68,7 +67,7 @@
 			_data.writeShort(version);
 			_data.writeShort(sections.length);
 			_data.writeShort(sizeThing);
-			_data.writeShort(unknownHeader);
+			_data.writeShort(0);
 			
 			const dataStart:uint=_data.position+sections.length*SPTEntry.entryLength;
 			var dataPosition:uint=dataStart;
@@ -92,7 +91,7 @@
 		/** Generates an XML document that lists all the sections in the file
 		@return The XML document */
 		public function headerToXML():XML {
-			var o:XML=<SPT version={version} sizeThing={sizeThing.toString(16)} unknownHeader={unknownHeader.toString(16)} />
+			var o:XML=<SPT version={version} sizeThing={sizeThing.toString(16)} scramblingKey={scramblingKey.toString(16)} />
 			
 			for each(var entry:SPTEntry in sections) {
 				o.appendChild(<section flag1={ entry.flag1.toString(16) } flag2={ entry.flag2.toString(16) } /> );
@@ -110,7 +109,7 @@
 		public function loadHeader(header:XML):void {
 			version= parseInt(header.@version);
 			sizeThing= parseInt(header.@sizeThing,16);
-			unknownHeader = parseInt(header.@unknownHeader,16);
+			scramblingKey = parseInt(header.@scramblingKey,16);
 			
 			var xmlSections:XMLList=header.section;
 			
@@ -131,7 +130,7 @@
 			
 			var section:SPTEntry=sections[sectionID];
 			
-			section.loadScript(sectionXML);
+			section.loadScript(sectionXML,this);
 		}
 		
 		private static function bytesToSize(bytes:uint):uint {
@@ -171,7 +170,7 @@
 			return sectionXML;
 		}
 		
-		internal static function buildSection(script:XML):ByteArray {
+		internal function buildSection(script:XML):ByteArray {
 			var o:ByteArray=new ByteArray();
 			o.endian=Endian.LITTLE_ENDIAN;
 			
@@ -197,7 +196,7 @@
 			return o;
 		}
 		
-		private static function writeText(o:ByteArray,text:String):void {
+		private function writeText(o:ByteArray,text:String):void {
 			
 			for(var pos:uint=0;pos<text.length;++pos) {
 				var char:uint=text.charCodeAt(pos);
@@ -208,7 +207,7 @@
 			}
 		}
 		
-		private static function writeCommand(o:ByteArray,command:XML):void {
+		private function writeCommand(o:ByteArray,command:XML):void {
 			var args:Vector.<uint>;
 			
 			if(command.@args) {

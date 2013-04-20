@@ -1,4 +1,4 @@
-package Nitro.SDAT {
+﻿package Nitro.SDAT {
 	
 	import Nitro.SDAT.InfoRecords.*;
 	
@@ -125,7 +125,7 @@ package Nitro.SDAT {
 					fatId={seqInfo.fatId}
 				/>;
 				
-				if(sdat.hasSymbols) {
+				if(sdat.hasSymbols && symb.subSymbols && j<symb.subSymbols.length) {
 					seqXML.@symbol=symb.subSymbols[j];
 				}
 				archiveXML.appendChild(seqXML);
