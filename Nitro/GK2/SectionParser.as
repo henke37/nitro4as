@@ -79,6 +79,10 @@
 			
 			switch(commandType) {
 				
+				case 0xE0B0://random branch
+					return commandE0B0();
+				break;
+				
 				case 0xE040: return <whiteText/>;
 				case 0xE041: return <orangeText/>;
 				case 0xE042: return <blueText/>;
@@ -112,6 +116,8 @@
 				
 				case 0xE104: return <clear/>;
 				
+				case 0xE106: return <fullscreenAck />;
+				
 				case 0xE107:
 					return <textSpeed speed={section.readShort()} />;
 				break;
@@ -122,6 +128,10 @@
 					
 				case 0xE10D:
 					return commandE10D();
+				break;
+				
+				case 0xE11B:
+					return <penalty />;
 				break;
 				
 					
@@ -182,6 +192,38 @@
 				case 0xE15A:
 					return <syncCtrl enable={section.readShort()} />;
 				break;
+				
+				//If statement? Button choice? Halp!
+				case 0xE160:
+					return <unknowBranchHead command="0xE160"/>;
+				break;
+				
+				case 0xE161:
+					return <unknownBranchSuccess command="0xE161" cond={section.readShort()} section={section.readShort()} />;
+				break;
+				
+				case 0xE162:
+					return <unknownBranchFail command="0xE162" section={section.readShort()} />;
+				break;
+					
+					
+				case 0xE165:
+					return <investigationBranchTableStart />;
+				break;
+				
+				case 0xE166:
+					return <investigationBranchTableEnd />;
+				break;
+				
+				case 0xE168:
+					return <investigationBranchTableEnt region={section.readShort()} section={section.readShort()} />;
+				break;
+				
+				case 0xE169:
+					return <investigationBranchTableDefEnt section={section.readShort()} />;
+				break;
+					
+				
 					
 					
 				case 0xE172:
@@ -194,6 +236,24 @@
 
 				case 0xE17A:
 					return <music a={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE17A"/>;//music enable/select
+				break;
+					
+					
+				//present evidence branch table
+				case 0xE17C:
+					return <presentBranchStart />;
+				break;
+				
+				case 0xE17F:
+					return <presentBranchEntry section={section.readShort()} evidence={section.readShort()} />;
+				break;
+				
+				case 0xE180:
+					return <presentBranchDefEntry section={section.readShort()} />;
+				break;
+				
+				case 0xE181:
+					return <presentBranchEnd />;
 				break;
 					
 					
@@ -257,9 +317,7 @@
 				case 0xE195://one of these tween in the 
 				case 0xE10F://court record button
 				
-				
-				case 0xE106://one of these is the flash logic button
-				case 0xE1E0://and wait for it to be pressed command
+				case 0xE1E0://flash logic button
 				
 					
 				case 0xE153://one is show fullscreen image
@@ -268,8 +326,7 @@
 				case 0xE148://one of these is fade bg to black
 				case 0xE149:
 				
-				case 0xE106://one of these is show logic to be gained
-				case 0xE198://the other is ack
+				case 0xE198://one of these is show logic to be gained
 				
 				case 0xE158://One of these is the slide in evidcence
 				case 0xE1CE://for addition to record anim command
@@ -286,6 +343,18 @@
 					return <unknownCommand commandType={commandType.toString(16)}  />;
 				break;
 			}
+		}
+		
+		private function commandE0B0():XML {
+			var cmd:XML=<randomBranch />;
+			for(var i:uint=0;i<4;++i) {
+				var weight:uint=section.readShort();
+				var dst:uint=section.readShort();
+				
+				cmd.appendChild(<destination weight={weight} section={dst} />);
+			}
+			
+			return cmd;
 		}
 		
 		private function commandE10D():XML {
