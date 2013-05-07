@@ -131,9 +131,26 @@
 				break;
 				
 				case 0xE11B:
-					return <penalty />;
+					return <checkForPresent evidence={section.readShort()} section={section.readShort()} />;
 				break;
 				
+				case 0xE11E:
+					return <ceDefStart />;
+				break;
+				
+				case 0xE11F:
+					return <ceStatement
+						count={section.readShort()}
+						statementSection={section.readShort()}
+						pressSection={section.readShort()}
+						presentSection={section.readShort()}
+						startHidden={section.readShort()}
+					/>;
+				break;
+				
+				case 0xE120:
+					return <ceAid count={section.readShort()} section={section.readShort()} />;
+				break;
 					
 				case 0xE12F:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
@@ -171,6 +188,10 @@
 					return <loadScene scene={section.readShort()} />;
 				break;
 					
+				case 0xE145:
+					return <longJump case={section.readShort()} part={section.readShort()} index={section.readShort()}/>;
+				break;
+					
 					
 				case 0xE150:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE150"/>;
@@ -206,6 +227,13 @@
 					return <unknownBranchFail command="0xE162" section={section.readShort()} />;
 				break;
 					
+				case 0xE163:
+					return <yesNoPrompt />;
+				break;
+					
+				case 0xE164:
+					return <unknownCondJump command="0xE164" unk={section.readShort()} section={section.readShort()} />;
+				break;
 					
 				case 0xE165:
 					return <investigationBranchTableStart />;
@@ -226,9 +254,9 @@
 				
 					
 					
-				case 0xE172:
+				/*case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
-				break;
+				break;*/
 				
 				case 0xE173:
 					return <stopMusic a={section.readShort() } />;
@@ -245,7 +273,7 @@
 				break;
 				
 				case 0xE17F:
-					return <presentBranchEntry section={section.readShort()} evidence={section.readShort()} />;
+					return <presentBranchEntry evidence={section.readShort()} section={section.readShort()} />;
 				break;
 				
 				case 0xE180:
@@ -254,6 +282,14 @@
 				
 				case 0xE181:
 					return <presentBranchEnd />;
+				break;
+				
+				case 0xE184:
+					return <unknownBranch section={section.readShort()} />;
+				break;
+				
+				case 0xE185:
+					return <unknownReturn />;
 				break;
 					
 					
