@@ -130,6 +130,10 @@
 					return commandE10D();
 				break;
 				
+				case 0xE118:
+					return <fullscreenImage a={section.readShort()} b={section.readShort()} />;
+				break;
+				
 				case 0xE11B:
 					return <checkForPresent evidence={section.readShort()} section={section.readShort()} />;
 				break;
@@ -146,6 +150,10 @@
 						presentSection={section.readShort()}
 						startHidden={section.readShort()}
 					/>;
+				break;
+						
+				case 0xE1FB:
+					return <logicChessTimeout section={section.readShort()} />;
 				break;
 				
 				case 0xE120:
@@ -251,7 +259,9 @@
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
 					
-				
+				case 0xE1C3:
+					return <gameOver />;
+				break;
 					
 					
 				/*case 0xE172:
@@ -297,6 +307,7 @@
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
 					
+				case 0xE1C4: return <returnToTitleScreen />;
 				
 				case 0xE1D1: return <screenShake strength="mild" />;
 				case 0xE1D2: return <screenShake strength="moderate" />;
@@ -309,6 +320,9 @@
 					return <interjection a={section.readShort()} b={section.readShort()} />;
 				break;
 					
+				case 0xE201:
+					return <logicChessChoise destination={section.readShort()} />;
+				break;
 				
 				case 0xE20D: return <center/>;
 				
