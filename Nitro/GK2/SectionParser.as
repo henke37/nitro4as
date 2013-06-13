@@ -87,6 +87,10 @@
 				case 0xE041: return <orangeText/>;
 				case 0xE042: return <blueText/>;
 				case 0xE043: return <greenText/>;
+
+				case 0xE080:
+					return <callSection section={section.readUnsignedShort()} />;
+				break;
 				
 				case 0xE081:
 					return <jumpToSection section={section.readUnsignedShort()} />;
@@ -322,6 +326,10 @@
 					
 				case 0xE201:
 					return <logicChessChoise destination={section.readShort()} />;
+				break;
+					
+				case 0xE202:
+					return <logicChessPrompt />;
 				break;
 				
 				case 0xE20D: return <center/>;
