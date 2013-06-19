@@ -121,8 +121,8 @@
 				tracker.tempo=(evt as TempoEvent).bpm;
 			} else if(evt is JumpEvent) {
 				var jmpEvt:JumpEvent=evt as JumpEvent;
-				position=jmpEvt.target;
 				if(jmpEvt.isCall) callReturn=position+1;
+				position=jmpEvt.target;				
 				normalFlow=false;
 			} else if(evt is LoopStartEvent) {
 				var loopStartEvt:LoopStartEvent=evt as LoopStartEvent;
