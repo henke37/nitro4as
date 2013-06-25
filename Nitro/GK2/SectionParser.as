@@ -262,6 +262,10 @@
 				case 0xE169:
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
+				
+				case 0xE1C1:
+					return <noHPBranch section={section.readShort()} />;
+				break;
 					
 				case 0xE1C3:
 					return <gameOver />;
