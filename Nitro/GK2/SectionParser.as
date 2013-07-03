@@ -262,15 +262,6 @@
 				case 0xE169:
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
-				
-				case 0xE1C1:
-					return <noHPBranch section={section.readShort()} />;
-				break;
-					
-				case 0xE1C3:
-					return <gameOver />;
-				break;
-					
 					
 				/*case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
@@ -309,13 +300,30 @@
 				case 0xE185:
 					return <unknownReturn />;
 				break;
-					
+				
+				//case 0xE186: seems related to E187
+				
+				case 0xE187:
+					return <unknownCondJump cond={section.readShort()} section={section.readShort()} />;
+				break;
 					
 				case 0xE188:
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
 					
-				case 0xE1C4: return <returnToTitleScreen />;
+					
+				case 0xE1C1:
+					return <noHPBranch section={section.readShort()} />;
+				break;
+					
+				case 0xE1C3:
+					return <gameOver />;
+				break;
+					
+				case 0xE1C4:
+					return <returnToTitleScreen />;
+				break;
+				
 				
 				case 0xE1D1: return <screenShake strength="mild" />;
 				case 0xE1D2: return <screenShake strength="moderate" />;
@@ -326,6 +334,12 @@
 
 				case 0xE1EA:
 					return <interjection a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+				//case 0xE1FF: return <enableLogicTimer />;
+					
+				case 0xE200:
+					return <showLogicChessPrompt a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
 					
 				case 0xE201:
