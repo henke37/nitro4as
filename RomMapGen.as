@@ -76,8 +76,8 @@
 		private function saveDump(e:MouseEvent):void {
 			fr=new FileReference();
 			var xml:XML=<nds>
-				<arm9 mirror={hex(nds.arm9Mirror)} romoffset={hex(nds.arm9Offset)} length={hex(nds.arm9Len)} entrypoint={hex(nds.arm9ExecuteStart)} />
-				<arm7 mirror={hex(nds.arm7Mirror)} romoffset={hex(nds.arm7Offset)} length={hex(nds.arm7Len)} entrypoint={hex(nds.arm7ExecuteStart)} />
+				<arm9 LoadBase={hex(nds.arm9LoadBase)} romoffset={hex(nds.arm9Offset)} length={hex(nds.arm9Len)} entrypoint={hex(nds.arm9ExecuteStart)} />
+				<arm7 LoadBase={hex(nds.arm7LoadBase)} romoffset={hex(nds.arm7Offset)} length={hex(nds.arm7Len)} entrypoint={hex(nds.arm7ExecuteStart)} />
 			</nds>;
 			
 			if(nds.banner) {
@@ -112,7 +112,7 @@
 		
 		private static function addOverlays(xml:XML,overlays:Vector.<Overlay>):void {
 			for each(var overlay:Overlay in overlays) {
-				xml.appendChild(<overlay id={overlay.id} fileId={overlay.fileId}>
+				xml.appendChild(<overlay id={overlay.id} fileId={overlay.fileId} compressed={overlay.compressed?"Yes":"No"}>
 					<ram address={hex(overlay.ramAddress)} size={hex(overlay.ramSize)} />
 					<bss size={hex(overlay.bssSize)} start={hex(overlay.bssStart)} stop={hex(overlay.bssStop)} />
 				</overlay>);

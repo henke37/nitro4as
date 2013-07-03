@@ -24,7 +24,7 @@
 		/** The position of the ARM9 executable in ROM */
 		public var arm9Offset:uint;
 		/** The position in memory where the ARM9 executable will be loaded before execution. */
-		public var arm9Mirror:uint;
+		public var arm9LoadBase:uint;
 		/** The entrypoint for the ARM9 executable. */
 		public var arm9ExecuteStart:uint;
 		/** The length of the ARM9 executable*/
@@ -33,7 +33,7 @@
 		/** The position of the ARM7 executable in ROM */
 		public var arm7Offset:uint;
 		/** The position in memory where the ARM7 executable will be loaded before execution. */
-		public var arm7Mirror:uint;
+		public var arm7LoadBase:uint;
 		/** The entrypoint for the ARM7 executable. */
 		public var arm7ExecuteStart:uint;
 		/** The length of the ARM7 executable*/
@@ -81,12 +81,12 @@
 			
 			arm9Offset=nds.readUnsignedInt();
 			arm9ExecuteStart=nds.readUnsignedInt();
-			arm9Mirror=nds.readUnsignedInt();
+			arm9LoadBase=nds.readUnsignedInt();
 			arm9Len=nds.readUnsignedInt();
 			
 			arm7Offset=nds.readUnsignedInt();
 			arm7ExecuteStart=nds.readUnsignedInt();
-			arm7Mirror=nds.readUnsignedInt();
+			arm7LoadBase=nds.readUnsignedInt();
 			arm7Len=nds.readUnsignedInt();
 			
 			var fileNameTablePos:uint=nds.readUnsignedInt();
@@ -235,11 +235,11 @@
 				
 				var flags:uint=nds.readUnsignedInt();
 				overlay.compressed=Boolean(flags & 0x1000000);
-				if(overlay.compressed) {
+				//if(overlay.compressed) {
 					overlay.size=flags & 0xFFFFFF;
-				} else {
-					overlay.size=overlay.ramSize;
-				}
+				//} else {
+					//overlay.size=overlay.ramSize;
+				//}
 				
 				o.push(overlay);
 			}
