@@ -164,6 +164,18 @@
 					return <ceAid count={section.readShort()} section={section.readShort()} />;
 				break;
 					
+					
+				case 0xE12C:
+					section.position+=2;//ignore one argument;
+					return <clearFlag flag={section.readShort()} />;
+				break;
+					
+				case 0xE12D:
+					section.position+=2;//ignore one argument;
+					return <setFlag flag={section.readShort()} />;
+				break;
+					
+					
 				case 0xE12F:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
 				break;
@@ -194,6 +206,10 @@
 					
 				case 0xE13E:
 					return <waitAnim a={section.readShort()} />;
+				break;
+					
+				case 0xE141:
+					return <panCamera />;
 				break;
 					
 				case 0xE144:
