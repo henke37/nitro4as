@@ -175,6 +175,12 @@
 					return <setFlag flag={section.readShort()} />;
 				break;
 					
+				case 0xE12E:
+					section.position+=2;//ignored
+					return <jumpIfFlag flag={section.readShort()} cond={section.readShort()} section={section.readShort()} />;
+				break;
+				
+					
 					
 				case 0xE12F:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
@@ -366,6 +372,19 @@
 					return <logicChessPrompt />;
 				break;
 				
+				case 0xE218:
+					return jumpIfFlagsEqTo(2);
+				break;
+				case 0xE219:
+					return jumpIfFlagsEqTo(3);
+				break;
+				case 0xE21A:
+					return jumpIfFlagsEqTo(4);
+				break;
+				case 0xE21B:
+					return jumpIfFlagsEqTo(5);
+				break;
+				
 				case 0xE20D: return <center/>;
 				
 				case 0xE280: return <flashShakeAndSound sfx="Slash" command="0xE280" />;
@@ -435,6 +454,20 @@
 					return <unknownCommand commandType={commandType.toString(16)}  />;
 				break;
 			}
+		}
+		
+		private function jumpIfFlagsEqTo(count:uint):XML {
+			var out:XML=<jumpIfFlagsEqTo />;
+				
+			for(var i:uint=0;i<count;++i) {
+				var flagXML:XML=<flag flag={section.readShort()} />;
+				out.appendChild(flagXML);
+			}
+			
+			out.@cond=section.readShort();
+			out.@section=section.readShort();
+			
+			return out;
 		}
 		
 		private function commandE0B0():XML {
