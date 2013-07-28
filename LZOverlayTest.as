@@ -42,7 +42,7 @@
 			stage.addEventListener(MouseEvent.CLICK,save);
 			
 			//testOverlays(7,nds.arm7Overlays);
-			//testOverlays(9,nds.arm9Overlays);
+			testOverlays(9,nds.arm9Overlays);
 			
 			checkCmp();
 		}
@@ -84,7 +84,12 @@
 		private function testOverlays(cpu:uint,overlays:Vector.<Overlay>):void {
 			if(!overlays) return;
 			for each(var overlay:Overlay in overlays) {
-				nds.openOverlayByReference(overlay);
+				trace("opening overlay #",overlay.id," compressed",overlay.compressed);
+				try {
+					nds.openOverlayByReference(overlay);
+				} catch(err:Error) {
+					trace(err.message);
+				}
 			}
 		}
 	}

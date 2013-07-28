@@ -19,10 +19,10 @@
 			inData.position=inData.length-4;
 			var extraLength:uint=inData.readUnsignedInt();
 			
-			trace("extra len",extraLength);
+			//trace("extra len",extraLength);
 			
 			if(extraLength==0) {//uncompressed
-				trace("no compressed part");
+				//trace("no compressed part");
 				outData.writeBytes(inData,0,inData.length-4);
 				return outData;
 			}
@@ -30,10 +30,10 @@
 			inData.position=inData.length-5;
 			
 			var headerSize:uint=inData.readUnsignedByte();
-			trace("header size",headerSize);
+			//trace("header size",headerSize);
 			inData.position-=4;
 			var compressedLength:uint=read3ByteUint(inData);
-			trace("compressed length",compressedLength);
+			//trace("compressed length",compressedLength);
 			
 			if(compressedLength + headerSize >= inData.length) {
 				compressedLength = inData.length - headerSize;
@@ -98,7 +98,7 @@
 			outData.writeBytes(decmpOut,0);
 			
 			outData.position=0;
-			trace("final length",outData.length);
+			//trace("final length",outData.length);
 			return outData;
 		}
 
