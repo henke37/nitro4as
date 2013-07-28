@@ -16,41 +16,57 @@
 			
 			var outData:ByteArray=new ByteArray();
 			
-			inData.position=inData.length-5;
-			var uncompressedLength:uint=inData.readUnsignedInt();
+			inData.position=inData.length-4;
+			var extraLength:uint=inData.readUnsignedInt();
 			
-			if(uncompressedLength==0) {//uncompressed
+			trace("extra len",extraLength);
+			
+			if(extraLength==0) {//uncompressed
+				trace("no compressed part");
 				outData.writeBytes(inData,0,inData.length-4);
 				return outData;
 			}
 			
-			inData.position=inData.length-6;
+			inData.position=inData.length-5;
 			
 			var headerSize:uint=inData.readUnsignedByte();
-			inData.position=inData.length-9;
+			trace("header size",headerSize);
+			inData.position-=4;
 			var compressedLength:uint=read3ByteUint(inData);
+			trace("compressed length",compressedLength);
 			
+			if(compressedLength + headerSize >= inData.length) {
+				compressedLength = inData.length - headerSize;
+			}
 			
-			outData.length=compressedLength+uncompressedLength;
+			var noncomplen:uint = inData.length - headerSize - compressedLength;
 			
-			outData.writeBytes(inData,0,uncompressedLength);
+			if(noncomplen) {
+				outData.writeBytes(inData,0,noncomplen);
+			}
 			
-			var inPos:uint=inData.length-headerSize-1;
-			var outPos:uint=outData.length-1;
+			var decmpLen:uint=compressedLength + headerSize + extraLength;
+			var decmpOut:ByteArray=new ByteArray();
+			decmpOut.length=decmpLen;
+			
+			var inPos:uint=noncomplen + compressedLength -1 ;
+			var outPos:uint=decmpLen-1;
 			
 			//todo: decompression loop
 			var decompressed:uint=0;
-			var bit:uint=0;
+			var bit:uint=8;
 			var flags:uint=0;
-			while(decompressed<compressedLength) {
-				if(bit==0) {
+			while(decompressed<decmpLen) {
+				if(bit==8) {
 					flags=inData[inPos--];
-					bit=8;
+					bit=0;
 				}
-				bit--;
+				bit++;
 				
-				var compressed:Boolean=Boolean(flags&1);
-				flags>>=1;
+				var compressed:Boolean=Boolean(flags& 0x80);
+				flags<<=1;
+				
+				//trace(compressed?"C":"P");
 				
 				if(compressed) {
 					var byte1:uint=inData[inPos--];
@@ -63,24 +79,26 @@
 					displacement+=3;
 					
 					if(displacement>decompressed) {
-						//displacement=2;
+						displacement=2;
 					}
 					
 					for(var cloned:uint=0;cloned<cloneLen;++cloned) {
-						outData[outPos]=outData[outPos+displacement];
+						decmpOut[outPos]=decmpOut[outPos+displacement];
 						outPos--;
 					}
 					
 					decompressed+=cloneLen;
 
 				} else {
-					outData[outPos--]=inData[inPos--];
+					decmpOut[outPos--]=inData[inPos--];
 					decompressed++;
 				}
 			}
 			
+			outData.writeBytes(decmpOut,0);
 			
 			outData.position=0;
+			trace("final length",outData.length);
 			return outData;
 		}
 

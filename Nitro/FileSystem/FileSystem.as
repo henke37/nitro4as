@@ -207,7 +207,7 @@
 			
 			var start:uint=nds.readUnsignedInt();
 			var stop:uint=nds.readUnsignedInt();
-			var len:uint=stop-start+1;
+			var len:uint=stop-start;
 			
 			var out:ByteArray=new ByteArray();
 			
