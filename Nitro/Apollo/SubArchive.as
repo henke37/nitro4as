@@ -33,18 +33,23 @@
 			var sections:Object=readSectionTable(data);
 			
 			var tableStart:uint;
-			if("YEKB" in sections) {
-				tableStart=sections["YEKB"];
-			} else if("YEKP" in sections) {
-				tableStart=sections["YEKP"];
-			} else throw new ArgumentError("File has no table base section!");
 			
 			if("TADB" in sections) {
 				dataBaseOffset=sections["TADB"];
 			} else if("TADP" in sections) {
 				dataBaseOffset=sections["TADP"];
-			} else throw new ArgumentError("File has no data base section!");
+			} else throw new ArgumentError("File has no data base section!");			
 			
+			if("YEKB" in sections) {
+				readYEKB(sections["YEKB"],dataBaseOffset);
+			} else if("YEKP" in sections) {
+				readYEKP(sections["YEKP"],dataBaseOffset);
+			} else throw new ArgumentError("File has no table base section!");
+			
+			subfiles.fixed=true;
+		}
+		
+		private function readYEKB(tableStart:uint,dataBaseOffset):void {
 			subfiles=new Vector.<SubFileEntry>();
 			
 			data.position=tableStart;
@@ -66,8 +71,32 @@
 				}
 				subfiles.push(entry);				
 			} while(data.position<dataBaseOffset);
+		}
+		
+		private function readYEKP(tableStart:uint,dataBaseOffset):void {
+			subfiles=new Vector.<SubFileEntry>();
 			
-			subfiles.fixed=true;
+			data.position=tableStart+1;
+			do {
+				var entry:SubFileEntry=new SubFileEntry();
+				var mixed:uint=data.readUnsignedInt();
+				entry.compressed=Boolean(mixed & 0x80000000);
+				entry.offset=mixed & ~0x80000000;
+				
+				subfiles.push(entry);		
+				
+			} while(data.position<dataBaseOffset);
+			
+			const stop:uint=subfiles.length-3;//skip last entry
+			for(var i:uint=0;i<stop;++i) {
+				var cur:SubFileEntry=subfiles[i];
+				var next:SubFileEntry=subfiles[i+1];
+				cur.size=next.offset-cur.offset;
+				
+				if(cur.size+cur.offset>=data.length) {
+					throw new ArgumentError("borked parse");
+				}
+			}
 		}
 		
 		/** Opens a file with a given id
