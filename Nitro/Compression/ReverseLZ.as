@@ -22,15 +22,18 @@
 			//trace("extra len",extraLength);
 			
 			if(extraLength==0) {//uncompressed
-				//trace("no compressed part");
-				outData.writeBytes(inData,0,inData.length-4);
-				return outData;
+				trace("no compressed part");
+				inData.length-=4;
+				return inData;
 			}
 			
 			inData.position=inData.length-5;
 			
 			var headerSize:uint=inData.readUnsignedByte();
 			//trace("header size",headerSize);
+			
+			if(headerSize<=7 || headerSize> 0x100) throw new ArgumentError("Bogus header size!");
+			
 			inData.position-=4;
 			var compressedLength:uint=read3ByteUint(inData);
 			//trace("compressed length",compressedLength);
@@ -48,6 +51,8 @@
 			var decmpLen:uint=compressedLength + headerSize + extraLength;
 			var decmpOut:ByteArray=new ByteArray();
 			decmpOut.length=decmpLen;
+			
+			//trace("decmplen",decmpLen);
 			
 			var inPos:uint=noncomplen + compressedLength -1 ;
 			var outPos:uint=decmpLen-1;
