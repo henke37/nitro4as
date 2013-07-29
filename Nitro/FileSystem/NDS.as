@@ -21,6 +21,8 @@
 		
 		public var cardSize:uint;
 		
+		public var autoBoot:Boolean;
+		
 		/** The position of the ARM9 executable in ROM */
 		public var arm9Offset:uint;
 		/** The position in memory where the ARM9 executable will be loaded before execution. */
@@ -78,6 +80,8 @@
 			var romVersion:uint=nds.readUnsignedByte();
 			
 			var flags:uint=nds.readUnsignedByte();
+			
+			autoBoot=Boolean(flags);
 			
 			arm9Offset=nds.readUnsignedInt();
 			arm9ExecuteStart=nds.readUnsignedInt();
