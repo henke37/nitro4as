@@ -10,11 +10,10 @@
 	import fl.controls.*;
 	import fl.containers.*;
 	
-	import com.adobe.images.PNGEncoder;
-	
 	import Nitro.Apollo.*;
 	import Nitro.FileSystem.NDS;
 	import Nitro.GhostTrick.*;
+	import flash.geom.Rectangle;
 	
 	public class GhostTrick extends MovieClip {
 		
@@ -91,7 +90,7 @@
 		
 		private function ripSingleClick(e:MouseEvent):void {
 			outputDestination=new File();
-			outputDestination.save(PNGEncoder.encode(bmd),imageIndex_mc.value.toString()+".png");
+			outputDestination.save(bmd.encode(new Rectangle(0,0,bmd.width,bmd.height),new PNGEncoderOptions()),imageIndex_mc.value.toString()+".png");
 		}
 		
 		private function ripAllClick(e:MouseEvent):void {
@@ -122,7 +121,7 @@
 		}
 		
 		protected function saveImage(img:BitmapData,fileName:String):void {
-			var png:ByteArray=PNGEncoder.encode(img);
+			var png:ByteArray=img.encode(new Rectangle(0,0,img.width,img.height),new PNGEncoderOptions())
 			
 			saveFile(png,fileName);
 		}

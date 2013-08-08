@@ -22,7 +22,7 @@
 			//trace("extra len",extraLength);
 			
 			if(extraLength==0) {//uncompressed
-				trace("no compressed part");
+				//trace("no compressed part");
 				inData.length-=4;
 				return inData;
 			}
@@ -54,8 +54,8 @@
 			
 			//trace("decmplen",decmpLen);
 			
-			var inPos:uint=noncomplen + compressedLength -1 ;
-			var outPos:uint=decmpLen-1;
+			var inPos:int=noncomplen + compressedLength -1 ;
+			var outPos:int=decmpLen-1;
 			
 			//todo: decompression loop
 			var decompressed:uint=0;
