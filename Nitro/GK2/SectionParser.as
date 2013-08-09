@@ -340,7 +340,7 @@
 				
 				case 0xE199: return <flashHp a={section.readShort()} />;
 				case 0xE19A: return <clearFlashingHp />;
-				case 0xE19C: return <penality />;
+				case 0xE19C: return <penalty />;
 					
 				case 0xE1C1:
 					return <noHPBranch section={section.readShort()} />;
@@ -403,7 +403,7 @@
 				
 				case 0xE20D: return <center/>;
 				
-				case 0xE22E: return <timePenality a={section.readShort()} />;
+				case 0xE22E: return <timePenalty a={section.readShort()} />;
 				
 				case 0xE234: return <blinkLogicChessTimerArrows />;
 				
