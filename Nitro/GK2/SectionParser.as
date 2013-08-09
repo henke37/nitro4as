@@ -155,7 +155,12 @@
 						startHidden={section.readShort()}
 					/>;
 				break;
+				
 						
+				case 0xE1FA:
+					return <logicChessSwapSide a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()}/>;
+				break;
+				
 				case 0xE1FB:
 					return <logicChessTimeout section={section.readShort()} />;
 				break;
@@ -285,9 +290,9 @@
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
 					
-				/*case 0xE172:
+				case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
-				break;*/
+				break;
 				
 				case 0xE173:
 					return <stopMusic a={section.readShort() } />;
@@ -332,7 +337,10 @@
 				case 0xE188:
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
-					
+				
+				case 0xE199: return <flashHp a={section.readShort()} />;
+				case 0xE19A: return <clearFlashingHp />;
+				case 0xE19C: return <penality />;
 					
 				case 0xE1C1:
 					return <noHPBranch section={section.readShort()} />;
@@ -361,16 +369,24 @@
 				//case 0xE1FF: return <enableLogicTimer />;
 					
 				case 0xE200:
-					return <showLogicChessPrompt a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+					return <logicChessChoiseAttack a={section.readShort()} b={section.readShort()} destination={section.readShort()} d={section.readShort()} />;
 				break;
 					
 				case 0xE201:
-					return <logicChessChoise destination={section.readShort()} />;
+					return <logicChessChoiseRest destination={section.readShort()} />;
 				break;
 					
 				case 0xE202:
 					return <logicChessPrompt />;
 				break;
+				
+				case 0xE203: return <showAttackingChessPiece />;
+				
+				case 0xE205: <refillTimeBar a={section.readShort()} />;
+				
+				case 0xE206: return <showChessPieces />;
+				
+				case 0xE208: return <chessAttack a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				
 				case 0xE218:
 					return jumpIfFlagsEqTo(2);
@@ -386,6 +402,10 @@
 				break;
 				
 				case 0xE20D: return <center/>;
+				
+				case 0xE22E: return <timePenality a={section.readShort()} />;
+				
+				case 0xE234: return <blinkLogicChessTimerArrows />;
 				
 				case 0xE280: return <flashShakeAndSound sfx="Slash" command="0xE280" />;
 				case 0xE281: return <flashShakeAndSound sfx="Klash" command="0xE281" />;
