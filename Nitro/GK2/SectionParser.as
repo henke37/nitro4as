@@ -155,6 +155,15 @@
 						startHidden={section.readShort()}
 					/>;
 				break;
+						
+						
+				case 0xE1CB:
+					return <openPipWindow />;
+				break;
+				
+				case 0xE1CC:
+					return <closePipWindow />;
+				break;
 				
 						
 				case 0xE1FA:
@@ -249,6 +258,10 @@
 					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE155"/>;
 				break;
 					
+				case 0xE158:
+					return <revealEvidence evidence={section.readShort()} />;
+				break;
+					
 				case 0xE15A:
 					return <syncCtrl enable={section.readShort()} />;
 				break;
@@ -296,6 +309,10 @@
 				
 				case 0xE173:
 					return <stopMusic a={section.readShort() } />;
+				break;
+					
+				case 0xE176:
+					return <fadeMusic a={section.readShort()} b={section.readShort()} />;
 				break;
 
 				case 0xE17A:
@@ -355,6 +372,16 @@
 				break;
 				
 				
+				
+				case 0xE1CE:
+					return <showOrganizerWithNewEvidenceHighligted evidence={section.readShort()} />;
+				break;
+					
+				case 0xE1CF:
+					return <closeOrgaizer />;
+				break;
+				
+				
 				case 0xE1D1: return <screenShake strength="mild" />;
 				case 0xE1D2: return <screenShake strength="moderate" />;
 				case 0xE1D5: return <flash />;
@@ -387,6 +414,15 @@
 				case 0xE206: return <showChessPieces />;
 				
 				case 0xE208: return <chessAttack a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+				
+
+				case 0xE213:
+					return <enter3dExaminationMode />;
+				break;
+				
+				case 0xE216:
+					return <switchTo3dExaminationView />;
+				break;
 				
 				case 0xE218:
 					return jumpIfFlagsEqTo(2);
