@@ -15,7 +15,9 @@
 		public function loadScript(script:XML,spt:SPT):void {
 			_script=script;
 			
-			_encodedScript=spt.buildSection(script);
+			var writer:SectionWriter=new SectionWriter(spt);
+			
+			_encodedScript=writer.buildSection(script);
 		}
 		
 		internal function get encodedScript():ByteArray { return _encodedScript; }

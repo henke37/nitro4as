@@ -11,7 +11,7 @@
 		private var version:uint;
 		private var sizeThing:uint;
 		
-		private var scramblingKey:uint=0x55AA;
+		internal var scramblingKey:uint=0x55AA;
 
 		public function SPT() {
 			// constructor code
@@ -67,7 +67,7 @@
 			_data.writeShort(version);
 			_data.writeShort(sections.length);
 			_data.writeShort(sizeThing);
-			_data.writeShort(0);
+			_data.writeShort(scramblingKey);
 			
 			const dataStart:uint=_data.position+sections.length*SPTEntry.entryLength;
 			var dataPosition:uint=dataStart;
@@ -168,109 +168,6 @@
 			sectionXML.@id=id;
 			
 			return sectionXML;
-		}
-		
-		internal function buildSection(script:XML):ByteArray {
-			var o:ByteArray=new ByteArray();
-			o.endian=Endian.LITTLE_ENDIAN;
-			
-			for each(var child:XML in script.children()) {
-				switch(child.nodeKind()) {
-					case "element":
-						writeCommand(o,child);
-					break;
-					
-					case "text":
-						writeText(o,String(child));
-					break;
-					
-					case "comment":
-					break;
-					
-					default:
-						throw new ArgumentError("Unknown nodekind:"+child.nodeKind());
-					break;
-				}
-			}
-			
-			return o;
-		}
-		
-		private function writeText(o:ByteArray,text:String):void {
-			
-			for(var pos:uint=0;pos<text.length;++pos) {
-				var char:uint=text.charCodeAt(pos);
-				
-				char^=scramblingKey;
-				
-				o.writeShort(char);
-			}
-		}
-		
-		private function writeCommand(o:ByteArray,command:XML):void {
-			var args:Vector.<uint>;
-			
-			if(command.@args) {
-				args=argsStringToVector(command.@args);
-			}
-			
-			//trace(String(command.name()));
-			
-			switch(String(command.name())) {//new <uint>[0x55A0]
-				case "newline": writeRawCommand(o,0x55A0); break;
-				case "sound": writeRawCommand(o,0xB422,args); break;
-				case "flash": writeRawCommand(o,0xB47F); break;
-				case "wait": writeRawCommand(o,0xB4A2,new <uint>[parseInt(command.@time)]); break;
-				case "textWindow":
-					if(command.@show=="1") {
-						writeRawCommand(o,0xB4AA,new <uint>[0xAA]);
-					} else if(command.@show=="0") {
-						writeRawCommand(o,0xB4AA,new <uint>[0xAB]);
-					} else {
-						throw new ArgumentError("Invalid show value for textWindow command");
-					}
-				break;
-				case "speakerBadge": writeRawCommand(o,0xB4A8,args); break;
-				case "ack": writeRawCommand(o,0xB4A8); break;
-				case "textSpeed": writeRawCommand(o,0xB4AD,new <uint>[parseInt(command.@speed)]); break;
-				case "clear": writeRawCommand(o,0xB4AE);
-				case "charAnim":
-					writeRawCommand(o,0xB4FA,new <uint>[parseInt(command.@char),parseInt(command.@anim)]);
-				break;
-				case "blue": writeRawCommand(o,0xB5E8); break;
-				case "green": writeRawCommand(o,0xB5E9); break;
-				case "white": writeRawCommand(o,0xB5EA); break;
-				case "orange": writeRawCommand(o,0xB5EB); break;
-				case "center": writeRawCommand(o,0xB7A7); break;
-				case "fade": writeRawCommand(o,0xB7FE,args); break;
-				case "unknownCommand":
-					writeRawCommand(o,parseInt(command.@commandType,16),args);
-				break;
-				
-				default:
-					throw new ArgumentError("Unknown command \""+command.name()+"\"!");
-				break;
-			}
-		}
-		
-		private static function argsStringToVector(args:String):Vector.<uint> {
-			var pieces:Array=args.split(",");
-			var o:Vector.<uint>=new Vector.<uint>(pieces.length);
-			for(var i:uint=0;i<o.length;++i) {
-				o[i]=parseInt(pieces[i],16);
-			}
-			return o;
-		}
-		
-		private static function writeRawCommand(o:ByteArray,command:uint,args:Vector.<uint>=null):void {
-			o.writeShort(command);
-			
-			if(!args) return;
-			
-			for(var i:uint=0;i<args.length;++i) {
-				o.writeShort(0x5500|args[i]);
-			}
-
 		}
 
 		private function pad(str:String,leftSide:Boolean=false,len:uint=2,padding:String=" "):String {
