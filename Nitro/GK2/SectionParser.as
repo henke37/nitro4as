@@ -148,7 +148,7 @@
 				
 				case 0xE11F:
 					return <ceStatement
-						count={section.readShort()}
+						index={section.readShort()}
 						statementSection={section.readShort()}
 						pressSection={section.readShort()}
 						presentSection={section.readShort()}
@@ -175,7 +175,7 @@
 				break;
 				
 				case 0xE120:
-					return <ceAid count={section.readShort()} section={section.readShort()} />;
+					return <ceAid index={section.readShort()} section={section.readShort()} />;
 				break;
 					
 					
@@ -355,7 +355,7 @@
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
 				
-				case 0xE199: return <flashHp a={section.readShort()} />;
+				case 0xE199: return <flashHp amount={section.readShort()} />;
 				case 0xE19A: return <clearFlashingHp />;
 				case 0xE19C: return <penalty />;
 					
