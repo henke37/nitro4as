@@ -134,6 +134,28 @@
 					return commandE10D();
 				break;
 				
+				case 0xE10E:
+					return <waitForSceneChange />;
+				break;
+				
+				case 0xE111:
+					return <addCharacter
+						char={section.readShort()}
+						b={section.readShort()}
+						c={section.readShort()}
+						d={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+					/>;
+				
+				case 0xE112:
+					return <waitForCharTween char={section.readShort()} />;
+				break;
+				
+				case 0xE113:
+					return <fadeChar char={section.readShort()} b={section.readShort()} c={section.readShort()} />;
+				break;
+				
 				case 0xE118:
 					return <fullscreenImage a={section.readShort()} b={section.readShort()} />;
 				break;
@@ -155,29 +177,23 @@
 						startHidden={section.readShort()}
 					/>;
 				break;
-						
-						
-				case 0xE1CB:
-					return <openPipWindow />;
-				break;
-				
-				case 0xE1CC:
-					return <closePipWindow />;
-				break;
-				
-						
-				case 0xE1FA:
-					return <logicChessSwapSide a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()}/>;
-				break;
-				
-				case 0xE1FB:
-					return <logicChessTimeout section={section.readShort()} />;
-				break;
 				
 				case 0xE120:
 					return <ceAid index={section.readShort()} section={section.readShort()} />;
 				break;
 					
+					
+				case 0xE122:
+					return <tweenChar char={section.readShort()} b={section.readShort()} c={section.readShort()} />;
+				break;
+					
+				case 0xE123:
+					return <panToCharacter char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+				break;
+				
+				case 0xE124:
+					return <waitForCharacterPan char={section.readShort()} />;
+				break;
 					
 				case 0xE12C:
 					section.position+=2;//ignore one argument;
@@ -200,12 +216,47 @@
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE12F"/>;
 				break;
 					
+					
+				
+				
+				case 0xE133:
+					return <startOamScene
+						sceneId={section.readShort()}
+						b= {section.readShort()}
+						c= {section.readShort()}
+						d= {section.readShort()}
+						e= {section.readShort()}
+						f= {section.readShort()}
+						g= {section.readShort()}
+					/>;
+					
+				case 0xE134:
+					return <waitForOamAnim scene={section.readShort()} />;
+				break;
+				
+				case 0xE137:
+					return <oamSceneAnim scene={section.readShort()} anim={section.readShort()} />;
+				break;
+					
+					
 				case 0xE13A:
 					return <miniWalk
 						command="0xA13A"
-						a={section.readShort()}
-						b={section.readShort()}
-						c={section.readShort()}
+						char={section.readShort()}
+						x={section.readShort()}
+						y={section.readShort()}
+						d={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+					/>;
+				break;
+						
+				case 0xE13B:
+					return <miniWalk
+						command="0xA13B"
+						char={section.readShort()}
+						x={section.readShort()}
+						y={section.readShort()}
 						d={section.readShort()}
 						e={section.readShort()}
 						f={section.readShort()}
@@ -225,11 +276,11 @@
 				break;
 					
 				case 0xE13E:
-					return <waitAnim a={section.readShort()} />;
+					return <waitCharAnim char={section.readShort()} />;
 				break;
 					
 				case 0xE141:
-					return <panCamera />;
+					return <panCamera x={section.readShort()} y={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
 					
 				case 0xE144:
@@ -249,13 +300,24 @@
 					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE151"/>;
 				break;
 					
+				case 0xE152:
+					return <charAnim char={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE152"/>;
+				break;
 
 				case 0xE153:
 					return <fullscreenImage a={section.readShort()} b={section.readShort()} command="0xE153" />;
 				break;
 					
+				case 0xE154:
+					return <flash command="0xE154"/>;
+				break;
+					
 				case 0xE155:
-					return <miniAnim char={section.readShort()} dir={section.readShort()} anim={section.readShort()} command="0xE155"/>;
+					return <miniAnim char={section.readShort()} anim={section.readShort()} dir={section.readShort()} command="0xE155"/>;
+				break;
+					
+				case 0xE156:
+					return <miniAnim char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
 					
 				case 0xE158:
@@ -288,7 +350,7 @@
 				break;
 					
 				case 0xE165:
-					return <investigationBranchTableStart />;
+					return <investigationBranchTableStart a={section.readShort()} b={section.readShort()} />;
 				break;
 				
 				case 0xE166:
@@ -311,6 +373,10 @@
 					return <stopMusic a={section.readShort() } />;
 				break;
 					
+				case 0xE175:
+					return <music command="0xE175" />;
+				break;
+					
 				case 0xE176:
 					return <fadeMusic a={section.readShort()} b={section.readShort()} />;
 				break;
@@ -323,6 +389,10 @@
 				//present evidence branch table
 				case 0xE17C:
 					return <presentBranchStart />;
+				break;
+				
+				case 0xE17E:
+					return <talkTopic button={section.readShort()} section={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
 				
 				case 0xE17F:
@@ -338,26 +408,42 @@
 				break;
 				
 				case 0xE184:
-					return <unknownBranch section={section.readShort()} />;
+					return <unknownBranch section={section.readShort()} command="0xE184" />;
 				break;
 				
 				case 0xE185:
-					return <unknownReturn />;
+					return <unknownReturn command="0xE185" />;
 				break;
 				
 				//case 0xE186: seems related to E187
 				
 				case 0xE187:
-					return <unknownCondJump cond={section.readShort()} section={section.readShort()} />;
+					return <unknownCondJump cond={section.readShort()} section={section.readShort()} command="0xE187" />;
 				break;
 					
 				case 0xE188:
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
+					
+				case 0xE196:
+					return <showArgumentOverlay a={section.readShort()} />;
+				break;
+					
+				case 0xE197:
+					return <hideArgumentOverlay />;
+				break;
+					
+				case 0xE198:
+					return <showNewLogic case={section.readShort()} logic={section.readShort()} />;
+				break;
 				
 				case 0xE199: return <flashHp amount={section.readShort()} />;
 				case 0xE19A: return <clearFlashingHp />;
 				case 0xE19C: return <penalty />;
+				
+				case 0xE1A7:
+					return <showEyeStripeCutIn />;
+				break;
 					
 				case 0xE1C1:
 					return <noHPBranch section={section.readShort()} />;
@@ -371,10 +457,24 @@
 					return <returnToTitleScreen />;
 				break;
 				
+				case 0xE1C6:
+					return <savePrompt/>;
+				break;
 				
+				case 0xE1CB:
+					return <openPipWindow evidence={section.readShort()} side={section.readShort()} c={section.readShort()} />;
+				break;
+				
+				case 0xE1CC:
+					return <closePipWindow />;
+				break;
+				
+				case 0xE1CD:
+					return <waitForPipWindowAnimation />;
+				break;
 				
 				case 0xE1CE:
-					return <showOrganizerWithNewEvidenceHighligted evidence={section.readShort()} />;
+					return <showNewEvidenceAdded evidence={section.readShort()} />;
 				break;
 					
 				case 0xE1CF:
@@ -391,6 +491,15 @@
 
 				case 0xE1EA:
 					return <interjection a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+					
+				case 0xE1FA:
+					return <logicChessSwapSide a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()}/>;
+				break;
+				
+				case 0xE1FB:
+					return <logicChessTimeout section={section.readShort()} />;
 				break;
 					
 				//case 0xE1FF: return <enableLogicTimer />;
@@ -439,6 +548,8 @@
 				
 				case 0xE20D: return <center/>;
 				
+				case 0xE228: return <showRebutalAnim />;
+				
 				case 0xE22E: return <timePenalty a={section.readShort()} />;
 				
 				case 0xE234: return <blinkLogicChessTimerArrows />;
@@ -456,13 +567,9 @@
 				
 				//guessed but not confirmed commands
 					
-				case 0xE112:
-					return <fadeChar char={section.readShort()} confirm="guess" />;
-				break;
+				
 					
-				case 0xE122:
-					return <tweenChar confirm="guess" />;
-				break;
+				
 					
 				case 0xE12B:
 					return <fadeToBlack confirm="guess" />;
@@ -479,7 +586,8 @@
 				
 				//unknown pairs 'n stuff
 					
-				
+				case 0xE226://one of these is the
+				case 0xE244://begin investigations animation
 				
 				case 0xE195://one of these tween in the 
 				case 0xE10F://court record button
@@ -493,7 +601,7 @@
 				case 0xE148://one of these is fade bg to black
 				case 0xE149:
 				
-				case 0xE198://one of these is show logic to be gained
+				
 				
 				case 0xE158://One of these is the slide in evidcence
 				case 0xE1CE://for addition to record anim command
@@ -540,30 +648,27 @@
 		
 		private function commandE10D():XML {
 			var a:uint=section.readShort();
-			var screenFlags:uint=section.readShort();
-			var fadeTime:uint=section.readShort();
+			var b:uint=section.readShort();
+			var c:uint=section.readShort();
 			
-			var lowerScreen:String=(Boolean(screenFlags & 1)?"Off":"On");
-			var upperScreen:String=(Boolean(screenFlags & 2)?"Off":"On");
-			
-			return <screenActivator a={a} lowerScreen={lowerScreen} upperScreen={upperScreen} fadeTime={fadeTime} />;
+			return <sceneChange a={a} b={b} c={c} />;
 		}
 		
 		private function speakerBadge():XML {
-			var flags:uint=section.readShort();
-			var speakerId:uint=section.readShort();
+			var flags:uint=section.readUnsignedShort();
+			var tagId:uint=section.readShort();
 			
-			var windowPos:String=flags.toString(16);//(flags==-1?"top":"bottom");
+			var char:uint=flags;
 			
-			var speaker:String;
+			var tag:String;
 			
-			if(speakerId in speakerNames) {
-				speaker=speakerNames[speakerId];
+			if(tagId in speakerNames) {
+				tag=speakerNames[tagId];
 			} else {
-				speaker="0x"+speakerId.toString(16);
+				tag="0x"+tagId.toString(16);
 			}
 			
-			return <speakerBadge windowPos={windowPos} speaker={speaker} />;
+			return <speaker char={char} nametag={tag} />;
 		}
 		
 		private static const speakerNames:Object = {
