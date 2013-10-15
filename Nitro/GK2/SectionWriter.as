@@ -160,7 +160,7 @@
 				
 				case "longJump":
 					o.writeShort(0xE145);
-					o.writeShort(int(node.@case));
+					o.writeShort(int(node.attribute("case")));
 					o.writeShort(int(node.@part));
 					o.writeShort(int(node.@index));
 				break;

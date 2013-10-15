@@ -79,9 +79,7 @@
 			
 			switch(commandType) {
 				
-				case 0xE0B0://random branch
-					return commandE0B0();
-				break;
+				
 				
 				case 0xE040: return <whiteText/>;
 				case 0xE041: return <orangeText/>;
@@ -94,6 +92,10 @@
 				
 				case 0xE081:
 					return <jumpToSection section={section.readUnsignedShort()} />;
+				break;
+					
+				case 0xE0B0://random branch
+					return commandE0B0();
 				break;
 				
 				case 0xE100:
@@ -138,6 +140,10 @@
 					return <waitForSceneChange />;
 				break;
 				
+				case 0xE110:
+					return <beginBustDisplay a={section.readShort()} b={section.readShort()} />;
+				break;
+				
 				case 0xE111:
 					return <addCharacter
 						char={section.readShort()}
@@ -155,10 +161,19 @@
 				case 0xE113:
 					return <fadeChar char={section.readShort()} b={section.readShort()} c={section.readShort()} />;
 				break;
+					
+				case 0xE115:
+					return <removeMini char={section.readShort()} />;
+				break;
 				
 				case 0xE118:
 					return <fullscreenImage a={section.readShort()} b={section.readShort()} />;
 				break;
+					
+				case 0xE119:
+					return <panFullscreenImage a={section.readShort()} b={section.readShort()} />;
+				break;
+					
 				
 				case 0xE11B:
 					return <checkForPresent evidence={section.readShort()} section={section.readShort()} />;
@@ -182,17 +197,30 @@
 					return <ceAid index={section.readShort()} section={section.readShort()} />;
 				break;
 					
+				case 0xE121:
+					return <beginCrossExam />;
+				break;
+				
+				
 					
 				case 0xE122:
 					return <tweenChar char={section.readShort()} b={section.readShort()} c={section.readShort()} />;
 				break;
 					
 				case 0xE123:
-					return <panToCharacter char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+					return <panToCharacter char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} command="0xE123" />;
 				break;
 				
 				case 0xE124:
 					return <waitForCharacterPan char={section.readShort()} />;
+				break;
+					
+				case 0xE125:
+					return <panToCharacter char={section.readShort()} b={section.readShort()} command="0xE125" />;
+				break;
+					
+				case 0xE129:
+					return <waitForFullscreenImagePan />;
 				break;
 					
 				case 0xE12C:
@@ -241,7 +269,7 @@
 					
 				case 0xE13A:
 					return <miniWalk
-						command="0xA13A"
+						command="0xE13A"
 						char={section.readShort()}
 						x={section.readShort()}
 						y={section.readShort()}
@@ -279,8 +307,29 @@
 					return <waitCharAnim char={section.readShort()} />;
 				break;
 					
+				case 0xE13F:
+					return <miniWalk
+						command="0xE13F"
+						char={section.readShort()}
+						b={section.readShort()}
+						x={section.readShort()}
+						y={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+						g={section.readShort()}
+					/>;
+				break;
+					
 				case 0xE141:
-					return <panCamera x={section.readShort()} y={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+					return <panCamera x={section.readShort()} y={section.readShort()} c={section.readShort()} d={section.readShort()} command="0xE141"/>;
+				break;
+					
+				case 0xE142:
+					return <panCamera x={section.readShort()} y={section.readShort()} c={section.readShort()} d={section.readShort()} command="0xE142"/>;
+				break;
+					
+				case 0xE143:
+					return <waitForCameraPan />;
 				break;
 					
 				case 0xE144:
@@ -291,6 +340,10 @@
 					return <longJump case={section.readShort()} part={section.readShort()} index={section.readShort()}/>;
 				break;
 					
+					
+				case 0xE148:
+					return <fadeToGrayscale a={section.readShort()} b={section.readShort()} />;
+				break;
 					
 				case 0xE150:
 					return <charAnim char={section.readShort()} anim={section.readShort()} command="0xE150"/>;
@@ -324,6 +377,10 @@
 					return <revealEvidence evidence={section.readShort()} />;
 				break;
 					
+				case 0xE159:
+					return <hideEvidence evidence={section.readShort()} />;
+				break;
+					
 				case 0xE15A:
 					return <syncCtrl enable={section.readShort()} />;
 				break;
@@ -342,11 +399,11 @@
 				break;
 					
 				case 0xE163:
-					return <yesNoPrompt />;
+					return <evidencePrompt a={section.readShort()} b={section.readShort()} />;
 				break;
 					
 				case 0xE164:
-					return <unknownCondJump command="0xE164" unk={section.readShort()} section={section.readShort()} />;
+					return <evidencePromptJump evidence={section.readShort()} section={section.readShort()} />;
 				break;
 					
 				case 0xE165:
@@ -364,6 +421,13 @@
 				case 0xE169:
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
+					
+					
+
+				case 0xE16F:
+					return <positionMini char={section.readShort()} x={section.readShort()} y={section.readShort()} d={section.readShort()} />;
+				break;
+					
 					
 				case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
@@ -392,7 +456,7 @@
 				break;
 				
 				case 0xE17E:
-					return <talkTopic button={section.readShort()} section={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+					return <talkTopic button={section.readShort()} section={section.readShort()} c={section.readShort()} cond={section.readShort()} />;
 				break;
 				
 				case 0xE17F:
@@ -405,6 +469,10 @@
 				
 				case 0xE181:
 					return <presentBranchEnd />;
+				break;
+				
+				case 0xE182:
+					return <updateEvidence a={section.readShort()} b={section.readShort()} />;
 				break;
 				
 				case 0xE184:
@@ -425,6 +493,8 @@
 					return <sound a={section.readShort()} b={section.readShort()} />;
 				break;
 					
+				case 0xE194: return <forceLogic />;
+					
 				case 0xE196:
 					return <showArgumentOverlay a={section.readShort()} />;
 				break;
@@ -441,8 +511,16 @@
 				case 0xE19A: return <clearFlashingHp />;
 				case 0xE19C: return <penalty />;
 				
+				case 0xE1A6:
+					return <showEyeStripeCutIn char="Gregory"/>;
+				break;
+				
 				case 0xE1A7:
-					return <showEyeStripeCutIn />;
+					return <showEyeStripeCutIn char="Edgeworth"/>;
+				break;
+				
+				case 0xE1C0:
+					return <textboxAlignment a={section.readShort()} />;
 				break;
 					
 				case 0xE1C1:
@@ -458,7 +536,7 @@
 				break;
 				
 				case 0xE1C6:
-					return <savePrompt/>;
+					return <savePrompt type={section.readShort()} />;
 				break;
 				
 				case 0xE1CB:
@@ -466,7 +544,7 @@
 				break;
 				
 				case 0xE1CC:
-					return <closePipWindow />;
+					return <closePipWindow a={section.readShort()} />;
 				break;
 				
 				case 0xE1CD:
@@ -486,13 +564,25 @@
 				case 0xE1D2: return <screenShake strength="moderate" />;
 				case 0xE1D5: return <flash />;
 				case 0xE1DA: return <flashShakeAndPlaySound command="0xE1DA" />;
-					
-					
+				
+				case 0xE1E0: return <highlightLogicButton />;
 
 				case 0xE1EA:
 					return <interjection a={section.readShort()} b={section.readShort()} />;
 				break;
 					
+				case 0xE1Ec:
+					return <gavelSlamAnim a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+				case 0xE1E6: return <enterCloseUp a={section.readShort()} />;				
+				case 0xE1E7: return <exitCloseUp />;
+				
+				case 0xE1E8:
+					return <crossExamVsBars topChar={section.readShort()} bottomChar={section.readShort()} />;
+				break;
+					
+				case 0xE1F9: return <addOpponentChessPiece type={chessPieceList[section.readShort()]} />;
 					
 				case 0xE1FA:
 					return <logicChessSwapSide a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()}/>;
@@ -502,14 +592,26 @@
 					return <logicChessTimeout section={section.readShort()} />;
 				break;
 					
+				case 0xE1FD:
+					return <logicChessTopic
+						a={section.readShort()} 
+						button={section.readShort()} 
+						section={section.readShort()} 
+						d={section.readShort()} 
+						command="0xE1FD"
+					/>;
+				break;
+						
+				
+					
 				//case 0xE1FF: return <enableLogicTimer />;
 					
 				case 0xE200:
-					return <logicChessChoiseAttack a={section.readShort()} b={section.readShort()} destination={section.readShort()} d={section.readShort()} />;
+					return <logicChessChoiseAttack a={section.readShort()} button={section.readShort()} section={section.readShort()} d={section.readShort()} />;
 				break;
 					
 				case 0xE201:
-					return <logicChessChoiseRest destination={section.readShort()} />;
+					return <logicChessChoiseRest section={section.readShort()} />;
 				break;
 					
 				case 0xE202:
@@ -525,6 +627,16 @@
 				case 0xE208: return <chessAttack a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				
 
+				case 0xE20A:
+					return <logicChessTopic
+						a={section.readShort()}
+						button={section.readShort()}
+						section={section.readShort()}
+						d={section.readShort()}
+						command="0xE20A"
+					/>;
+				break;
+				
 				case 0xE213:
 					return <enter3dExaminationMode />;
 				break;
@@ -548,11 +660,15 @@
 				
 				case 0xE20D: return <center/>;
 				
-				case 0xE228: return <showRebutalAnim />;
+				case 0xE228: return <showRebuttalAnim />;
 				
 				case 0xE22E: return <timePenalty a={section.readShort()} />;
 				
 				case 0xE234: return <blinkLogicChessTimerArrows />;
+				
+				case 0xE254:
+					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+				break;
 				
 				case 0xE280: return <flashShakeAndSound sfx="Slash" command="0xE280" />;
 				case 0xE281: return <flashShakeAndSound sfx="Klash" command="0xE281" />;
@@ -561,21 +677,7 @@
 				case 0xE284: return <flashAndSound sfx="DingL" command="0xE284" />;
 				case 0xE285: return <flashAndSound sfx="DingH" command="0xE285" />;
 				
-				case 0xE254:
-					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
-				break;
 				
-				//guessed but not confirmed commands
-					
-				
-					
-				
-					
-				case 0xE12B:
-					return <fadeToBlack confirm="guess" />;
-				break;
-				
-					
 				
 				//case 0xE175:
 					//return <music confirmed="just a guess"/>;//music change?
@@ -592,9 +694,6 @@
 				case 0xE195://one of these tween in the 
 				case 0xE10F://court record button
 				
-				case 0xE1E0://flash logic button
-				
-					
 				case 0xE153://one is show fullscreen image
 				case 0xE118://one is a moderate/controllable shake
 				
@@ -671,6 +770,15 @@
 			return <speaker char={char} nametag={tag} />;
 		}
 		
+		private static const chessPieceList:Object = {
+			0: "Pawn",
+			1: "Knight",
+			2: "Rook",
+			3: "Bishop",
+			4: "Queen",
+			5: "King"
+		};
+		
 		private static const speakerNames:Object = {
 			0x00:"Edgeworth",
 			0x01:"Gumshoe",
@@ -684,6 +792,7 @@
 			0x09:"Mikagami",
 			0x0A:"Ichiyanagi",
 			0x0B:"Shigaraki",
+			0x0C:"von Karma",
 			0x0D:"Larry",
 			0x0E:"Lotta Hearth",
 			0x0F:"Missile",
