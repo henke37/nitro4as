@@ -161,6 +161,10 @@
 				case 0xE113:
 					return <fadeChar char={section.readShort()} b={section.readShort()} c={section.readShort()} />;
 				break;
+
+				case 0xE114:
+					return <addMini char={section.readShort()} b={section.readShort()} x={section.readShort()} y={section.readShort()} e={section.readShort()} />;
+				break;
 					
 				case 0xE115:
 					return <removeMini char={section.readShort()} />;
@@ -385,18 +389,14 @@
 					return <syncCtrl enable={section.readShort()} />;
 				break;
 				
-				//If statement? Button choice? Halp!
-				case 0xE160:
-					return <unknowBranchHead command="0xE160"/>;
-				break;
-				
+				case 0xE160: return <pointAtPicture picture={section.readShort()} />;				
 				case 0xE161:
-					return <unknownBranchSuccess command="0xE161" cond={section.readShort()} section={section.readShort()} />;
+					return <pointAtPictureHit area={section.readShort()} section={section.readShort()} />;
 				break;
-				
 				case 0xE162:
-					return <unknownBranchFail command="0xE162" section={section.readShort()} />;
+					return <pointAtPictureMiss section={section.readShort()} />;
 				break;
+					
 					
 				case 0xE163:
 					return <evidencePrompt a={section.readShort()} b={section.readShort()} />;
@@ -405,6 +405,7 @@
 				case 0xE164:
 					return <evidencePromptJump evidence={section.readShort()} section={section.readShort()} />;
 				break;
+					
 					
 				case 0xE165:
 					return <investigationBranchTableStart a={section.readShort()} b={section.readShort()} />;
@@ -474,19 +475,18 @@
 				case 0xE182:
 					return <updateEvidence a={section.readShort()} b={section.readShort()} />;
 				break;
-				
+					
+				case 0xE183:
+					return <returnToTalkTopicMenu section={section.readShort()} />
 				case 0xE184:
-					return <unknownBranch section={section.readShort()} command="0xE184" />;
+					return <returnToPresentEvidencePrompt section={section.readShort()} />;
 				break;
 				
-				case 0xE185:
-					return <unknownReturn command="0xE185" />;
-				break;
-				
-				//case 0xE186: seems related to E187
+				case 0xE185: return <showChoiseMenu a={section.readShort()} />;				
+				case 0xE186: return <initChoiseMenu />;
 				
 				case 0xE187:
-					return <unknownCondJump cond={section.readShort()} section={section.readShort()} command="0xE187" />;
+					return <choiseMenuOption button={section.readShort()} section={section.readShort()} />;
 				break;
 					
 				case 0xE188:
