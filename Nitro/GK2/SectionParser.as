@@ -620,9 +620,9 @@
 				
 				case 0xE203: return <showAttackingChessPiece />;
 				
-				case 0xE205: <refillTimeBar a={section.readShort()} />;
+				case 0xE206: <refillTimeBar a={section.readShort()} />;
 				
-				case 0xE206: return <showChessPieces />;
+				case 0xE205: return <showChessPieces />;
 				
 				case 0xE208: return <chessAttack a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				
