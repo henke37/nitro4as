@@ -374,7 +374,11 @@
 				break;
 					
 				case 0xE156:
-					return <miniAnim char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
+					return <miniAnim char={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} command="0xE156" />;
+				break;
+					
+				case 0xE157:
+					return <miniAnim char={section.readShort()} anim={section.readShort()} dir={section.readShort()} command="0xE157" />;
 				break;
 					
 				case 0xE158:
@@ -424,6 +428,18 @@
 				break;
 					
 					
+				case 0xE16C:
+					return <presentContradiction 
+						evidence={section.readShort()}
+						evidenceType={section.readShort()}
+						section={section.readShort()}
+					/>;
+				break;
+				
+				case 0xE16D:
+					return <presentContradictionDefault section={section.readShort()} />;
+				break;
+					
 
 				case 0xE16F:
 					return <positionMini char={section.readShort()} x={section.readShort()} y={section.readShort()} d={section.readShort()} />;
@@ -444,6 +460,10 @@
 					
 				case 0xE176:
 					return <fadeMusic a={section.readShort()} b={section.readShort()} />;
+				break;
+					
+				case 0xE177:
+					return <music a={section.readShort()} b={section.readShort()} command="0xE177" />;
 				break;
 
 				case 0xE17A:
@@ -510,6 +530,8 @@
 				case 0xE199: return <flashHp amount={section.readShort()} />;
 				case 0xE19A: return <clearFlashingHp />;
 				case 0xE19C: return <penalty />;
+				
+				case 0xE1A3: return <waitFor3DExamination flag={section.readShort()} />;
 				
 				case 0xE1A6:
 					return <showEyeStripeCutIn char="Gregory"/>;
@@ -642,7 +664,7 @@
 				break;
 				
 				case 0xE216:
-					return <switchTo3dExaminationView />;
+					return <switchTo3dExaminationView a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
 				
 				case 0xE218:
@@ -660,15 +682,27 @@
 				
 				case 0xE20D: return <center/>;
 				
-				case 0xE228: return <showRebuttalAnim />;
+				case 0xE227: return <investigationCompleteAnim />;
+				
+				case 0xE228: return <showRebuttalAnim command="0xE228"/>;
+				
+				case 0xE22A: return <showRebuttalAnim command="0xE22A"/>;
 				
 				case 0xE22E: return <timePenalty a={section.readShort()} />;
 				
 				case 0xE234: return <blinkLogicChessTimerArrows />;
 				
+				case 0xE247: return <contradictionTutorial step="point" />;
+				case 0xE248: return <contradictionTutorial step="push" />;
+				case 0xE249: return <contradictionTutorial step="present" />;
+				case 0xE24A: return <contradictionTutorial step="retry" />;
+					
 				case 0xE254:
 					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
 				break;
+					
+				case 0xE25D: return <pointAtPictureWithReturn a={section.readShort()} />;
+				case 0xE25E: return <returnFromPointAtPicture section={section.readShort()} />;
 				
 				case 0xE280: return <flashShakeAndSound sfx="Slash" command="0xE280" />;
 				case 0xE281: return <flashShakeAndSound sfx="Klash" command="0xE281" />;
@@ -700,7 +734,7 @@
 				case 0xE148://one of these is fade bg to black
 				case 0xE149:
 				
-				
+				case 0xE1DD://fades chars?
 				
 				case 0xE158://One of these is the slide in evidcence
 				case 0xE1CE://for addition to record anim command
