@@ -98,6 +98,15 @@
 					return commandE0B0();
 				break;
 				
+				case 0xE091:
+					return <videoAnalysisHotspot
+						a={section.readUnsignedShort()}
+						b={section.readUnsignedShort()}
+						c={section.readUnsignedShort()}
+						section={section.readUnsignedShort()}
+					/>;
+				break;
+				
 				case 0xE100:
 					switch(section.readShort()) {
 						case 0:
@@ -412,7 +421,7 @@
 					
 					
 				case 0xE165:
-					return <investigationBranchTableStart a={section.readShort()} b={section.readShort()} />;
+					return <investigationBranchTableStart contradictionRegion={section.readShort()} contradictionEnableFlag={section.readShort()} />;
 				break;
 				
 				case 0xE166:
@@ -427,6 +436,13 @@
 					return <investigationBranchTableDefEnt section={section.readShort()} />;
 				break;
 					
+				case 0xE16A:
+					return <investigationContradictionPress section={section.readShort()} />;
+				break;
+				
+				case 0xE16B:
+					return <investigationContradictionEvidencePrompt a={section.readShort()} b={section.readShort()} />;
+				break;
 					
 				case 0xE16C:
 					return <presentContradiction 
@@ -696,6 +712,10 @@
 				case 0xE248: return <contradictionTutorial step="push" />;
 				case 0xE249: return <contradictionTutorial step="present" />;
 				case 0xE24A: return <contradictionTutorial step="retry" />;
+				
+				
+				case 0xE251: return <luminolTutorial step={section.readShort()} />;
+				case 0xE252: return <waitForLuminolSpray />;
 					
 				case 0xE254:
 					return <fadeToImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} />;
@@ -755,6 +775,8 @@
 		
 		private function jumpIfFlagsEqTo(count:uint):XML {
 			var out:XML=<jumpIfFlagsEqTo />;
+			
+			section.position+=2;//ignore one argument
 				
 			for(var i:uint=0;i<count;++i) {
 				var flagXML:XML=<flag flag={section.readShort()} />;
@@ -807,9 +829,9 @@
 		private static const chessPieceList:Object = {
 			0: "Pawn",
 			1: "Knight",
-			2: "Rook",
-			3: "Bishop",
-			4: "Queen",
+			2: "Queen",
+			3: "Rook",
+			4: "Bishop",
 			5: "King"
 		};
 		
