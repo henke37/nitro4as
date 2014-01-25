@@ -229,7 +229,6 @@
 			if(sources.length>0) {			
 				list_mc.visible=true;
 				status_txt.visible=false;
-				progress_mc.visible=true;
 				
 				source_mc.selectedIndex=0;
 				source_mc.visible=sources.length>1;
@@ -253,6 +252,15 @@
 				sources.addItem(streamSource);
 			}
 			
+			if(sdat.sequenceInfo.length) {
+				var seqSource:Object={};
+				seqSource.dataProvider=listSequences(sdat);
+				seqSource.name="Sequences";
+				seqSource.fileName=fileName;
+				seqSource.fileIndex=fileId;
+				sources.addItem(seqSource);
+			}
+			
 			if(sdat.waveArchiveInfo.length>0) {
 				for(var archiveIndex:uint=0;archiveIndex<sdat.waveArchiveInfo.length;++archiveIndex) {
 					var archive:SWAR=sdat.openSWAR(archiveIndex);
@@ -274,6 +282,7 @@
 					sources.addItem(archiveSource);
 				}
 			}
+			
 		}
 		
 		private function sourceChange(e:Event):void {
@@ -312,6 +321,32 @@
 				
 				++fileId;
 			}
+		}
+		
+		private function listSequences(sdat:SDAT):DataProvider {
+			
+			var provider:DataProvider=new DataProvider();
+			
+			for(var seqIndex:uint=0;seqIndex<sdat.sequenceInfo.length;++seqIndex) {
+				try {
+					var sseq:SSEQ=sdat.openSSEQ(seqIndex);
+					
+					var item:Object={ index: seqIndex, type: "sequence" };
+					item.seq=sseq.sequence;
+					item.info=sdat.sequenceInfo[seqIndex];
+					
+					if(sdat.seqSymbols) {
+						if(seqIndex in sdat.seqSymbols) {
+							item.name=sdat.seqSymbols[seqIndex];
+						}
+					}
+					
+					provider.addItem(item);
+				} catch(err:Error) {
+					trace(err);
+				}
+			}
+			return provider;
 		}
 		
 		private function listStreams(sdat:SDAT):DataProvider {
@@ -375,7 +410,7 @@
 				name=String(item.type).toLocaleUpperCase()+" #"+item.index;
 			}
 			
-			if(includeTime) {
+			if(includeTime && "sampleRate" in item) {
 				name+=" - "+formatTime(item.length/item.sampleRate) + (item.loops?(" - Loop: "+formatTime(item.loopPoint/item.sampleRate)):"");
 			}
 			
@@ -397,11 +432,16 @@
 				player=new STRMPlayer(playingItem.stream);
 			} else if(playingItem.type=="wave") {
 				player=new WavePlayer(playingItem.wave);
+			} else {
+				player=null;
 			}
 			
-			export_mc.visible=true;
+			progress_mc.visible=export_mc.visible=Boolean(player);
 			
-			player.play();
+			
+			if(player) {
+				player.play();
+			}
 		}
 		
 		private function exportClick(e:MouseEvent):void {
@@ -416,7 +456,11 @@
 				decoder=new STRMDecoder(playingItem.stream);
 			} else if(playingItem.type=="wave") {
 				decoder=new WaveDecoder(playingItem.wave);
+			} else {
+				decoder=null;
 			}
+			
+			if(!decoder) return;
 			
 			decoder.loopAllowed=false;
 			decoder.rendAsMono=!stereo;
