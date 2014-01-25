@@ -261,25 +261,50 @@
 				sources.addItem(seqSource);
 			}
 			
-			if(sdat.waveArchiveInfo.length>0) {
-				for(var archiveIndex:uint=0;archiveIndex<sdat.waveArchiveInfo.length;++archiveIndex) {
-					var archive:SWAR=sdat.openSWAR(archiveIndex);
+			
+			for(var seqArchiveIndex:uint=0;seqArchiveIndex<sdat.sequenceArchiveInfo.length;++seqArchiveIndex) {
+				//try {
+					var seqArchive:SSAR=sdat.openSSAR(seqArchiveIndex);
 					
-					var archiveSource:Object={};
-					var name:String;
+					var seqArchiveSource:Object={};
+					var symb:SeqArcSymbRecord;
 					
-					if(sdat.waveArchiveSymbols) {
-						name=sdat.waveArchiveSymbols[archiveIndex];
+					if(sdat.seqArchiveSymbols) {
+						symb=sdat.seqArchiveSymbols[seqArchiveIndex];
 					}
 					
 					if(!name) {
-						name="SWAR #"+archiveIndex;
+						name="SSAR #"+seqArchiveIndex;
 					}
-					archiveSource.name=name;
-					archiveSource.fileName=fileName;
-					archiveSource.fileIndex=fileId;
-					archiveSource.dataProvider=listSwar(archive);
-					sources.addItem(archiveSource);
+					seqArchiveSource.name=name;
+					seqArchiveSource.fileName=fileName;
+					seqArchiveSource.fileIndex=fileId;
+					seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
+					sources.addItem(seqArchiveSource);
+				//} catch(err:Error) {
+					//trace(err);
+				//}
+			}
+			
+			if(sdat.waveArchiveInfo.length>0) {
+				for(var waveArchiveIndex:uint=0;waveArchiveIndex<sdat.waveArchiveInfo.length;++waveArchiveIndex) {
+					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
+					
+					var waveArchiveSource:Object={};
+					var name:String;
+					
+					if(sdat.waveArchiveSymbols) {
+						name=sdat.waveArchiveSymbols[waveArchiveIndex];
+					}
+					
+					if(!name) {
+						name="SWAR #"+waveArchiveIndex;
+					}
+					waveArchiveSource.name=name;
+					waveArchiveSource.fileName=fileName;
+					waveArchiveSource.fileIndex=fileId;
+					waveArchiveSource.dataProvider=listSwar(waveArchive);
+					sources.addItem(waveArchiveSource);
 				}
 			}
 			
@@ -331,15 +356,7 @@
 				try {
 					var sseq:SSEQ=sdat.openSSEQ(seqIndex);
 					
-					var item:Object={ index: seqIndex, type: "sequence" };
-					item.seq=sseq.sequence;
-					item.info=sdat.sequenceInfo[seqIndex];
-					
-					if(sdat.seqSymbols) {
-						if(seqIndex in sdat.seqSymbols) {
-							item.name=sdat.seqSymbols[seqIndex];
-						}
-					}
+					var item:Object=listSequence(seqIndex,sseq.sequence,sdat.sequenceInfo[seqIndex],sdat.seqSymbols);
 					
 					provider.addItem(item);
 				} catch(err:Error) {
@@ -347,6 +364,20 @@
 				}
 			}
 			return provider;
+		}
+		
+		private function listSequence(seqIndex:uint,sequence:Sequence,info:SequenceInfoRecord,symbols:Vector.<String>):Object {
+			var item:Object={ index: seqIndex, type: "sequence" };
+			item.seq=sequence;
+			item.info=info;
+			
+			if(symbols) {
+				if(seqIndex in symbols) {
+					item.name=symbols[seqIndex];
+				}
+			}
+			
+			return item;
 		}
 		
 		private function listStreams(sdat:SDAT):DataProvider {
@@ -372,6 +403,25 @@
 						item.name=sdat.streamSymbols[streamIndex];
 					}
 				}
+				
+				provider.addItem(item);
+			}
+			
+			return provider;
+		}
+		
+		private function listSsar(ssar:SSAR,symbol:SeqArcSymbRecord):DataProvider {
+			var provider:DataProvider=new DataProvider();
+			
+			for(var sequenceIndex:uint=0;sequenceIndex<ssar.length;++sequenceIndex) {
+				var symbols:Vector.<String>;
+				if(symbol) {
+					symbols=symbol.subSymbols;
+				} else {
+					symbols=null;
+				}
+					
+				var item:Object=listSequence(sequenceIndex,null,ssar.sequenceInfo[sequenceIndex],symbols);
 				
 				provider.addItem(item);
 			}
