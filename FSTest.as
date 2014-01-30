@@ -5,6 +5,7 @@
 	import flash.net.*;
 	import flash.events.*;
 	import flash.text.*;
+	import flash.ui.*;
 	
 	import Nitro.FileSystem.*;
 	import Nitro.SDAT.InfoRecords.*;
@@ -28,6 +29,8 @@
 		
 		private static const iconZoom:Number=10;
 		private static const title_txtHeight:Number=40;
+		private static const TITLE:String="Nitro SDAT Stream player WIP";
+		private static const CLICKLOAD:String="Click to load game from disk";
 		
 		private var sources:DataProvider;
 		
@@ -41,6 +44,8 @@
 		
 		private var loopMark:Shape;
 		private var icon:Bitmap;
+		
+		var resetItem:ContextMenuItem
 		
 		public function FSTest() {
 			
@@ -61,7 +66,7 @@
 			title_txt.width=550-Banner.ICON_WIDTH*iconZoom;
 			title_txt.wordWrap=true;
 			title_txt.height=title_txtHeight;
-			title_txt.text="Nitro SDAT Stream player WIP";
+			title_txt.text=TITLE;
 			
 			//playback_txt=new TextField();
 			playback_txt.y=Banner.ICON_HEIGHT*iconZoom;
@@ -76,7 +81,7 @@
 				loader.dataFormat=URLLoaderDataFormat.BINARY;
 				loader.load(new URLRequest("game.nds"));
 			} else {
-				status_txt.text="Click to load game from disk";
+				status_txt.text=CLICKLOAD;
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
 			
@@ -116,7 +121,35 @@
 			
 			addEventListener(Event.ENTER_FRAME,updatePosition);
 			
+			resetItem=new ContextMenuItem("Reset",false,false);
+			resetItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,reset);
+			contextMenu=new ContextMenu();
+			contextMenu.hideBuiltInItems();
+			contextMenu.customItems=[resetItem];
+			
+			
 			return;//explicit return to suppress harmful code that the flash IDE injects beyond this point.
+		}
+		
+		private function reset(e:Event):void {
+			sources.removeAll();
+			progress_mc.visible=false;
+			export_mc.visible=false;
+			loopMark.visible=false;
+			icon.bitmapData=null;
+			list_mc.visible=false;
+			source_mc.visible=false;
+			playback_txt.visible=false;
+			
+			title_txt.text=TITLE;
+			status_txt.text=CLICKLOAD;
+			status_txt.visible=true;
+			
+			if(player) { player.stop(); }
+			
+			resetItem.enabled=false;
+			
+			stage.addEventListener(MouseEvent.CLICK,stageClick);
 		}
 		
 		private function updatePosition(e:Event):void {
@@ -234,6 +267,8 @@
 				source_mc.visible=sources.length>1;
 				
 				sourceChange(null);
+				
+				resetItem.enabled=true;
 			}
 		}
 		
@@ -327,19 +362,23 @@
 			var provider:DataProvider=new DataProvider();
 			
 			for(var bankIndex:uint=0;bankIndex<sdat.bankInfo.length;++bankIndex) {
-				var sbnk:SBNK=sdat.openBank(bankIndex);
-				
-				var item:Object= { index: bankIndex, type: "bank" };
-				item.instruments=sbnk.instruments;
-				item.info=sdat.bankInfo[bankIndex];
-				
-				if(sdat.bankSymbols) {
-					if(bankIndex in sdat.bankSymbols) {
-						item.name=sdat.bankSymbols[bankIndex];
+				try {
+					var sbnk:SBNK=sdat.openBank(bankIndex);
+					
+					var item:Object= { index: bankIndex, type: "bank" };
+					item.instruments=sbnk.instruments;
+					item.info=sdat.bankInfo[bankIndex];
+					
+					if(sdat.bankSymbols) {
+						if(bankIndex in sdat.bankSymbols) {
+							item.name=sdat.bankSymbols[bankIndex];
+						}
 					}
+					
+					provider.addItem(item);
+				} catch(err:Error) {
+					trace(err.getStackTrace());
 				}
-				
-				provider.addItem(item);
 			}
 			
 			return provider;
