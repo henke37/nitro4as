@@ -17,11 +17,15 @@
 		private var chanMgr:ChannelManager;
 		private var tracker:Tracker;
 		
+		private var globalVariables:Vector.<uint>;
+		
 		private var outSnd:Sound;
 		
 		private static const UPDATE_RATE:uint=64 * 2728 * 44100 / Mixer.internalSamplerate;//note, not a nice integer
 		
-		private static const PLAYBACK_SAMPLES:uint=8192
+		private static const PLAYBACK_SAMPLES:uint=8192;
+		
+		
 
 		/** Creates a new Sequence player
 		@param sdat The SDAT to load data from */
@@ -32,6 +36,8 @@
 			mixer=new Mixer();
 			chanMgr=new ChannelManager(mixer);
 			tracker=new Tracker(chanMgr);
+			
+			globalVariables=new Vector.<uint>(16,true);
 			
 			mixer.callback=updateTick;
 		}

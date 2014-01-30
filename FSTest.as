@@ -152,6 +152,20 @@
 			stage.addEventListener(MouseEvent.CLICK,stageClick);
 		}
 		
+		private function filesLoaded():void {
+			if(sources.length>0) {			
+				list_mc.visible=true;
+				status_txt.visible=false;
+				
+				source_mc.selectedIndex=0;
+				source_mc.visible=sources.length>1;
+				
+				sourceChange(null);
+				
+				resetItem.enabled=true;
+			}
+		}
+		
 		private function updatePosition(e:Event):void {
 			if(!player) return;
 			progress_mc.liveDragging=false;
@@ -258,20 +272,6 @@
 
 		}
 		
-		private function filesLoaded():void {
-			if(sources.length>0) {			
-				list_mc.visible=true;
-				status_txt.visible=false;
-				
-				source_mc.selectedIndex=0;
-				source_mc.visible=sources.length>1;
-				
-				sourceChange(null);
-				
-				resetItem.enabled=true;
-			}
-		}
-		
 		private function loadSDAT(fileContents:ByteArray,fileName:String,fileId:uint=0):void {
 			var sdat:SDAT=new SDAT();
 			sdat.parse(fileContents);
@@ -330,6 +330,15 @@
 				sources.addItem(bankSource);
 			}
 			
+			if(sdat.groupInfo.length>0) {
+				var groupSource:Object={};
+				groupSource.dataProvider=listGroups(sdat);
+				groupSource.name="Groups";
+				groupSource.fileName=fileName;
+				groupSource.fileIndex=fileId;
+				sources.addItem(groupSource);
+			}
+			
 			if(sdat.waveArchiveInfo.length>0) {
 				for(var waveArchiveIndex:uint=0;waveArchiveIndex<sdat.waveArchiveInfo.length;++waveArchiveIndex) {
 					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
@@ -356,6 +365,25 @@
 		
 		private function sourceChange(e:Event):void {
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
+		}
+		
+		private function listGroups(sdat:SDAT):DataProvider {
+			var provider:DataProvider=new DataProvider();
+			
+			for(var groupIndex:uint=0;groupIndex<sdat.groupInfo.length;++groupIndex) {
+				var item:Object={index: groupIndex, type: "group" };
+				item.info=sdat.groupInfo[groupIndex];
+				
+				if(sdat.groupSymbols) {
+					if(groupIndex in sdat.groupSymbols) {
+						item.name=sdat.groupSymbols[groupIndex];
+					}
+				}
+				
+				provider.addItem(item);
+			}
+			
+			return provider;
 		}
 		
 		private function listBanks(sdat:SDAT):DataProvider {
@@ -556,7 +584,7 @@
 				player=null;
 			}
 			
-			progress_mc.visible=export_mc.visible=Boolean(player);
+			playback_txt.visible=progress_mc.visible=export_mc.visible=Boolean(player);
 			
 			
 			if(player) {

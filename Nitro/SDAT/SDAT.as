@@ -1,4 +1,4 @@
-package Nitro.SDAT {
+﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
 	
@@ -327,9 +327,10 @@ package Nitro.SDAT {
 				
 				var groupElementCount:uint=info.readUnsignedInt();
 				for(j=0;j<groupElementCount;++j) {
-					var groupInfoSubRecord:GroupInfoSubRecord=new GroupInfoSubRecord();
-					groupInfoSubRecord.type=info.readUnsignedInt();
-					groupInfoSubRecord.id=info.readUnsignedInt();
+					var itemType:uint=info.readUnsignedInt();
+					var itemId:uint=info.readUnsignedInt();
+					var groupInfoSubRecord:GroupInfoSubRecord=new GroupInfoSubRecord(itemType,itemId);
+					
 					groupInfoRecord.entries.push(groupInfoSubRecord);
 				}
 			}

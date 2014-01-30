@@ -14,6 +14,8 @@
 		
 		private var callReturn:uint;
 		
+		public var playerVariables:Vector.<uint>;
+		
 		internal var patch:uint;
 		
 		internal var priority:uint;
@@ -45,6 +47,8 @@
 			if(!tracker) throw new ArgumentError("Tracker can not be null!");
 			position=trackStart;
 			this.tracker=tracker;
+			
+			playerVariables=new Vector.<uint>(16,true);
 		}
 		
 		public function reset():void {

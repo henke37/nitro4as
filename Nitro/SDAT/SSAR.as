@@ -1,4 +1,4 @@
-package Nitro.SDAT {
+﻿package Nitro.SDAT {
 	
 	import flash.utils.*;
 	import Nitro.SectionedFile;
@@ -55,6 +55,12 @@ package Nitro.SDAT {
 				section.position+=2;
 				
 				sequenceInfo[i]=info;
+				
+				/*
+				var parser:SequenceDataParser=new SequenceDataParser();
+				
+				sequence=parser.parse(sequenceData);
+				*/
 			}
 		}
 
