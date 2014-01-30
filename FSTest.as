@@ -286,6 +286,15 @@
 				//}
 			}
 			
+			if(sdat.bankInfo.length>0) {
+				var bankSource:Object={};
+				bankSource.dataProvider=listBanks(sdat);
+				bankSource.name="Instrument Banks";
+				bankSource.fileName=fileName;
+				bankSource.fileIndex=fileId;
+				sources.addItem(bankSource);
+			}
+			
 			if(sdat.waveArchiveInfo.length>0) {
 				for(var waveArchiveIndex:uint=0;waveArchiveIndex<sdat.waveArchiveInfo.length;++waveArchiveIndex) {
 					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
@@ -312,6 +321,28 @@
 		
 		private function sourceChange(e:Event):void {
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
+		}
+		
+		private function listBanks(sdat:SDAT):DataProvider {
+			var provider:DataProvider=new DataProvider();
+			
+			for(var bankIndex:uint=0;bankIndex<sdat.bankInfo.length;++bankIndex) {
+				var sbnk:SBNK=sdat.openBank(bankIndex);
+				
+				var item:Object= { index: bankIndex, type: "bank" };
+				item.instruments=sbnk.instruments;
+				item.info=sdat.bankInfo[bankIndex];
+				
+				if(sdat.bankSymbols) {
+					if(bankIndex in sdat.bankSymbols) {
+						item.name=sdat.bankSymbols[bankIndex];
+					}
+				}
+				
+				provider.addItem(item);
+			}
+			
+			return provider;
 		}
 		
 		private function listSwavs(files:Vector.<AbstractFile>,nds:NDS):void {
