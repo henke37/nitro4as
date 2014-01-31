@@ -123,12 +123,18 @@
 			
 			resetItem=new ContextMenuItem("Reset",false,false);
 			resetItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,reset);
+			var sourceItem:ContextMenuItem=new ContextMenuItem("Source code",true);
+			sourceItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,goSource);
 			contextMenu=new ContextMenu();
 			contextMenu.hideBuiltInItems();
-			contextMenu.customItems=[resetItem];
+			contextMenu.customItems=[resetItem,sourceItem];
 			
 			
 			return;//explicit return to suppress harmful code that the flash IDE injects beyond this point.
+		}
+		
+		private function goSource(e:Event):void {
+			navigateToURL(new URLRequest("https://www.assembla.com/code/sdat4as/subversion/nodes/Nitro"));
 		}
 		
 		private function reset(e:Event):void {
