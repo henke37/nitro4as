@@ -42,14 +42,14 @@
 					case 0xE5:
 					case 0xE6:
 					case 0xE7:
-					case 0xE8:/*
+					case 0xE8:
 					case 0xE9:
 					case 0xEA:
 					case 0xEB:
 					case 0xEC:
 					case 0xED:
 					case 0xEE:
-					case 0xEF:*/
+					case 0xEF:
 						toAppend=parseCommand(word);
 					break;
 					
@@ -82,9 +82,11 @@
 				
 				
 				case 0xE040: return <whiteText/>;
-				case 0xE041: return <orangeText/>;
+				case 0xE041: return <orangeText command="0xE041"/>;
 				case 0xE042: return <blueText/>;
-				case 0xE043: return <greenText/>;
+				case 0xE043: return <greenText command="0xE043"/>;
+				case 0xE04C: return <greenText command="0xE04C"/>;
+				case 0xE04D: return <orangeText command="0xE04D"/>;
 
 				case 0xE080:
 					return <callSection section={section.readUnsignedShort()} />;
@@ -147,6 +149,10 @@
 				
 				case 0xE10E:
 					return <waitForSceneChange />;
+				break;
+				
+				case 0xE10F:
+					return <endBustDisplay a={section.readShort()} b={section.readShort()} />;
 				break;
 				
 				case 0xE110:
@@ -460,7 +466,11 @@
 				case 0xE16F:
 					return <positionMini char={section.readShort()} x={section.readShort()} y={section.readShort()} d={section.readShort()} />;
 				break;
+				
 					
+				case 0xE171:
+					return <waitForSoundEffect />;
+				break;
 					
 				case 0xE172:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE172" />;
@@ -550,7 +560,13 @@
 				case 0xE1A3: return <waitFor3DExamination flag={section.readShort()} />;
 				
 				case 0xE1A6:
-					return <showEyeStripeCutIn char="Gregory"/>;
+					return <ceRevisedStatement
+						index={section.readShort()}
+						statementSection={section.readShort()}
+						pressSection={section.readShort()}
+						presentSection={section.readShort()}
+						startHidden={section.readShort()}
+					/>;
 				break;
 				
 				case 0xE1A7:
@@ -575,6 +591,10 @@
 				
 				case 0xE1C6:
 					return <savePrompt type={section.readShort()} />;
+				break;
+					
+				case 0xE1C9:
+					return <fullscreenImagePan a={section.readShort()} b={section.readShort()} c={section.readShort()} />;
 				break;
 				
 				case 0xE1CB:
@@ -731,7 +751,7 @@
 				case 0xE284: return <flashAndSound sfx="DingL" command="0xE284" />;
 				case 0xE285: return <flashAndSound sfx="DingH" command="0xE285" />;
 				
-				
+				case 0xE901: return <langScrollAnim />;
 				
 				//case 0xE175:
 					//return <music confirmed="just a guess"/>;//music change?
