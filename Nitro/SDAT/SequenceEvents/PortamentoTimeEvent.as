@@ -7,6 +7,10 @@
 		public function PortamentoTimeEvent(_time:uint) {
 			time=_time;
 		}
+		
+		public function toString():String {
+			return "[PortamentoTime time="+time+"]";
+		}
 
 	}
 	

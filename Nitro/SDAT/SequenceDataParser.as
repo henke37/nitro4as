@@ -159,6 +159,14 @@
 						evt=new MonoPolyEvent(data.readBoolean());
 					break;
 					
+					case 0xC8:
+						evt=new TieEvent(data.readBoolean());
+					break;
+					
+					case 0xC9:
+						evt=new PortamentoKeyEvent(data.readUnsignedByte());
+					break;
+					
 					case 0xCA:
 						evt=new ModulationEvent("depth",data.readUnsignedByte());
 					break;
