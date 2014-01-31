@@ -265,6 +265,7 @@
 			
 			if(sources.length==0) {
 				status_txt.text="No files found";
+				resetItem.enabled=true;
 				return;
 			}
 			
