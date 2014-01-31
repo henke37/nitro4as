@@ -105,9 +105,9 @@
 				xml.appendChild(overlay);
 			}
 			
-			trace(xml);
+			//trace(xml);
 			
-			//fr.save(xml,"ndsmap.xml");
+			fr.save(xml,"ndsmap.xml");
 		}
 		
 		private static function addOverlays(xml:XML,overlays:Vector.<Overlay>):void {
