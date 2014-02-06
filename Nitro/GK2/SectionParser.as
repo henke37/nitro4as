@@ -633,7 +633,7 @@
 				case 0xE1D1: return <screenShake strength="mild" />;
 				case 0xE1D2: return <screenShake strength="moderate" />;
 				case 0xE1D5: return <flash />;
-				case 0xE1DA: return <flashShakeAndPlaySound command="0xE1DA" />;
+				case 0xE1DA: return <flashAndShake command="0xE1DA" />;
 				
 				case 0xE1E0: return <highlightLogicButton />;
 
