@@ -500,9 +500,12 @@
 				case 0xE177:
 					return <music a={section.readShort()} b={section.readShort()} command="0xE177" />;
 				break;
+					
+				case 0xE178: return <pauseMusic />;
+				case 0xE179: return <resumeMusic />;
 
 				case 0xE17A:
-					return <music a={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE17A"/>;//music enable/select
+					return <musicAttunetation a={section.readShort()} b={section.readShort()} c={section.readShort()} command="0xE17A"/>;//music enable/select
 				break;
 					
 					
