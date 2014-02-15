@@ -49,8 +49,8 @@
 				
 				info.bankId=section.readUnsignedShort();
 				info.vol=section.readUnsignedByte();
-				info.channelPressure=section.readUnsignedByte();
-				info.polyPressure=section.readUnsignedByte();
+				info.channelPriority=section.readUnsignedByte();
+				info.playerPriority=section.readUnsignedByte();
 				info.player=section.readUnsignedByte();
 				section.position+=2;
 				

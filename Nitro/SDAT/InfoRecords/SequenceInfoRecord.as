@@ -8,11 +8,11 @@
 		/** The playback volume */
 		public var vol:uint;
 		
-		/** The channel preasure */
-		public var channelPressure:uint;
+		/** The channel priority */
+		public var channelPriority:uint;
 		
-		/** The polyphonic preasure */
-		public var polyPressure:uint;
+		/** The player priority */
+		public var playerPriority:uint;
 		
 		/** The player to use to play this sequence */
 		public var player:uint;
@@ -22,7 +22,7 @@
 		}
 		
 		public function toString():String {
-			return "[SequenceInfoRecord fatId="+fatId+" bankId="+bankId+" vol="+vol+" cpr="+channelPressure+" ppr="+polyPressure+" ply="+player+"]";
+			return "[SequenceInfoRecord fatId="+fatId+" bankId="+bankId+" vol="+vol+" cpr="+channelPriority+" ppr="+playerPriority+" ply="+player+"]";
 		}
 
 	}

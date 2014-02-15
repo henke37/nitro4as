@@ -27,6 +27,9 @@
 		public var bankInfo:Vector.<BankInfoRecord>;
 		/** The info records for all groups stored in the SDAT file */
 		public var groupInfo:Vector.<GroupInfoRecord>;
+		/** The info records for all sequence players in the SDAT file */
+		public var playerInfo:Vector.<PlayerInfoRecord>;
+		
 		
 		sdatInternal var files:Vector.<FATRecord>;
 		
@@ -225,8 +228,8 @@
 				info.position+=2;
 				seqRecord.bankId=info.readUnsignedShort();
 				seqRecord.vol=info.readUnsignedByte();
-				seqRecord.channelPressure=info.readUnsignedByte();
-				seqRecord.polyPressure=info.readUnsignedByte();
+				seqRecord.channelPriority=info.readUnsignedByte();
+				seqRecord.playerPriority=info.readUnsignedByte();
 				seqRecord.player=info.readUnsignedByte();
 				info.position+=2;
 				
@@ -311,6 +314,26 @@
 			}
 			waveArchiveInfo.fixed=true;
 			
+			
+			
+			info.position=infoSectionOffsets[4];
+			var playerCount:uint=info.readUnsignedInt();
+			var playerInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,playerCount);
+			
+			playerInfo=new Vector.<PlayerInfoRecord>();
+			for(i=0;i<playerCount;++i) {
+				var playerRecord:PlayerInfoRecord=new PlayerInfoRecord();
+				playerRecord.maxSequences=info.readUnsignedByte();
+				info.position+=1;
+				playerRecord.channels=info.readUnsignedShort();
+				playerRecord.heapSize=info.readUnsignedInt();
+				
+				playerInfo[i]=playerRecord;
+			}
+			
+			
+			
+			
 			//read the group info
 			info.position=infoSectionOffsets[5];
 			const groupCount:uint=info.readUnsignedInt();
@@ -327,9 +350,11 @@
 				
 				var groupElementCount:uint=info.readUnsignedInt();
 				for(j=0;j<groupElementCount;++j) {
-					var itemType:uint=info.readUnsignedInt();
+					var itemType:uint=info.readUnsignedByte();
+					var loadFlags:uint=info.readUnsignedByte();
+					info.position+=2
 					var itemId:uint=info.readUnsignedInt();
-					var groupInfoSubRecord:GroupInfoSubRecord=new GroupInfoSubRecord(itemType,itemId);
+					var groupInfoSubRecord:GroupInfoSubRecord=new GroupInfoSubRecord(itemType,loadFlags,itemId);
 					
 					groupInfoRecord.entries.push(groupInfoSubRecord);
 				}
@@ -355,7 +380,8 @@
 				streamRecord.vol=info.readUnsignedByte();
 				streamRecord.priority=info.readUnsignedByte();
 				streamRecord.player=info.readUnsignedByte();
-				info.position+=5;
+				streamRecord.forceStereo=info.readBoolean();
+				info.position+=4;
 				
 				//trace(streamRecord);
 				

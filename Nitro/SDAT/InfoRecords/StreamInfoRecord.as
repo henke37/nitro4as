@@ -8,6 +8,8 @@
 		public var priority:uint;
 		
 		public var player:uint;
+		
+		public var forceStereo:Boolean;
 
 		public function StreamInfoRecord() {
 			// constructor code

@@ -8,12 +8,12 @@
 
 		public function NoteEvent(note:uint,velocity:uint,duration:uint) {
 			
-			if(duration==0) throw new RangeError("duration can't be zero!");
-			
 			this.note=note;
 			this.velocity=velocity;
 			this.duration=duration;
 		}
+		
+		public function get infiniteDuration():Boolean { return duration==0; }
 		
 		public function toString():String {
 			return "[NoteEvent note="+note+" vel="+velocity+" dur="+duration+"]";
