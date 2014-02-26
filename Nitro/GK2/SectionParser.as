@@ -250,6 +250,9 @@
 				case 0xE129:
 					return <waitForFullscreenImagePan />;
 				break;
+				
+				case 0xE12A: return <restoreCameraPosition a={section.readShort()} />;
+				case 0xE12B: return <saveCameraPosition />;
 					
 				case 0xE12C:
 					section.position+=2;//ignore one argument;
@@ -309,7 +312,7 @@
 						
 				case 0xE13B:
 					return <miniWalk
-						command="0xA13B"
+						command="0xE13B"
 						char={section.readShort()}
 						x={section.readShort()}
 						y={section.readShort()}
@@ -347,6 +350,18 @@
 						g={section.readShort()}
 					/>;
 				break;
+						
+				case 0xE140:
+					return <miniWalk
+						command="0xE140"
+						char={section.readShort()}
+						b={section.readShort()}
+						x={section.readShort()}
+						y={section.readShort()}
+						e={section.readShort()}
+						f={section.readShort()}
+						g={section.readShort()}
+					/>;
 					
 				case 0xE141:
 					return <panCamera x={section.readShort()} y={section.readShort()} c={section.readShort()} d={section.readShort()} command="0xE141"/>;
@@ -730,11 +745,10 @@
 				
 				case 0xE20D: return <center/>;
 				
-				case 0xE227: return <investigationCompleteAnim />;
-				
-				case 0xE228: return <showRebuttalAnim command="0xE228"/>;
-				
-				case 0xE22A: return <showRebuttalAnim command="0xE22A"/>;
+				case 0xE227: return <investigationCompleteAnim />;				
+				case 0xE228: return <showRebuttalAnim command="0xE228" mode="enter" />;
+				case 0xE229: return <showBeginInvestigationAnim mode="leave" />;				
+				case 0xE22A: return <showRebuttalAnim mode="leave" />;
 				
 				case 0xE22E: return <timePenalty a={section.readShort()} />;
 				
