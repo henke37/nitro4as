@@ -16,6 +16,7 @@
 	import fl.data.*;
 	
 	import HTools.Audio.WaveWriter;
+	import flash.geom.ColorTransform;
 	
 	use namespace strmInternal;
 	
@@ -85,7 +86,7 @@
 				stage.addEventListener(MouseEvent.CLICK,stageClick);
 			}
 			
-			//source_mc.visible=false;
+			source_mc.dropdown.setStyle("cellRenderer",ColoredCellRenderer);
 			source_mc.x=Banner.ICON_WIDTH*iconZoom;
 			source_mc.y=title_txt.y+title_txt.height;
 			source_mc.labelFunction=sourceLabeler;
@@ -291,6 +292,7 @@
 				streamSource.name="Streams";
 				streamSource.fileName=fileName;
 				streamSource.fileIndex=fileId;
+				streamSource.colorTransform=new ColorTransform(1,0.3,0.5);
 				sources.addItem(streamSource);
 			}
 			
@@ -300,6 +302,7 @@
 				seqSource.name="Sequences";
 				seqSource.fileName=fileName;
 				seqSource.fileIndex=fileId;
+				seqSource.colorTransform=new ColorTransform(1,1,0.6);
 				sources.addItem(seqSource);
 			}
 			
@@ -322,6 +325,7 @@
 					seqArchiveSource.fileName=fileName;
 					seqArchiveSource.fileIndex=fileId;
 					seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
+					seqArchiveSource.colorTransform=new ColorTransform(0.90,1,0.6);
 					sources.addItem(seqArchiveSource);
 				//} catch(err:Error) {
 					//trace(err);
@@ -334,6 +338,7 @@
 				bankSource.name="Instrument Banks";
 				bankSource.fileName=fileName;
 				bankSource.fileIndex=fileId;
+				bankSource.colorTransform=new ColorTransform(0.65,0.8,1);
 				sources.addItem(bankSource);
 			}
 			
@@ -343,6 +348,7 @@
 				groupSource.name="Groups";
 				groupSource.fileName=fileName;
 				groupSource.fileIndex=fileId;
+				groupSource.colorTransform=new ColorTransform(0.8,0.7,0.5);
 				sources.addItem(groupSource);
 			}
 			
@@ -364,6 +370,7 @@
 					waveArchiveSource.fileName=fileName;
 					waveArchiveSource.fileIndex=fileId;
 					waveArchiveSource.dataProvider=listSwar(waveArchive);
+					waveArchiveSource.colorTransform=new ColorTransform(1,0.5,0.8);
 					sources.addItem(waveArchiveSource);
 				}
 			}
