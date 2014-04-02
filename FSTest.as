@@ -17,6 +17,7 @@
 	
 	import HTools.Audio.WaveWriter;
 	import flash.geom.ColorTransform;
+	import HTools.Audio.MidiPlayer.Instrument;
 	
 	use namespace strmInternal;
 	
@@ -40,6 +41,7 @@
 		
 		public var progress_mc:Slider;
 		public var list_mc:List;
+		public var sublist_mc:List;
 		public var source_mc:ComboBox;
 		public var export_mc:Button;
 		
@@ -95,6 +97,9 @@
 			source_mc.visible=false;
 			source_mc.dataProvider=sources;
 			
+			sublist_mc.setSize(Banner.ICON_WIDTH*iconZoom,Banner.ICON_HEIGHT*iconZoom);
+			sublist_mc.visible=false;
+			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
 			list_mc.x=Banner.ICON_WIDTH*iconZoom;
@@ -118,7 +123,7 @@
 			icon=new Bitmap();
 			icon.scaleX=iconZoom;
 			icon.scaleY=iconZoom;
-			addChild(icon);
+			addChildAt(icon,0);
 			
 			addEventListener(Event.ENTER_FRAME,updatePosition);
 			
@@ -410,6 +415,7 @@
 					var item:Object= { index: bankIndex, type: "bank" };
 					item.instruments=sbnk.instruments;
 					item.info=sdat.bankInfo[bankIndex];
+					item.sublist=providerForBank(sbnk);
 					
 					if(sdat.bankSymbols) {
 						if(bankIndex in sdat.bankSymbols) {
@@ -424,6 +430,34 @@
 			}
 			
 			return provider;
+		}
+		
+		private function providerForBank(sbnk:SBNK):DataProvider {
+			var out:DataProvider=new DataProvider();
+			for(var i:uint=0;i<sbnk.instruments.length;++i) {
+				var inst:Instrument=sbnk.instruments[i];
+				var label:String;
+				if(!inst) {
+					label="NULL";
+				} else {
+					if(inst.drumset) {
+						label="Drums";
+					} else if(inst.regions.length>1) {
+						label="Split";
+					} else {
+						if(inst.noteType==Instrument.NOTETYPE_NOISE) {
+							label="Noise";
+						} else if(inst.noteType==Instrument.NOTETYPE_PULSE) {
+							label="Pulse";
+						} else {
+							label="PCM";
+						}
+					}
+				}
+				label="# "+i+" "+label;
+				out.addItem({inst:inst, label:label});
+			}
+			return out;
 		}
 		
 		private function listSwavs(files:Vector.<AbstractFile>,nds:NDS):void {
@@ -585,6 +619,8 @@
 		}
 		
 		private function listSelect(e:Event):void {
+			sublist_mc.visible=false;
+			
 			if(player) {
 				player.stop();
 			}
@@ -596,6 +632,11 @@
 				player=new WavePlayer(playingItem.wave);
 			} else {
 				player=null;
+			}
+			
+			if("sublist" in playingItem) {
+				sublist_mc.dataProvider=playingItem.sublist;
+				sublist_mc.visible=true;
 			}
 			
 			playback_txt.visible=progress_mc.visible=export_mc.visible=Boolean(player);
