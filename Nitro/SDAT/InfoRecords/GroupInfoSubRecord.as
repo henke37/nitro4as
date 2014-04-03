@@ -6,11 +6,10 @@
 		public var loadFlags:uint;
 		public var id:uint;
 		
-		/*
-		public static const SEQ:uint=0x0700;
-		public static const SEQARC:uint=0x0803;
-		public static const BANK:uint=0x0601;
-		public static const WAVEARC:uint=0x0402; */
+		public static const SEQ:uint=0x00;
+		public static const SEQARC:uint=0x03;
+		public static const BANK:uint=0x01;
+		public static const WAVEARC:uint=0x02;
 		
 		public static const typeMap:Object={
 			0x00: "SEQ",

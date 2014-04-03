@@ -150,6 +150,7 @@
 			loopMark.visible=false;
 			icon.bitmapData=null;
 			list_mc.visible=false;
+			sublist_mc.visible=false;
 			source_mc.visible=false;
 			playback_txt.visible=false;
 			
@@ -396,6 +397,7 @@
 				if(sdat.groupSymbols) {
 					if(groupIndex in sdat.groupSymbols) {
 						item.name=sdat.groupSymbols[groupIndex];
+						item.sublist=providerForGroup(sdat,item.info);
 					}
 				}
 				
@@ -403,6 +405,41 @@
 			}
 			
 			return provider;
+		}
+		
+		private function providerForGroup(sdat:SDAT,item:GroupInfoRecord):DataProvider {
+			var out:DataProvider=new DataProvider();
+			
+			for each(var subitem:GroupInfoSubRecord in item.entries) {
+				var label:String;
+				
+				label=GroupInfoSubRecord.typeMap[subitem.type]+" ";
+				
+				var symbols:Vector.<String>=null;
+				switch(subitem.type) {
+					case GroupInfoSubRecord.BANK:
+						symbols=sdat.bankSymbols;
+					break;
+					case GroupInfoSubRecord.SEQ:
+						symbols=sdat.seqSymbols;
+					break;
+					case GroupInfoSubRecord.WAVEARC:
+						symbols=sdat.waveArchiveSymbols;
+					break;
+				}
+				
+				if(subitem.type==GroupInfoSubRecord.SEQARC && sdat.seqArchiveSymbols && subitem.id in sdat.seqArchiveSymbols) {
+					label+=sdat.seqArchiveSymbols[subitem.id].symbol;
+				} else if(symbols && subitem.id in symbols) {
+					label+=symbols[subitem.id];
+				} else {
+					label+=subitem.id;
+				}
+				
+				out.addItem( { entry:subitem, label: label });
+			}
+			
+			return out;
 		}
 		
 		private function listBanks(sdat:SDAT):DataProvider {
