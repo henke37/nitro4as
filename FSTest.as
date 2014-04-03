@@ -6,6 +6,7 @@
 	import flash.events.*;
 	import flash.text.*;
 	import flash.ui.*;
+	import flash.geom.*;
 	
 	import Nitro.FileSystem.*;
 	import Nitro.SDAT.InfoRecords.*;
@@ -16,8 +17,6 @@
 	import fl.data.*;
 	
 	import HTools.Audio.WaveWriter;
-	import flash.geom.ColorTransform;
-	import HTools.Audio.MidiPlayer.Instrument;
 	
 	use namespace strmInternal;
 	
@@ -495,23 +494,21 @@
 					label="NULL";
 					color=new ColorTransform(0.4,0.4,0.4);
 				} else {
-					if(inst.drumset) {
+					if(inst is DrumInstrument) {
 						label="Drums";
 						color=new ColorTransform(0.8,1,0.8);
-					} else if(inst.regions.length>1) {
+					} else if(inst is SplitInstrument) {
 						label="Split";
 						color=new ColorTransform(0.8,1,1);
+					} else if(inst is NoiseInstrument) {
+						label="Noise";
+						color=new ColorTransform(0.8,0.2,0.8);
+					} else if(inst is PulseInstrument) {
+						label="Pulse";
+						color=new ColorTransform(1,1,0.5);
 					} else {
-						if(inst.noteType==Instrument.NOTETYPE_NOISE) {
-							label="Noise";
-							color=new ColorTransform(0.8,0.2,0.8);
-						} else if(inst.noteType==Instrument.NOTETYPE_PULSE) {
-							label="Pulse";
-							color=new ColorTransform(1,1,0.5);
-						} else {
-							label="PCM";
-							color=new ColorTransform(1,1,1);
-						}
+						label="PCM";
+						color=new ColorTransform(1,1,1);
 					}
 				}
 				label="# "+i+" "+label;
