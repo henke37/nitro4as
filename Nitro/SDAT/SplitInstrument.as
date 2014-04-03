@@ -17,14 +17,13 @@
 				if(!regionEnd) break;
 				regionEnds.push(regionEnd);
 			}
+			section.position=offset+8;
 			
 			regions.length=regionEnds.length;
 			regions.fixed=true;
 			
 			var startPos:uint=0;
 			for(var i:uint=0;i<regionEnds.length;++i) {
-				//record length*record index+base offset+skipping the region end data
-				section.position=i*12+offset+8;
 				var region:InstrumentRegion=new InstrumentRegion();
 				region.parse(section,0);
 				region.lowEnd=startPos;
