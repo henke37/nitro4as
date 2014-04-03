@@ -48,7 +48,14 @@
 		private var loopMark:Shape;
 		private var icon:Bitmap;
 		
-		var resetItem:ContextMenuItem
+		private var resetItem:ContextMenuItem;
+		
+		private static const streamColor:ColorTransform=new ColorTransform(1,0.3,0.5);
+		private static const sequenceColor:ColorTransform=new ColorTransform(1,1,0.6);
+		private static const sequenceArchiveColor:ColorTransform=new ColorTransform(0.90,1,0.6);
+		private static const bankColor:ColorTransform=new ColorTransform(0.65,0.8,1);
+		private static const groupColor:ColorTransform=new ColorTransform(0.8,0.7,0.5);
+		private static const waveArchiveColor=new ColorTransform(1,0.5,0.8);
 		
 		public function FSTest() {
 			
@@ -99,6 +106,7 @@
 			
 			sublist_mc.setSize(Banner.ICON_WIDTH*iconZoom,Banner.ICON_HEIGHT*iconZoom);
 			sublist_mc.visible=false;
+			sublist_mc.setStyle("cellRenderer",ColoredCellRenderer);
 			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
@@ -298,7 +306,7 @@
 				streamSource.name="Streams";
 				streamSource.fileName=fileName;
 				streamSource.fileIndex=fileId;
-				streamSource.colorTransform=new ColorTransform(1,0.3,0.5);
+				streamSource.colorTransform=streamColor;
 				sources.addItem(streamSource);
 			}
 			
@@ -308,7 +316,7 @@
 				seqSource.name="Sequences";
 				seqSource.fileName=fileName;
 				seqSource.fileIndex=fileId;
-				seqSource.colorTransform=new ColorTransform(1,1,0.6);
+				seqSource.colorTransform=sequenceColor;
 				sources.addItem(seqSource);
 			}
 			
@@ -331,7 +339,7 @@
 					seqArchiveSource.fileName=fileName;
 					seqArchiveSource.fileIndex=fileId;
 					seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
-					seqArchiveSource.colorTransform=new ColorTransform(0.90,1,0.6);
+					seqArchiveSource.colorTransform=sequenceArchiveColor;
 					sources.addItem(seqArchiveSource);
 				//} catch(err:Error) {
 					//trace(err);
@@ -344,7 +352,7 @@
 				bankSource.name="Instrument Banks";
 				bankSource.fileName=fileName;
 				bankSource.fileIndex=fileId;
-				bankSource.colorTransform=new ColorTransform(0.65,0.8,1);
+				bankSource.colorTransform=bankColor;
 				sources.addItem(bankSource);
 			}
 			
@@ -354,7 +362,7 @@
 				groupSource.name="Groups";
 				groupSource.fileName=fileName;
 				groupSource.fileIndex=fileId;
-				groupSource.colorTransform=new ColorTransform(0.8,0.7,0.5);
+				groupSource.colorTransform=groupColor;
 				sources.addItem(groupSource);
 			}
 			
@@ -376,7 +384,7 @@
 					waveArchiveSource.fileName=fileName;
 					waveArchiveSource.fileIndex=fileId;
 					waveArchiveSource.dataProvider=listSwar(waveArchive);
-					waveArchiveSource.colorTransform=new ColorTransform(1,0.5,0.8);
+					waveArchiveSource.colorTransform=waveArchiveColor;
 					sources.addItem(waveArchiveSource);
 				}
 			}
@@ -412,6 +420,7 @@
 			
 			for each(var subitem:GroupInfoSubRecord in item.entries) {
 				var label:String;
+				var color:ColorTransform=null;
 				
 				label=GroupInfoSubRecord.typeMap[subitem.type]+" ";
 				
@@ -419,12 +428,19 @@
 				switch(subitem.type) {
 					case GroupInfoSubRecord.BANK:
 						symbols=sdat.bankSymbols;
+						color=bankColor;
 					break;
 					case GroupInfoSubRecord.SEQ:
 						symbols=sdat.seqSymbols;
+						color=sequenceColor;
 					break;
 					case GroupInfoSubRecord.WAVEARC:
 						symbols=sdat.waveArchiveSymbols;
+						color=waveArchiveColor;
+					break;
+					case GroupInfoSubRecord.SEQARC:
+						color=sequenceArchiveColor;
+						symbols=null;//special handled
 					break;
 				}
 				
@@ -436,7 +452,7 @@
 					label+=subitem.id;
 				}
 				
-				out.addItem( { entry:subitem, label: label });
+				out.addItem( { entry:subitem, label: label, colorTransform: color });
 			}
 			
 			return out;
@@ -474,25 +490,32 @@
 			for(var i:uint=0;i<sbnk.instruments.length;++i) {
 				var inst:Instrument=sbnk.instruments[i];
 				var label:String;
+				var color:ColorTransform;
 				if(!inst) {
 					label="NULL";
+					color=new ColorTransform(0.4,0.4,0.4);
 				} else {
 					if(inst.drumset) {
 						label="Drums";
+						color=new ColorTransform(0.8,1,0.8);
 					} else if(inst.regions.length>1) {
 						label="Split";
+						color=new ColorTransform(0.8,1,1);
 					} else {
 						if(inst.noteType==Instrument.NOTETYPE_NOISE) {
 							label="Noise";
+							color=new ColorTransform(0.8,0.2,0.8);
 						} else if(inst.noteType==Instrument.NOTETYPE_PULSE) {
 							label="Pulse";
+							color=new ColorTransform(1,1,0.5);
 						} else {
 							label="PCM";
+							color=new ColorTransform(1,1,1);
 						}
 					}
 				}
 				label="# "+i+" "+label;
-				out.addItem({inst:inst, label:label});
+				out.addItem({inst:inst, label:label, colorTransform: color});
 			}
 			return out;
 		}
