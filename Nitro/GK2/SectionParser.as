@@ -754,6 +754,8 @@
 				
 				case 0xE234: return <blinkLogicChessTimerArrows />;
 				
+				case 0xE241: return <runInvestigation />;
+				
 				case 0xE247: return <contradictionTutorial step="point" />;
 				case 0xE248: return <contradictionTutorial step="push" />;
 				case 0xE249: return <contradictionTutorial step="present" />;
