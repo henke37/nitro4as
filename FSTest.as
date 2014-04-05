@@ -17,6 +17,7 @@
 	import fl.data.*;
 	
 	import HTools.Audio.WaveWriter;
+	import HTools.Audio.MidiPlayer.Instrument;
 	
 	use namespace strmInternal;
 	
@@ -105,7 +106,8 @@
 			
 			sublist_mc.setSize(Banner.ICON_WIDTH*iconZoom,Banner.ICON_HEIGHT*iconZoom);
 			sublist_mc.visible=false;
-			sublist_mc.setStyle("cellRenderer",ColoredCellRenderer);
+			sublist_mc.setStyle("cellRenderer",ColoredCellRenderer);			
+			sublist_mc.addEventListener(Event.CHANGE,sublistSelect);
 			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
@@ -451,7 +453,7 @@
 					label+=subitem.id;
 				}
 				
-				out.addItem( { entry:subitem, label: label, colorTransform: color });
+				out.addItem( { entry:subitem, label: label, colorTransform: color, selectHandler: groupSubRecordSelected });
 			}
 			
 			return out;
@@ -512,7 +514,7 @@
 					}
 				}
 				label="# "+i+" "+label;
-				out.addItem({inst:inst, label:label, colorTransform: color});
+				out.addItem({inst:inst, label:label, colorTransform: color, selectHandler: instrumentSelected });
 			}
 			return out;
 		}
@@ -673,6 +675,22 @@
 		private function sourceLabeler(item:Object):String {
 			//trace(item.fileName,item.fileName.match(/\/([^\/]+)$/));
 			return item.fileIndex + " - "+ item.name;
+		}
+		
+		private function sublistSelect(e:Event):void {
+			var handler:Function=sublist_mc.selectedItem.selectHandler;
+			if(!Boolean(handler)) return;
+			handler(sublist_mc.selectedItem);
+		}
+		
+		private function instrumentSelected(obj:Object):void {
+			var inst:Instrument=obj.inst;
+			if(!inst) return;
+			trace(inst.toXML().toXMLString());
+		}
+		
+		private function groupSubRecordSelected(obj:Object):void {
+			var entry:GroupInfoSubRecord=obj.entry;
 		}
 		
 		private function listSelect(e:Event):void {

@@ -18,6 +18,7 @@
 		
 		public function parse(section:ByteArray,baseOffset:uint):void {
 			subInstrument=Instrument.makeInstrument(section,baseOffset);
+			if(subInstrument is MetaInstrument) throw new ArgumentError("Can't have meta instruments inside another meta instrument!");
 		}
 		
 		public function matchesNote(n:uint):Boolean {
@@ -29,8 +30,12 @@
 				lowEnd={lowEnd}
 				highEnd={highEnd}
 			/>;
-				
-			o.appendChild(subInstrument.toXML());
+			
+			if(subInstrument) {
+				o.appendChild(subInstrument.toXML());
+			} else {
+				o.appendChild(<NULL />);
+			}
 			
 			return o;
 		}

@@ -4,8 +4,6 @@
 	/** An instrument that can be used to play a melody */
 	public class Instrument {
 		
-		public var instrumentType:uint;
-		
 		/** Null instrument */
 		public static const INSTRUMENT_TYPE_NULL:uint=0;
 		/** Sample instrument */
@@ -16,6 +14,8 @@
 		public static const INSTRUMENT_TYPE_NOISE:uint=3;
 		/** Region meta instrument */
 		public static const INSTRUMENT_TYPE_SPLIT:uint=17;
+		/** Drumset meta instrument */
+		public static const INSTRUMENT_TYPE_DRUMS:uint=16;
 
 		public function Instrument() {
 		}
@@ -28,25 +28,25 @@
 			var instrument:Instrument;
 			
 			switch(type) {
-				case 0:
+				case INSTRUMENT_TYPE_NULL:
 					return null;
 				break;
 				
-				case 1:
+				case INSTRUMENT_TYPE_PCM:
 					instrument=new PCMInstrument();
 				break;
-				case 2:
+				case INSTRUMENT_TYPE_PULSE:
 					instrument=new PulseInstrument();
 				break;
-				case 3:
+				case INSTRUMENT_TYPE_NOISE:
 					instrument=new NoiseInstrument();
 				break;
 				
-				case 16:
+				case INSTRUMENT_TYPE_DRUMS:
 					instrument=new DrumInstrument();
 				break;
 				
-				case 17:
+				case INSTRUMENT_TYPE_SPLIT:
 					instrument=new SplitInstrument();
 				break;
 				
@@ -73,11 +73,15 @@
 			return o;
 		}
 		
+		public function get instrumentType():uint { throw new Error("Unimplemented!"); }
+		
 		public static function instrumentTypeAsString(type:uint):String {
 			if(type==INSTRUMENT_TYPE_NULL) return "NULL";
 			if(type==INSTRUMENT_TYPE_PCM) return "PCM";
 			if(type==INSTRUMENT_TYPE_PULSE) return "Pulse";
 			if(type==INSTRUMENT_TYPE_NOISE) return "Noise";
+			if(type==INSTRUMENT_TYPE_SPLIT) return "Split";
+			if(type==INSTRUMENT_TYPE_DRUMS) return "Drums";
 			return "INVALID";
 		}
 

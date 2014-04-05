@@ -26,6 +26,8 @@
 			o.@swar=swar;
 			return o;
 		}
+		
+		public override function get instrumentType():uint { return INSTRUMENT_TYPE_PCM; }
 
 	}
 	

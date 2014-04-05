@@ -34,6 +34,8 @@
 				regions[i]=region;
 			}
 		}
+		
+		public override function get instrumentType():uint { return INSTRUMENT_TYPE_SPLIT; }
 
 	}
 	

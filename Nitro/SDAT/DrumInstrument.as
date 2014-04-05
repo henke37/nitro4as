@@ -38,6 +38,9 @@
 		}
 		
 		public override function get drumset():Boolean { return true; }
+		
+		
+		public override function get instrumentType():uint { return INSTRUMENT_TYPE_DRUMS; }
 
 	}
 	
