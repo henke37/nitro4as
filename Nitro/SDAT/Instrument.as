@@ -26,7 +26,7 @@
 		
 		public static function makeInstrument(section:ByteArray,baseOffset:uint):Instrument {
 			var type:uint=section.readUnsignedByte();
-			var offset:uint=section.readUnsignedShort();
+			var offset:uint=section[section.position++] | section[section.position++]<< 8 | section[section.position++] << 16;
 			offset-=baseOffset;
 			
 			section.position=offset;

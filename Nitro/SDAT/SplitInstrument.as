@@ -8,10 +8,11 @@
 		}
 		
 		public override function parse(section:ByteArray):void {
+			var i:uint;
 			var startPosition:uint=section.position;
 			var regionEnds:Vector.<uint>=new Vector.<uint>();
 			
-			for(;;) {
+			for(i=0;i<8;++i) {
 				var regionEnd:uint=section.readUnsignedByte();
 				
 				if(!regionEnd) break;
@@ -23,7 +24,7 @@
 			regions.fixed=true;
 			
 			var startPos:uint=0;
-			for(var i:uint=0;i<regionEnds.length;++i) {
+			for(i=0;i<regionEnds.length;++i) {
 				var region:InstrumentRegion=new InstrumentRegion();
 				region.parse(section);
 				region.lowEnd=startPos;
