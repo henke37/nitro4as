@@ -7,11 +7,13 @@
 			// constructor code
 		}
 		
-		public override function parse(section:ByteArray,offset:uint):void {
-			section.position=offset;
+		public override function parse(section:ByteArray):void {
+			var startPosition:uint=section.position;
 			
 			var low:uint=section.readUnsignedByte();
 			var high:uint=section.readUnsignedByte();
+			
+			const drumHeaderLen:uint=2;
 			
 			if(high<low) {
 				throw new ArgumentError("Invalid range, high("+high+") is lower than low("+low+")!");
@@ -23,11 +25,10 @@
 			regions.fixed=true;
 			
 			for(var i:uint;i<range;++i) {
-				//base offset+lh bytes+indexed positon+skipping first two bytes of each record
-				section.position=offset+2+i*12+2;
+				//section.position=startPosition+drumHeaderLen+i*INSTRUMENT_RECORD_LENGTH;
 				
 				var region:InstrumentRegion=new InstrumentRegion();
-				region.parse(section,0);
+				region.parse(section);
 				
 				region.highEnd=region.lowEnd=i+low;
 				

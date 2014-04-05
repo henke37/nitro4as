@@ -13,11 +13,11 @@
 			// constructor code
 		}
 		
-		public override function parse(section:ByteArray,offset:uint):void {
+		public override function parse(section:ByteArray):void {
 			swav=section.readUnsignedShort();
 			swar=section.readUnsignedShort();
 			
-			super.parse(section,offset);
+			super.parse(section);
 		}
 		
 		public override function toXML():XML {

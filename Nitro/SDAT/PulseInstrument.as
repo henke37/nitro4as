@@ -9,11 +9,22 @@
 			// constructor code
 		}
 		
-		public override function parse(section:ByteArray,offset:uint):void {
-			duty=section.readUnsignedShort();
-			section.position+=2;
+		public override function parse(section:ByteArray):void {
 			
-			super.parse(section,offset);
+			duty=section.readUnsignedShort();
+			/*if(duty>=8) {
+				throw new RangeError("The duty cycle has to be less than 8!");
+			} */
+			
+			section.position+=2;			
+			
+			super.parse(section);
+		}
+		
+		public override function toXML():XML {
+			var o:XML=super.toXML();
+			o.@duty=duty;
+			return o;
 		}
 		
 		

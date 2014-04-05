@@ -1,5 +1,6 @@
 ﻿package Nitro.SDAT {
 	import flash.utils.*;
+	import HTools.Audio.MidiPlayer.Instrument;
 	
 	/** An instrument that can be used to play a melody */
 	public class Instrument {
@@ -16,6 +17,9 @@
 		public static const INSTRUMENT_TYPE_SPLIT:uint=17;
 		/** Drumset meta instrument */
 		public static const INSTRUMENT_TYPE_DRUMS:uint=16;
+		
+		
+		public static const INSTRUMENT_RECORD_LENGTH:uint=10;
 
 		public function Instrument() {
 		}
@@ -25,10 +29,25 @@
 			var offset:uint=section.readUnsignedShort();
 			offset-=baseOffset;
 			
+			section.position=offset;
+			
+			return _makeInstrument(section,type);
+		}
+		
+		public static function parseInstrumentRecord(section:ByteArray):Instrument {
+			var type:uint=section.readUnsignedByte();
+			section.position+=1;
+			return _makeInstrument(section,type);
+		}
+		
+		
+		private static function _makeInstrument(section:ByteArray,type:uint):Instrument {
+			
 			var instrument:Instrument;
 			
 			switch(type) {
 				case INSTRUMENT_TYPE_NULL:
+					section.position+=INSTRUMENT_RECORD_LENGTH;
 					return null;
 				break;
 				
@@ -55,19 +74,18 @@
 				break;
 			}
 			
-			instrument.parse(section,offset);
+			instrument.parse(section);
 			
 			return instrument;
 		}
 		
-		public function parse(section:ByteArray,offset:uint):void { throw new Error("Unimplemented instrument parser!"); }
+		public function parse(section:ByteArray):void { throw new Error("Unimplemented instrument parser!"); }
 		
 		public function get drumset():Boolean { return false; }
 		
 		public function toXML():XML {
 			var o:XML=<instrument 
 				instrumentType={instrumentTypeAsString(instrumentType)}
-				drumset={drumset?"true":"false"}
 			/>;
 				
 			return o;

@@ -15,7 +15,7 @@
 			// constructor code
 		}
 		
-		public override function parse(section:ByteArray,offset:uint):void {
+		public override function parse(section:ByteArray):void {
 			baseNote=section.readUnsignedByte();
 			
 			attack=section.readUnsignedByte();

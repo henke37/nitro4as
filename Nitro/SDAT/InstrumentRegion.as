@@ -16,8 +16,8 @@
 			
 		}
 		
-		public function parse(section:ByteArray,baseOffset:uint):void {
-			subInstrument=Instrument.makeInstrument(section,baseOffset);
+		public function parse(section:ByteArray):void {
+			subInstrument=Instrument.parseInstrumentRecord(section);
 			if(subInstrument is MetaInstrument) throw new ArgumentError("Can't have meta instruments inside another meta instrument!");
 		}
 		
