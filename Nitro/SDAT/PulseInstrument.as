@@ -12,9 +12,9 @@
 		public override function parse(section:ByteArray):void {
 			
 			duty=section.readUnsignedShort();
-			/*if(duty>=8) {
+			if(duty>=8) {
 				throw new RangeError("The duty cycle has to be less than 8!");
-			} */
+			}
 			
 			section.position+=2;			
 			
