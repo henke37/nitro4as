@@ -687,7 +687,7 @@
 					/>;
 				break;
 						
-				
+				case 0xE1F7: return <beginLogicChessAnimation />;
 					
 				//case 0xE1FF: return <enableLogicTimer />;
 					
@@ -742,6 +742,8 @@
 				case 0xE21B:
 					return jumpIfFlagsEqTo(5);
 				break;
+				
+				case 0xE21C: return <logicChessCompleteAnimation />;
 				
 				case 0xE20D: return <center/>;
 				
