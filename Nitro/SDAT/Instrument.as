@@ -40,6 +40,9 @@
 			return _makeInstrument(section,type);
 		}
 		
+		public function leafInstrumentForNote(note:uint):LeafInstrumentBase {
+			throw new Error("Base class did not implement leafInstrumentForNote!");
+		}
 		
 		private static function _makeInstrument(section:ByteArray,type:uint):Instrument {
 			

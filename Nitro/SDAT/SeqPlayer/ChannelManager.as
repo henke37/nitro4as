@@ -43,15 +43,15 @@
 			if(!noteEvt) throw new ArgumentError("noteEvnt can not be null!");
 			if(!trackState) throw new ArgumentError("trackState can not be null!");
 			
-			var instrument:Instrument=bank.instruments[trackState.patch];
+			var baseInstrument:Instrument=bank.instruments[trackState.patch];
+			if(!baseInstrument) throw new Error("Bad instrument selected!");
 			
-			var chanState:ChannelState=allocateChannel(instrument.noteType,trackState.priority);
+			var leafInstrument:LeafInstrumentBase=baseInstrument.leafInstrumentForNote(noteEvt.note);
 			
+			if(!leafInstrument) return;// null instruments should silently be ignored
+			
+			var chanState:ChannelState=allocateChannel(leafInstrument.instrumentType,trackState.priority);
 			if(!chanState) throw new Error("Failed to allocate a channel!");
-			
-			var region:InstrumentRegion=instrument.regionForNote(noteEvt.note);
-			
-			if(!region) throw new Error("Failed to locate a region for the note!");
 			
 			chanState.track=trackState;
 			
@@ -59,33 +59,34 @@
 			
 			trace("allocated new channel with a duration of",noteEvt.duration,"update ticks");
 			
-			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:region.attack);
-			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:region.decay);
-			chanState.sustainLevel=Tables.cnvSustain(trackState.sustain!=-1?trackState.sustain:region.sustain);
-			chanState.releaseRate=Tables.cnvFall(trackState.release!=-1?trackState.release:region.release);
+			chanState.attackRate=Tables.cnvAttack(trackState.attack!=-1?trackState.attack:leafInstrument.attack);
+			chanState.decayRate =Tables.cnvFall(trackState.decay!=-1?trackState.decay:leafInstrument.decay);
+			chanState.sustainLevel=Tables.cnvSustain(trackState.sustain!=-1?trackState.sustain:leafInstrument.sustain);
+			chanState.releaseRate=Tables.cnvFall(trackState.release!=-1?trackState.release:leafInstrument.release);
 			
 			chanState.vel=noteEvt.velocity;
 			
 			chanState.priority=trackState.priority;
 			
-			chanState.instrumentPan=region.pan;
+			chanState.instrumentPan=leafInstrument.pan;
 			
 			chanState.mixerChannel.reset();
 			
-			if(instrument.noteType==Instrument.NOTETYPE_PCM) {
-				var wave:Wave=waveArchives[region.swar].waves[region.swav];
+			if(leafInstrument.instrumentType==Instrument.INSTRUMENT_TYPE_PCM) {
+				var pcmInstrument:PCMInstrument=PCMInstrument(leafInstrument)
+				var wave:Wave=waveArchives[pcmInstrument.swar].waves[pcmInstrument.swav];
 				
 				chanState.mixerChannel.wave=wave;
 				
-				chanState.baseTimer = Tables.adjustTimerForNote(wave.timerLen, noteEvt.note, region.baseNote);
+				chanState.baseTimer = Tables.adjustTimerForNote(wave.timerLen, noteEvt.note, leafInstrument.baseNote);
 			} else {
 				//TODO: watch further research on this part
 				chanState.baseTimer = Tables.adjustTimerForNote(-Tables.freq2Timer(440*8), noteEvt.note, 69);
 				chanState.mixerChannel.psgMode=true;
 				
-				if(instrument.noteType==Instrument.NOTETYPE_PULSE) {
+				if(leafInstrument.instrumentType==Instrument.INSTRUMENT_TYPE_PULSE) {
 					var pulseChan:PulseChannel=chanState.mixerChannel as PulseChannel;
-					pulseChan.duty=region.swav;
+					pulseChan.duty=PulseInstrument(leafInstrument).duty;
 				}
 			} 
 			

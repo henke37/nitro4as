@@ -79,7 +79,7 @@
 			var waveArchives:Vector.<SWAR>=new Vector.<SWAR>();
 			
 			for(var i:uint=0;i<4;++i) {
-				var swarId:uint=swars[i];
+				var swarId:int=swars[i];
 				if(swarId!=-1) {
 					waveArchives[i]=sdat.openSWAR(swarId);
 				}

@@ -15,6 +15,10 @@
 			// constructor code
 		}
 		
+		public override function leafInstrumentForNote(note:uint):LeafInstrumentBase {
+			return this;
+		}
+		
 		public override function parse(section:ByteArray):void {
 			baseNote=section.readUnsignedByte();
 			

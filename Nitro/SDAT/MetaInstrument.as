@@ -7,9 +7,15 @@
 			regions=new Vector.<InstrumentRegion>();
 		}
 		
-		public function regionForNote(note:uint):InstrumentRegion {
-			if(regions.length==1) return regions[0];
+		public override function leafInstrumentForNote(note:uint):LeafInstrumentBase {
+			var region:InstrumentRegion=regionForNote(note);
 			
+			if(!region) return null;
+			
+			return LeafInstrumentBase(region.subInstrument);
+		}
+		
+		public function regionForNote(note:uint):InstrumentRegion {
 			for each(var region:InstrumentRegion in regions) {
 				if(region.matchesNote(note)) {
 					return region;
