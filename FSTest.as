@@ -463,24 +463,20 @@
 			var provider:DataProvider=new DataProvider();
 			
 			for(var bankIndex:uint=0;bankIndex<sdat.bankInfo.length;++bankIndex) {
-				try {
-					var sbnk:SBNK=sdat.openBank(bankIndex);
-					
-					var item:Object= { index: bankIndex, type: "bank" };
-					item.instruments=sbnk.instruments;
-					item.info=sdat.bankInfo[bankIndex];
-					item.sublist=providerForBank(sbnk);
-					
-					if(sdat.bankSymbols) {
-						if(bankIndex in sdat.bankSymbols) {
-							item.name=sdat.bankSymbols[bankIndex];
-						}
+				var sbnk:SBNK=sdat.openBank(bankIndex);
+				
+				var item:Object= { index: bankIndex, type: "bank" };
+				item.instruments=sbnk.instruments;
+				item.info=sdat.bankInfo[bankIndex];
+				item.sublist=providerForBank(sbnk);
+				
+				if(sdat.bankSymbols) {
+					if(bankIndex in sdat.bankSymbols) {
+						item.name=sdat.bankSymbols[bankIndex];
 					}
-					
-					provider.addItem(item);
-				} catch(err:Error) {
-					trace(err.getStackTrace());
 				}
+				
+				provider.addItem(item);
 			}
 			
 			return provider;
@@ -506,10 +502,12 @@
 						label="Noise";
 						color=new ColorTransform(0.8,0.2,0.8);
 					} else if(inst is PulseInstrument) {
-						label="Pulse";
+						var pulse:PulseInstrument=PulseInstrument(inst);
+						label="Pulse "+pulse.dutyPercent.toFixed(1)+" %";
 						color=new ColorTransform(1,1,0.5);
 					} else {
-						label="PCM";
+						var pcm:PCMInstrument=PCMInstrument(inst);
+						label="PCM "+pcm.swar+"/"+pcm.swav;
 						color=new ColorTransform(1,1,1);
 					}
 				}
@@ -684,8 +682,32 @@
 		}
 		
 		private function instrumentSelected(obj:Object):void {
+			playback_txt.visible=true;
 			var inst:Instrument=obj.inst;
-			if(!inst) return;
+			if(!inst) {
+				playback_txt.text="NULL Instrument";
+				return;
+			}
+
+			var o:String=Instrument.instrumentTypeAsString(inst.instrumentType);
+			
+			var leaf:LeafInstrumentBase=inst as LeafInstrumentBase;
+			if(leaf) {
+
+				var pcm:PCMInstrument=inst as PCMInstrument;
+				var pulse:PulseInstrument=inst as PulseInstrument;
+				if(pcm) {
+					o+=" "+pcm.swar+"/"+pcm.swav;
+				} else if(pulse) {
+					o+=" "+pulse.dutyPercent.toFixed(1)+" %";
+				}
+				
+				o+="\nBase note: "+leaf.baseNote+"\n";
+				o+="ADSR: "+leaf.attack+", "+leaf.decay+", "+leaf.sustain+", "+leaf.release+"\n";
+				o+="Pan: "+leaf.pan+"\n";
+			}
+			
+			playback_txt.text=o;
 			trace(inst.toXML().toXMLString());
 		}
 		
