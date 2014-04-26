@@ -55,7 +55,8 @@
 		private static const sequenceArchiveColor:ColorTransform=new ColorTransform(0.90,1,0.6);
 		private static const bankColor:ColorTransform=new ColorTransform(0.65,0.8,1);
 		private static const groupColor:ColorTransform=new ColorTransform(0.8,0.7,0.5);
-		private static const waveArchiveColor=new ColorTransform(1,0.5,0.8);
+		private static const waveArchiveColor:ColorTransform=new ColorTransform(1,0.5,0.8);
+		private static const playerColor:ColorTransform=new ColorTransform(0.7,0.8,0.6);
 		
 		public function FSTest() {
 			
@@ -367,6 +368,16 @@
 				sources.addItem(groupSource);
 			}
 			
+			if(sdat.playerInfo.length>0) {
+				var playerSource:Object={};
+				playerSource.dataProvider=listPlayers(sdat);
+				playerSource.name="Players";
+				playerSource.fileName=fileName;
+				playerSource.fileIndex=fileId;
+				playerSource.colorTransform=playerColor;
+				sources.addItem(playerSource);
+			}
+			
 			if(sdat.waveArchiveInfo.length>0) {
 				for(var waveArchiveIndex:uint=0;waveArchiveIndex<sdat.waveArchiveInfo.length;++waveArchiveIndex) {
 					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
@@ -392,6 +403,22 @@
 			
 		}
 		
+		private function listPlayers(sdat:SDAT):DataProvider {
+			var o:DataProvider=new DataProvider();
+			for(var playerIndex:uint=0;playerIndex<sdat.playerInfo.length;++playerIndex) {
+				var player:PlayerInfoRecord=sdat.playerInfo[playerIndex];
+				var item:Object={type: "player", index: playerIndex};
+				item.info=player;
+				
+				if(sdat.playerSymbols && playerIndex in sdat.playerSymbols) {
+					item.name=sdat.playerSymbols[playerIndex];
+				}
+				
+				o.addItem(item);
+			}
+			return o;
+		}
+		
 		private function sourceChange(e:Event):void {
 			list_mc.dataProvider=source_mc.selectedItem.dataProvider;
 		}
@@ -402,11 +429,11 @@
 			for(var groupIndex:uint=0;groupIndex<sdat.groupInfo.length;++groupIndex) {
 				var item:Object={index: groupIndex, type: "group" };
 				item.info=sdat.groupInfo[groupIndex];
+				item.sublist=providerForGroup(sdat,item.info);
 				
 				if(sdat.groupSymbols) {
 					if(groupIndex in sdat.groupSymbols) {
 						item.name=sdat.groupSymbols[groupIndex];
-						item.sublist=providerForGroup(sdat,item.info);
 					}
 				}
 				
@@ -738,10 +765,32 @@
 			
 			playback_txt.visible=progress_mc.visible=export_mc.visible=Boolean(player);
 			
+			if(playingItem.type=="bank") {
+				bankSelected();
+			} else if(playingItem.type=="player") {
+				playerSelected();
+			}
 			
 			if(player) {
 				player.play();
 			}
+		}
+		
+		private function bankSelected():void {
+			var bankInfo:BankInfoRecord=list_mc.selectedItem.info;
+			playback_txt.visible=true;
+			var o:String="Bank\nSWARs:";
+			o+=bankInfo.swars.join(", ");
+			playback_txt.text=o;
+		}
+		
+		private function playerSelected():void {
+			var player:PlayerInfoRecord=list_mc.selectedItem.info;
+			playback_txt.visible=true;
+			var o:String="Player # "+list_mc.selectedItem.index;
+			o+="\nMax sequences: "+player.maxSequences+" Player heap size: "+player.heapSize;
+			o+="\nChannels: "+pad(player.channels.toString(2),16,"0",true);
+			playback_txt.text=o;
 		}
 		
 		private function exportClick(e:MouseEvent):void {
