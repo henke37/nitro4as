@@ -763,6 +763,9 @@
 				case 0xE249: return <contradictionTutorial step="present" />;
 				case 0xE24A: return <contradictionTutorial step="retry" />;
 				
+				case 0xE24C: return <startFingerptintingMinigame />;
+				case 0xE24D: return <fingerprintingAction action={fingerprintActions[section.readShort()]} />;
+				
 				
 				case 0xE251: return <luminolTutorial step={section.readShort()} />;
 				case 0xE252: return <waitForLuminolSpray />;
@@ -884,6 +887,12 @@
 			4: "Bishop",
 			5: "King"
 		};
+		
+		private static const fingerprintActions:Object= {
+			1: "autoSprinkle",
+			2: "autoBlow",
+			3: "manual"
+		}
 		
 		private static const speakerNames:Object = {
 			0x00:"Edgeworth",
