@@ -193,9 +193,12 @@
 				case 0xE115:
 					return <removeMini char={section.readShort()} />;
 				break;
+					
+				case 0xE117:
+					return <fullscreenImage a={section.readShort()} b={section.readShort()} c={section.readShort()} d={section.readShort()} commandType={commandType.toString(16)} />;
 				
 				case 0xE118:
-					return <fullscreenImage a={section.readShort()} b={section.readShort()} />;
+					return <fullscreenImage a={section.readShort()} b={section.readShort()} commandType={commandType.toString(16)} />;
 				break;
 					
 				case 0xE119:
@@ -584,7 +587,7 @@
 				case 0xE19A: return <clearFlashingHp />;
 				case 0xE19C: return <penalty />;
 				
-				case 0xE1A3: return <waitFor3DExamination flag={section.readShort()} />;
+				case 0xE1A3: return <waitFor3DExamination flagVal={section.readShort()} flagId={section.readShort()} />;
 				
 				case 0xE1A6:
 					return <ceRevisedStatement
