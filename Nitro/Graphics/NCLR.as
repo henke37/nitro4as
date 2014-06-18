@@ -13,11 +13,13 @@
 		/** The palette data, in RGB 555 format. */
 		public var colors:Vector.<uint>;
 		
-		/** The number of palettes in the palette data. */
-		public var paletteCount:uint;
+		/** If the extended palette memory should be used for this palette */
+		public var useExtPal:Boolean;
 		
 		/** The intended length of a pixel for usage with this palette. */
 		public var bitDepth:uint;
+		
+		
 
 		public function NCLR() {
 		}
@@ -50,8 +52,8 @@
 			section.endian=Endian.LITTLE_ENDIAN;
 			
 			bitDepth=1 << (section.readUnsignedShort()-1);
-			
-			section.position=0x08;
+			section.position+=2;
+			useExtPal=Boolean(section.readUnsignedInt());
 			var paletteSize:uint=section.readUnsignedInt();
 			
 			paletteSize/=RGB555.byteSize;
@@ -71,7 +73,9 @@
 		
 		private function parsePCMP(section:ByteArray):void {
 			section.endian=Endian.LITTLE_ENDIAN;
-			paletteCount=section.readUnsignedShort();
+			const compressedPaletteCount:uint=section.readUnsignedShort();
+			section.position+=2;//padding;
+			const tbltPtr=section.readUnsignedInt();
 		}
 		
 		/** Writes the palette data of the file to a new ByteArray
@@ -87,9 +91,8 @@
 			var o:ByteArray=new ByteArray();
 			o.endian=Endian.LITTLE_ENDIAN;
 			
-			o.writeShort(bitDepth==4?3:4);
-			o.writeShort(0);//unknown
-			o.writeUnsignedInt(0);//more unknown
+			o.writeUnsignedInt(bitDepth==4?3:4);
+			o.writeUnsignedInt(useExtPal?1:0);//more unknown
 			o.writeUnsignedInt(colors.length*RGB555.byteSize);
 			o.writeUnsignedInt(o.position+4);
 			
