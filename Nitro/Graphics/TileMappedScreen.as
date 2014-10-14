@@ -89,16 +89,26 @@
 		@return A new Sprite with the tiles of the screen correctly laid out
 		*/
 		public function render(tiles:GraphicsBank,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
+			return renderViewport(tiles,convertedPalette,useTransparency);
+		}
+		
+		public function renderViewport(tiles:GraphicsBank,convertedPalette:Vector.<uint>,useTransparency:Boolean=true,startX:uint=0,startY:uint=0,endX:uint=0xFFFFFFFF,endY:uint=0xFFFFFFFF):Sprite {
 			var spr:Sprite=new Sprite();
 			
 			var paletteCache:Object={};
 			
+			if(endX==0xFFFFFFFF) endX=cols;
+			if(endY==0xFFFFFFFF) endY=rows;
+			
 			//var hits:uint,misses:uint;
 			
-			for(var y:uint=0;y<height;y+=Tile.height) {
-				for(var x:uint=0;x<width;x+=Tile.width) {
+			for(var tileY:uint=0;tileY<endY;++tileY) {
+				var y:Number=tileY*Tile.height;
+				for(var tileX:uint=0;tileX<endX;++tileX) {
 					
-					var index:uint=(width/Tile.width)*(y/Tile.height)+(x/Tile.width);
+					var x:Number=tileX*Tile.width;
+					
+					var index:uint=tileX+tileY*cols;//not the endX value, but the width
 					
 					var entry:TileEntry=entries[index];
 					

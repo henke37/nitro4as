@@ -45,7 +45,8 @@
 			gridY=section.readUnsignedShort();
 			
 			var tileType:uint=section.readUnsignedInt();
-			
+			var vramTransfer:Boolean=Boolean(tileType & 0x100);
+			tileType&=0xFF;
 			
 			
 			var dataSize:uint=section.readUnsignedInt();

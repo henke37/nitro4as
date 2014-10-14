@@ -77,6 +77,12 @@
 		@return A BitmapData for the tile*/
 		public function renderTile(subTileIndex:uint,palette:Vector.<uint>,paletteIndex:uint,useTransparency:Boolean):BitmapData {
 			var tile:Tile=tiles[subTileIndex];
+
+			//ignore palette when in 8 bpp mode
+			if(bitDepth==8) {
+				paletteIndex=0;
+			}
+			
 			return tile.toBMD(palette,paletteIndex,useTransparency);
 		}
 		
@@ -328,7 +334,7 @@
 			var x:uint;
 			var y:uint;
 			var index:uint;
-			var bmd:BitmapData
+			var bmd:BitmapData;
 			
 			if(tiles) {
 			

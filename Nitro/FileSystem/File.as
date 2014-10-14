@@ -18,6 +18,10 @@
 			
 			fileId=fid;
 		}
+		
+		public function toString():String {
+			return "[File name="+name+" id="+fileId+"]";
+		}
 
 	}
 	

@@ -11,9 +11,9 @@
 	
 	public class NSCR extends TileMappedScreen {
 		/** The height of the viewport for the screen, measured in pixels. */
-		public var dataHeight:uint;
+		public var viewportHeight:uint;
 		/** The width of the viewport for the screen, measured in pixels. */
-		public var dataWidth:uint;
+		public var viewportWidth:uint;
 		
 		public function NSCR() {
 			// constructor code
@@ -41,16 +41,20 @@
 			var mode:uint=section.readUnsignedShort();
 			
 			if(mode==0) {
-				dataHeight=[256,256,512,512][size];
-				dataWidth=[256,512,256,512][size];
+				viewportHeight=[256,256,512,512][size];
+				viewportWidth=[256,512,256,512][size];
 			} else {
-				dataHeight=[128,256,512,1024][size];
-				dataWidth=[128,256,512,1024][size];
+				viewportHeight=[128,256,512,1024][size];
+				viewportWidth=[128,256,512,1024][size];
 			}
 			
 			section.position=0x0C;
 			
 			loadEntries(section,width/Tile.width,height/Tile.height,true);
+		}
+		
+		public override function render(tiles:GraphicsBank,convertedPalette:Vector.<uint>,useTransparency:Boolean=true):Sprite {
+			return renderViewport(tiles,convertedPalette,useTransparency,0,0,viewportWidth,viewportHeight);
 		}
 		
 	}
