@@ -67,7 +67,7 @@
 			loadFrame(nextFrame);
 			
 			if(nextFrame+1>=anim.frames.length) {
-				nextFrame=0;
+				nextFrame=anim.loopStart;
 			} else {
 				++nextFrame;
 			}

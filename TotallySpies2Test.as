@@ -32,15 +32,15 @@
 			nds=new NDS();
 			nds.parse(loader.data);
 			
+			extractAll();
+			
 			//trace(nds.fileSystem.rootDir.files);
 			//var img:DisplayObject=loadBG("Cine_ST01-01A");
 			//addChild(img);
 			
 			//var fr:FileReference=new FileReference();
 			//fr.save(openFile("Cine_ST01-01A00.NSCR.lz"),"Cine_ST01-01A00.NSCR.lz");
-			//extractAll();
 			
-			extractTextures();
 			//extractTexture("Levels/Alex_Arm.wmif");
 		}
 		
@@ -67,13 +67,14 @@
 			
 			var render:DisplayObject=wmif.render(palette);
 			
-			saveItem(baseName+".png",render);
+			saveItem(baseName,render);
 		}
 		
 		private function extractAll():void {
 			var start=getTimer();
 			extractBGs();
 			extractCellBanks();
+			extractTextures();
 			trace(getTimer()-start);
 		}
 		
@@ -106,10 +107,10 @@
 			ncer.parse(openFile(bank));
 			
 			if(ncer.cells.length==1) {
-				saveItem(bank+".png",ncer.rend(0,palette,ncgr));
+				saveItem(bank,ncer.rend(0,palette,ncgr));
 			} else {
 				for(var cell:uint=0;cell<ncer.cells.length;++cell)
-				saveItem(bank+flash.filesystem.File.separator+cell.toString()+".png",ncer.rend(cell,palette,ncgr));
+				saveItem(bank+flash.filesystem.File.separator+cell.toString(),ncer.rend(cell,palette,ncgr));
 			}
 		}
 		

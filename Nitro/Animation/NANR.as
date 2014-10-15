@@ -51,9 +51,10 @@
 				
 				section.position=animOffset+animIttr*animSize;
 				var anim:NANRAnim=new NANRAnim();
-				var frameCount:uint=section.readUnsignedInt();
-				var dataType:uint=section.readUnsignedShort();
-				section.position+=6;//unknown
+				var frameCount:uint=section.readUnsignedShort();
+				anim.loopStart=section.readUnsignedShort();
+				var dataType:uint=section.readUnsignedInt();
+				anim.playbackMethod=section.readUnsignedInt();
 				
 				var positionSize:uint=[4,16,8][dataType];
 				

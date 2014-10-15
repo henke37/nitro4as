@@ -50,7 +50,7 @@
 		private function parseKBEC(section:ByteArray):void {
 			
 			var cellCount:uint=section.readUnsignedShort();
-			var version:uint=section.readUnsignedShort();
+			var version:uint=section.readUnsignedShort();//bank attributes
 			
 			if(version>1) {
 				throw new ArgumentError("Unknown version: "+version);
@@ -60,15 +60,15 @@
 			cells.length=cellCount;
 			cells.fixed=true;
 			
-			section.position+=4;//seek past unknown constant
-			var flags:uint=section.readUnsignedInt();
+			section.position+=4;//pointer to cell data array
+			var flags:uint=section.readUnsignedInt();//mapping format
 			
 			var tileIndexShift:uint=flags & 3;
 			
-			var partionOffset:uint=section.readUnsignedInt();
+			var partionOffset:uint=section.readUnsignedInt();//vram transfer data pointer
 			subImages=Boolean(flags & 4);
 			
-			section.position+=8;//padding
+			section.position+=8;//space for pointers at runtime
 			
 			var cellOffset:uint=section.position;
 			
@@ -88,7 +88,7 @@
 				cells[cellItr]=cell;
 				
 				var numOAMS:uint=section.readUnsignedShort();
-				section.position+=2;
+				section.position+=2;//attributes
 				var oamOffset:uint=section.readUnsignedInt();
 				if(version==1) {
 					var xMax:int=section.readShort();
