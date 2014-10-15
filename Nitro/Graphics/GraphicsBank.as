@@ -8,10 +8,10 @@
 		
 		/** The tiles the picture is composed of, if any
 		@see picture*/
-		internal var tiles:Vector.<Tile>;
+		public var tiles:Vector.<Tile>;
 		/** The pixels the picture is composed of, if any
 		@see tiles*/
-		internal var picture:Vector.<uint>;
+		public var picture:Vector.<uint>;
 		
 		/** The number of tiles along the x axis */
 		public var tilesX:uint;
@@ -51,7 +51,15 @@
 			index=0;
 			while(data.position<dataSize+dataOffset) {
 				var byte:uint=data.readUnsignedByte();
-				if(bitDepth==4) {
+				if(bitDepth==2) {
+					picture[index++]=byte & 3;
+					byte>>=2;
+					picture[index++]=byte & 3;
+					byte>>=2;
+					picture[index++]=byte & 3;
+					byte>>=2;
+					picture[index++]=byte & 3;
+				} else if(bitDepth==4) {
 					picture[index++]=byte & 0xF;
 					picture[index++]=byte >> 4;
 				} else {

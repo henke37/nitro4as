@@ -12,6 +12,7 @@
 	import Nitro.Compression.Stock;
 	import Nitro.FileSystem.File;
 	import Nitro.FileSystem.AbstractFile;
+	import Nitro.WildMagic.*;
 	
 	public class TotallySpies2Test extends MovieClip {
 		
@@ -37,6 +38,39 @@
 			
 			//var fr:FileReference=new FileReference();
 			//fr.save(openFile("Cine_ST01-01A00.NSCR.lz"),"Cine_ST01-01A00.NSCR.lz");
+			//extractAll();
+			
+			extractTextures();
+			//extractTexture("Levels/Alex_Arm.wmif");
+		}
+		
+		private function extractTextures():void {
+			const files:Vector.<AbstractFile>=nds.fileSystem.searchForFile(
+				nds.fileSystem.rootDir,
+				/\.wmif$/,
+				true,
+				false
+			);
+			
+			for each(var file:Nitro.FileSystem.File in files) {
+				var fileName:String=nds.fileSystem.getFullNameForFile(file);
+				extractTexture(fileName);
+			}
+		}
+		
+		private function extractTexture(baseName:String) {
+			var wmif:WMIF=new WMIF();
+			wmif.parse(nds.fileSystem.openFileByName(baseName));
+			var wmpf:WMPF=new WMPF();
+			wmpf.parse(nds.fileSystem.openFileByName(baseName+".wmpf"));
+			var palette:Vector.<uint>=RGB555.paletteFromRGB555(wmpf.colors);
+			
+			var render:DisplayObject=wmif.render(palette);
+			
+			saveItem(baseName+".png",render);
+		}
+		
+		private function extractAll():void {
 			var start=getTimer();
 			extractBGs();
 			extractCellBanks();
@@ -392,6 +426,8 @@
 			bmd.draw(render,m);
 			
 			var comp:PNGEncoderOptions=new PNGEncoderOptions();
+			
+			fileName=fileName.replace("/",flash.filesystem.File.separator);
 			
 			var file:flash.filesystem.File=new flash.filesystem.File(basePath+flash.filesystem.File.separator+fileName+".png");
 			var fs:FileStream=new FileStream();
