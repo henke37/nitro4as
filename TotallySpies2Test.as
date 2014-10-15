@@ -37,9 +37,10 @@
 			
 			//var fr:FileReference=new FileReference();
 			//fr.save(openFile("Cine_ST01-01A00.NSCR.lz"),"Cine_ST01-01A00.NSCR.lz");
-			
-			//extractBGs();
+			var start=getTimer();
+			extractBGs();
 			extractCellBanks();
+			trace(getTimer()-start);
 		}
 		
 		private function extractCellBanks():void {
@@ -69,6 +70,13 @@
 			ncgr.parse(openFile(cgr));
 			var ncer:NCER=new NCER();
 			ncer.parse(openFile(bank));
+			
+			if(ncer.cells.length==1) {
+				saveItem(bank+".png",ncer.rend(0,palette,ncgr));
+			} else {
+				for(var cell:uint=0;cell<ncer.cells.length;++cell)
+				saveItem(bank+flash.filesystem.File.separator+cell.toString()+".png",ncer.rend(cell,palette,ncgr));
+			}
 		}
 		
 		private function extractBGs():void {
@@ -372,12 +380,17 @@
 			saveItem(scr,render);
 		}
 		
-		private function saveItem(fileName,render:DisplayObject):void {
+		private function saveItem(fileName:String,render:DisplayObject):void {
+			var rect:Rectangle=render.getBounds(render);
+			var m:Matrix=new Matrix();
+			m.translate(-rect.x,-rect.y);
 			
-			var bmd:BitmapData=new BitmapData(render.width,render.height);
-			bmd.draw(render);
+			rect.x=0;
+			rect.y=0;
 			
-			var rect:Rectangle=new Rectangle(0,0,render.width,render.height);
+			var bmd:BitmapData=new BitmapData(rect.width,rect.height,true,0x00FF00FF);
+			bmd.draw(render,m);
+			
 			var comp:PNGEncoderOptions=new PNGEncoderOptions();
 			
 			var file:flash.filesystem.File=new flash.filesystem.File(basePath+flash.filesystem.File.separator+fileName+".png");
