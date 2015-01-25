@@ -320,8 +320,12 @@
 			var playerCount:uint=info.readUnsignedInt();
 			var playerInfoOffsets:Vector.<uint>=readInfoRecordPtrTable(info,playerCount);
 			
-			playerInfo=new Vector.<PlayerInfoRecord>();
+			playerInfo=new Vector.<PlayerInfoRecord>(playerCount);
 			for(i=0;i<playerCount;++i) {
+				offset=playerInfoOffsets[i];
+				if(offset==0) continue;
+				info.position=offset;				
+				
 				var playerRecord:PlayerInfoRecord=new PlayerInfoRecord();
 				playerRecord.maxSequences=info.readUnsignedByte();
 				info.position+=1;

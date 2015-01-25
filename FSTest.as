@@ -787,9 +787,14 @@
 		private function playerSelected():void {
 			var player:PlayerInfoRecord=list_mc.selectedItem.info;
 			playback_txt.visible=true;
+			
 			var o:String="Player # "+list_mc.selectedItem.index;
-			o+="\nMax sequences: "+player.maxSequences+" Player heap size: "+player.heapSize;
-			o+="\nChannels: "+pad(player.channels.toString(2),16,"0",true);
+			if(player) {
+				o+="\nMax sequences: "+player.maxSequences+" Player heap size: "+player.heapSize;
+				o+="\nChannels: "+pad(player.channels.toString(2),16,"0",true);
+			} else {
+				o+="\nNULL player";
+			}
 			playback_txt.text=o;
 		}
 		
