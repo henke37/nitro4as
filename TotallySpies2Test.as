@@ -32,8 +32,8 @@
 			nds=new NDS();
 			nds.parse(loader.data);
 			
-			extractAll();
-			
+			//extractAll();
+			extractBGs();
 			//trace(nds.fileSystem.rootDir.files);
 			//var img:DisplayObject=loadBG("Cine_ST01-01A");
 			//addChild(img);
@@ -114,7 +114,7 @@
 			}
 		}
 		
-		private function extractBGs():void {
+		private function extractBGs():void {/*
 			extractBG("Centrifugeuse","Centrifugeuse00","Centrifugeuse00");
 			//extractBG("Centrifugeuse","Centrifugeuse01","Centrifugeuse01");
 			//extractBG("Centrifugeuse","Centrifugeuse02","Centrifugeuse02");
@@ -291,8 +291,8 @@
 			extractBG("GameGUI3_4","GameGUI3_400","GameGUI3_400",true);
 			extractBG("GameGUI3_4","GameGUI3_400","GameGUI3_401",true);
 			
-			extractBG("GameGUI4_1","GameGUI4_100","GameGUI4_100",true);
-			extractBG("GameGUI4_1","GameGUI4_100","GameGUI4_101",true);
+			extractBG("GameGUI4_1","GameGUI4_100","GameGUI4_100",true);*/
+			extractBG("GameGUI4_1","GameGUI4_100","GameGUI4_101",true);/*
 			extractBG("GameGUI4_2","GameGUI4_200","GameGUI4_200",true);
 			extractBG("GameGUI4_2","GameGUI4_200","GameGUI4_201",true);
 			extractBG("GameGUI4_3","GameGUI4_300","GameGUI4_300",true);
@@ -300,8 +300,8 @@
 			extractBG("GameGUI4_311","GameGUI4_31100","GameGUI4_31100",true);
 			extractBG("GameGUI4_322","GameGUI4_32200","GameGUI4_32200",true);
 			extractBG("GameGUI4_333","GameGUI4_33300","GameGUI4_33300",true);
-			extractBG("GameGUI4_4","GameGUI4_400","GameGUI4_400",true);
-			extractBG("GameGUI4_4","GameGUI4_400","GameGUI4_401",true);
+			extractBG("GameGUI4_4","GameGUI4_400","GameGUI4_400",true);*/
+			extractBG("GameGUI4_4","GameGUI4_400","GameGUI4_401",true);/*
 						
 			extractBG("GameGUI5_1","GameGUI5_100","GameGUI5_100",true);
 			extractBG("GameGUI5_1","GameGUI5_100","GameGUI5_101",true);
@@ -406,11 +406,11 @@
 			extractBG("Wifi_loseBottom","Wifi_loseBottom00","Wifi_loseBottom00");
 			extractBG("Wifi_loseTop","Wifi_loseTop00","Wifi_loseTop00");
 			extractBG("Wifi_winBottom","Wifi_winBottom00","Wifi_winBottom00");
-			extractBG("Wifi_winTop","Wifi_winTop00","Wifi_winTop00");
+			extractBG("Wifi_winTop","Wifi_winTop00","Wifi_winTop00");*/
 		}
 		
-		private function extractBG(pal:String,gr:String,scr:String,transp:Boolean=false):void {
-			var render:DisplayObject=loadBG(pal,gr,scr,transp);
+		private function extractBG(pal:String,gr:String,scr:String,transp:Boolean=false,tilesX:uint=32):void {
+			var render:DisplayObject=loadBG(pal,gr,scr,transp,tilesX);
 			
 			saveItem(scr,render);
 		}
@@ -441,7 +441,7 @@
 			return Stock.decompress(nds.fileSystem.openFileByName(fileName));
 		}
 		
-		private function loadBG(pal:String,gr:String,scr:String,transp:Boolean=false):DisplayObject {
+		private function loadBG(pal:String,gr:String,scr:String,transp:Boolean=false,tilesX:uint=32):DisplayObject {
 			var nclr:NCLR=new NCLR();
 			nclr.parse(openFile(pal+".NCLR.lz"));
 			var palette:Vector.<uint>=RGB555.paletteFromRGB555(nclr.colors);
@@ -461,7 +461,7 @@
 			
 			nscr.parse(nscrData);
 			
-			return nscr.renderViewport(ncgr,palette,transp,0,0,256/8,192/8);
+			return nscr.renderViewport(ncgr,palette,transp,0,0,tilesX,192/8);
 		}
 	}
 	

@@ -769,6 +769,8 @@
 				bankSelected();
 			} else if(playingItem.type=="player") {
 				playerSelected();
+			} else if(playingItem.type=="sequence") {
+				sequenceSelected();
 			}
 			
 			if(player) {
@@ -794,6 +796,22 @@
 				o+="\nChannels: "+pad(player.channels.toString(2),16,"0",true);
 			} else {
 				o+="\nNULL player";
+			}
+			playback_txt.text=o;
+		}
+		
+		private function sequenceSelected():void {
+			var info:SequenceInfoRecord=list_mc.selectedItem.info;
+			var seq:Sequence=list_mc.selectedItem.seq;
+			
+			playback_txt.visible=true;
+			
+			var o:String="Sequence # "+list_mc.selectedItem.index;
+			if(info) {
+				o+="\nBank: "+info.bankId+" Player: "+info.player+" Vol: "+info.vol;
+				o+="\nPlayer prio: "+info.playerPriority+" Chan prio: "+info.channelPriority;
+			} else {
+				o+="\nNULL sequence";
 			}
 			playback_txt.text=o;
 		}

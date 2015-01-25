@@ -55,6 +55,10 @@
 				entry.flag2=d.readUnsignedShort();
 				
 				sections[i]=entry;
+				
+				if(true) {
+					entry.offset<<=1;
+				}
 			}
 		}
 		

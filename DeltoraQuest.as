@@ -153,7 +153,7 @@
 				break;
 				
 				case "scr0":
-					return "scr";
+					return "script";
 				
 				default:
 					return (id.charAt(3)+id.charAt(2)+id.charAt(1)+id.charAt(0));
