@@ -845,6 +845,7 @@
 			do {
 				sampleBuff.length=0;
 				rendered=decoder.render(sampleBuff,renderSize);
+				sampleBuff.position=0;
 				wave.addSamples(sampleBuff);
 			} while(rendered==renderSize);
 			
