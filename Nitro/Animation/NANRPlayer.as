@@ -23,6 +23,9 @@
 		private var frameDelay:uint;
 		
 		private var currentCell:DisplayObject;
+		
+		/** 1 for forward, 0 for paused, -1 for backwards. */
+		private var direction:int=0;
 
 		/** Creates a new NANRPlayer.
 		@param p The palette to use.
@@ -39,6 +42,19 @@
 			tiles=t;
 			palette=p;
 			
+			
+			switch(a.playbackMethod) {
+				case NANRPlaybackMethod.FORWARD:
+				case NANRPlaybackMethod.FORWARD_LOOP:
+				case NANRPlaybackMethod.REVERSE:
+				case NANRPlaybackMethod.REVERSE_LOOP:
+					break;
+				case NANRPlaybackMethod.INVALID:
+					throw new ArgumentError("Invalid playback "+a.playbackMethod+" method!");
+				default:
+					throw new ArgumentError("Unknown playback "+a.playbackMethod+" method!");
+			}
+			
 			convertedPalette=RGB555.paletteFromRGB555(p.colors);
 			
 			cellCache={};
@@ -47,11 +63,13 @@
 		/** Starts playback. */
 		public function play():void {
 			addEventListener(Event.ENTER_FRAME,runAnim);
+			direction=1;
 		}
 		
 		/** Stops playback */
 		public function stop():void {
 			removeEventListener(Event.ENTER_FRAME,runAnim);
+			direction=0;
 		}
 		
 		private function runAnim(e:Event):void {
@@ -66,10 +84,32 @@
 		private function loadNextFrame():void {
 			loadFrame(nextFrame);
 			
-			if(nextFrame+1>=anim.frames.length) {
-				nextFrame=anim.loopStart;
-			} else {
-				++nextFrame;
+			if(direction==1) {
+				if(nextFrame+1>=anim.frames.length) {
+					if(anim.playbackMethod==NANRPlaybackMethod.FORWARD_LOOP) {
+						nextFrame=anim.loopStart;
+					} else if(anim.playbackMethod==NANRPlaybackMethod.REVERSE_LOOP || anim.playbackMethod==NANRPlaybackMethod.REVERSE) {
+						direction=-1;
+						nextFrame--;
+					} else {
+						stop();
+						dispatchEvent(new Event(Event.COMPLETE));
+					}
+				} else {
+					++nextFrame;
+				}
+			} else if(direction==-1) {
+				if(nextFrame==anim.loopStart) {
+					if(anim.playbackMethod==NANRPlaybackMethod.REVERSE_LOOP) {
+						direction=1;
+						nextFrame++;
+					} else {						
+						stop();
+						dispatchEvent(new Event(Event.COMPLETE));
+					}
+				} else {
+					--nextFrame;
+				}
 			}
 		}
 		
