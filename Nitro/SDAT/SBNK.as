@@ -2,7 +2,6 @@
 	
 	import flash.utils.*;
 	import Nitro.SectionedFile;
-	import HTools.Audio.MidiPlayer.Instrument;
 	
 	/** SBNK reader
 	

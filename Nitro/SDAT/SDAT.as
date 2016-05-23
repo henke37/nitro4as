@@ -516,6 +516,21 @@
 			}
 			throw new ArgumentError("Unknown stream name");
 		}
+		
+		/** Finds a sequence by it's symbol name
+		@param name The symbol name
+		@return The sequence
+		@throw ArgumentError There is no stream with that symbol name */
+		public function getSequenceByName(name:String):SSEQ {
+			var i:uint;
+			for each(var symbName:String in seqSymbols) {
+				if(symbName==name) {
+					return openSSEQ(i);
+				}
+				++i;
+			}
+			throw new ArgumentError("Unknown sequence name");
+		}
 	}
 	
 }

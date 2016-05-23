@@ -35,7 +35,9 @@
 			var untranslatedJumps:Vector.<JumpEvent>=new Vector.<JumpEvent>();
 			var jmpEvt:JumpEvent;
 			
-			for(;;) {
+			var prefixIf:Boolean=false;
+			
+parseLoop: for(;;) {
 				
 				var flowOver:Boolean=false;
 				
@@ -70,7 +72,7 @@
 						evt=jmpEvt=new JumpEvent(jmpTarget,false);
 						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
-						flowOver=true;
+						flowOver=!prefixIf;
 					break;
 					
 					case 0x95://call
@@ -81,7 +83,8 @@
 					break;
 					
 					case 0xA2:
-						evt=new IfEvent();
+						prefixIf=true;
+						continue parseLoop;
 					break;
 					
 					case 0xB0:
@@ -241,12 +244,12 @@
 					
 					case 0xFD:
 						evt=new ReturnEvent();
-						flowOver=true;
+						flowOver=!prefixIf;
 					break;
 					
 					case 0xFF:
 						evt=new EndTrackEvent();
-						flowOver=true;
+						flowOver=!prefixIf;
 					break;
 					
 					default:
@@ -256,6 +259,11 @@
 				
 				if(evt) {
 					commandIndex++;
+					
+					if(prefixIf) {
+						evt.prefixIf=true;
+						prefixIf=false;
+					}
 				
 					//must push null to keep indexes correct
 					seq.events.push(evt);

@@ -1,6 +1,5 @@
 ﻿package Nitro.SDAT {
 	import flash.utils.*;
-	import HTools.Audio.MidiPlayer.Instrument;
 	
 	/** An instrument that can be used to play a melody */
 	public class Instrument {

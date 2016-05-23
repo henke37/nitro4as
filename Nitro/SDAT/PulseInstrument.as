@@ -27,18 +27,10 @@
 			return o;
 		}
 		
+		private static const dutyCycles:Vector.<Number>=new <Number>[12.5, 25.0, 37.5, 50.0, 62.5, 75.0, 87.5, 0.0];
+		
 		public function get dutyPercent():Number {
-			return [
-				12.5,
-				25.0,
-				37.5,
-				50.0,
-				62.5,
-				75.0,
-				87.5,
-				0.0
-			]
-			[duty];
+			return dutyCycles[duty];
 		}
 		
 		public override function get instrumentType():uint { return INSTRUMENT_TYPE_PULSE; }
