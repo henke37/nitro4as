@@ -28,14 +28,13 @@
 			var newFlow:Flow;
 			
 			newFlow=new Flow(data.position);
-			seq.trackStarts[0]=commandIndex;
 			flows[data.position]=newFlow;
 			newFlow.parsed=true;
 			
 			var untranslatedJumps:Vector.<JumpEvent>=new Vector.<JumpEvent>();
 			var jmpEvt:JumpEvent;
 			
-			var prefixIf:Boolean=false;
+			var suffixIf:Boolean=false;
 			
 parseLoop: for(;;) {
 				
@@ -60,30 +59,32 @@ parseLoop: for(;;) {
 					break;
 					
 					case 0x93://open track
-						data.position+=1;//skip past the id
+						var trackId:uint=data.readUnsignedByte();
 						var trackPos:uint=read3ByteInt(data);
 						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
 						newFlow=new Flow(trackPos);
-						newFlow.isTrack=true;
+					
+						evt=jmpEvt=new OpenTrackEvent(jmpTarget,trackId);
+						untranslatedJumps.push(jmpEvt);
 					break;
 					
 					case 0x94:
 						var jmpTarget:uint=read3ByteInt(data);
-						evt=jmpEvt=new JumpEvent(jmpTarget,false);
+						evt=jmpEvt=new JumpEvent(jmpTarget,JumpEvent.JT_JUMP);
 						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
-						flowOver=!prefixIf;
+						flowOver=!suffixIf;
 					break;
 					
 					case 0x95://call
 						jmpTarget=read3ByteInt(data);
-						evt=jmpEvt=new JumpEvent(jmpTarget,true);
+						evt=jmpEvt=new JumpEvent(jmpTarget,JumpEvent.JT_CALL);
 						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
 					break;
 					
 					case 0xA2:
-						prefixIf=true;
+						suffixIf=true;
 						continue parseLoop;
 					break;
 					
@@ -219,7 +220,7 @@ parseLoop: for(;;) {
 					break;
 					
 					case 0xD6://print var
-						data.position+=1;
+						evt=new PrintVarEvent(data.readUnsignedByte());
 					break;	
 					
 					case 0xE0:
@@ -235,7 +236,7 @@ parseLoop: for(;;) {
 					break;
 					
 					case 0xFE://Multitrack marker op
-						data.position+=2;//unknown data
+						evt=new AllocateTrackEvent(data.readUnsignedShort());
 					break;
 					
 					case 0xFC:
@@ -244,12 +245,12 @@ parseLoop: for(;;) {
 					
 					case 0xFD:
 						evt=new ReturnEvent();
-						flowOver=!prefixIf;
+						flowOver=!suffixIf;
 					break;
 					
 					case 0xFF:
 						evt=new EndTrackEvent();
-						flowOver=!prefixIf;
+						flowOver=!suffixIf;
 					break;
 					
 					default:
@@ -260,9 +261,9 @@ parseLoop: for(;;) {
 				if(evt) {
 					commandIndex++;
 					
-					if(prefixIf) {
-						evt.prefixIf=true;
-						prefixIf=false;
+					if(suffixIf) {
+						evt.suffixIf=true;
+						suffixIf=false;
 					}
 				
 					//must push null to keep indexes correct
@@ -280,9 +281,6 @@ parseLoop: for(;;) {
 						break;
 					} else {
 						var nextFlow:Flow=unparsedFlows.shift();
-						if(nextFlow.isTrack) {
-							seq.trackStarts.push(commandIndex);
-						}
 						data.position=nextFlow.rawOffset;
 						nextFlow.parsed=true;
 						nextFlow.commandIndex=commandIndex;
