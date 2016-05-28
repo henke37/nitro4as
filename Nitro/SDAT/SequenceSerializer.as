@@ -3,13 +3,31 @@
 	
 	public class SequenceSerializer {
 		
-		private var seq:Sequence;
-
 		public function SequenceSerializer() {
 			// constructor code
 		}
 		
-		private function serializeEvent(evt:SequenceEvent):String {
+		public function serializeSequence(seq:Sequence):String {
+			var evt:SequenceEvent;
+			
+			var jumpTargets:Object={};
+			for each(evt in seq.events) {
+				var jmpEvt:JumpEvent=evt as JumpEvent;
+				if(!jmpEvt) continue;
+				jumpTargets[jmpEvt.target]=true;
+			}
+			var o:String="";
+			for(var evtIndex:uint=0;evtIndex<seq.events.length;++evtIndex) {
+				evt=seq.events[evtIndex];
+				if(evtIndex in jumpTargets) {
+					o+="L"+evtIndex+":\n";
+				}
+				o+=this.serializeEvent(evt)+"\n";
+			}
+			return o;
+		}
+		
+		public function serializeEvent(evt:SequenceEvent):String {
 			var params:Array=parameterizeEvent(evt);
 			var cmd:String=params.shift();
 			if(evt.suffixIf) cmd+="_if";

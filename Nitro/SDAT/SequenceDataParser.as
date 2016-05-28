@@ -64,7 +64,7 @@ parseLoop: for(;;) {
 						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
 						newFlow=new Flow(trackPos);
 					
-						evt=jmpEvt=new OpenTrackEvent(jmpTarget,trackId);
+						evt=jmpEvt=new OpenTrackEvent(trackPos,trackId);
 						untranslatedJumps.push(jmpEvt);
 					break;
 					
@@ -320,7 +320,6 @@ class Flow {
 	public var parsed:Boolean=false;
 	public var rawOffset:uint;
 	public var commandIndex:uint;
-	public var isTrack:Boolean;
 	
 	public function Flow(rawOffset:uint) {
 		this.rawOffset=rawOffset;
