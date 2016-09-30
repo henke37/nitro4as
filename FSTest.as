@@ -44,6 +44,7 @@
 		public var sublist_mc:List;
 		public var source_mc:ComboBox;
 		public var export_mc:Button;
+		public var disassm_mc:TextArea;
 		
 		private var loopMark:Shape;
 		private var icon:Bitmap;
@@ -120,6 +121,9 @@
 			progress_mc.width=Banner.ICON_WIDTH*iconZoom-20;
 			progress_mc.visible=false;
 			
+			disassm_mc.visible=false;
+			disassm_mc.setSize(Banner.ICON_WIDTH*iconZoom-15,Banner.ICON_HEIGHT*iconZoom);
+			
 			export_mc.visible=false;
 			export_mc.label="Export";
 			export_mc.addEventListener(MouseEvent.CLICK,exportClick);
@@ -163,6 +167,7 @@
 			sublist_mc.visible=false;
 			source_mc.visible=false;
 			playback_txt.visible=false;
+			disassm_mc.visible=false;
 			
 			title_txt.text=TITLE;
 			status_txt.text=CLICKLOAD;
@@ -744,6 +749,7 @@
 		
 		private function listSelect(e:Event):void {
 			sublist_mc.visible=false;
+			disassm_mc.visible=false;
 			
 			if(player) {
 				player.stop();
@@ -814,6 +820,16 @@
 				o+="\nNULL sequence";
 			}
 			playback_txt.text=o;
+			
+			disassembleSequence(seq);
+		}
+		
+		private function disassembleSequence(seq:Sequence):void {
+			var serializer:SequenceSerializer=new SequenceSerializer();
+			var dis:String=serializer.serializeSequence(seq);
+			
+			disassm_mc.text=dis;
+			disassm_mc.visible=true;
 		}
 		
 		private function exportClick(e:MouseEvent):void {
