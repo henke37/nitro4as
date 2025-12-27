@@ -11,8 +11,6 @@
 	import Nitro.Compression.*;
 	import Nitro.Graphics.*;
 	
-	import com.adobe.images.PNGEncoder;
-	
 	/** Base class for Ace Attorney game extractors */
 	
 	public class GSBaseExtractor extends MovieClip {

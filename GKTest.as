@@ -6,6 +6,7 @@
 	import flash.utils.*;
 	import flash.filesystem.*;
 	import flash.text.*;
+	import flash.geom.*;
 	
 	import Nitro.FileSystem.NDS;
 	import Nitro.GK.*;
@@ -16,7 +17,6 @@
 	import fl.events.*;
 	import fl.containers.*;
 	
-	import com.adobe.images.PNGEncoder;
 	
 	
 	public class GKTest extends MovieClip {
@@ -265,7 +265,7 @@
 		private function encodeImage(drawable:DisplayObject):ByteArray {
 			var bmd:BitmapData=new BitmapData(drawable.width,drawable.height);
 			bmd.draw(drawable);
-			return PNGEncoder.encode(bmd);
+			return bmd.encode(new Rectangle(0,0,drawable.width,drawable.height),new PNGEncoderOptions());
 		}
 		
 		private function loadPalette(palId:uint):Vector.<uint> {

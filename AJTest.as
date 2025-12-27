@@ -15,8 +15,7 @@
 	import Nitro.FileSystem.NDS;
 	import Nitro.Apollo.*;
 	import Nitro.Compression.*;
-	
-	import com.adobe.images.PNGEncoder;
+	import flash.geom.Rectangle;
 	
 	public class AJTest extends MovieClip {
 		
@@ -129,7 +128,7 @@
 					var outputFile:File=new File(outputDir+File.separator+subid+".png");
 					trace(outputFile.nativePath);
 					
-					var fileData:ByteArray=PNGEncoder.encode(bmd);
+					var fileData:ByteArray=bmd.encode(new Rectangle(0,0,bmd.width,bmd.height), new PNGEncoderOptions(true));
 					
 					var fs:FileStream=new FileStream();
 					fs.open(outputFile,FileMode.WRITE);
