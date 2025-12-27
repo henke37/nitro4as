@@ -60,7 +60,22 @@
 		private static const playerColor:ColorTransform=new ColorTransform(0.7,0.8,0.6);
 		
 		public function FSTest() {
+			if(!stage) {
+				this.visible=false;
+				addEventListener(Event.ADDED_TO_STAGE,waitStage);
+				return;
+			}
+			init();
 			
+			return;//explicit return to suppress harmful code that the flash IDE injects beyond this point.
+		}
+			
+		private function waitStage(e:Event):void {
+			init();
+			this.visible=true;
+		}
+		
+		private function init():void {
 			//stage.align=StageAlign.TOP_LEFT;
 			
 			sources=new DataProvider();
@@ -86,16 +101,8 @@
 			playback_txt.width=Banner.ICON_WIDTH*iconZoom;
 			playback_txt.selectable=false;
 			
-			if(loaderInfo.url.match(/^file:/) && false) {
-				status_txt.text="Loading data";
-				loader=new URLLoader();
-				loader.addEventListener(Event.COMPLETE,loaded);
-				loader.dataFormat=URLLoaderDataFormat.BINARY;
-				loader.load(new URLRequest("game.nds"));
-			} else {
-				status_txt.text=CLICKLOAD;
-				stage.addEventListener(MouseEvent.CLICK,stageClick);
-			}
+			status_txt.text=CLICKLOAD;
+			stage.addEventListener(MouseEvent.CLICK,stageClick);
 			
 			source_mc.dropdown.setStyle("cellRenderer",ColoredCellRenderer);
 			source_mc.x=Banner.ICON_WIDTH*iconZoom;
@@ -115,6 +122,7 @@
 			list_mc.addEventListener(Event.CHANGE,listSelect);
 			list_mc.x=Banner.ICON_WIDTH*iconZoom;
 			list_mc.y=source_mc.y+source_mc.height;
+			list_mc.setStyle("cellRenderer",ColoredCellRenderer);	
 			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,400-(source_mc.y+source_mc.height));
 			list_mc.labelFunction=listLabeler;
 			
@@ -150,7 +158,6 @@
 			contextMenu.customItems=[resetItem,sourceItem];
 			
 			
-			return;//explicit return to suppress harmful code that the flash IDE injects beyond this point.
 		}
 		
 		private function goSource(e:Event):void {
@@ -412,6 +419,9 @@
 			var o:DataProvider=new DataProvider();
 			for(var playerIndex:uint=0;playerIndex<sdat.playerInfo.length;++playerIndex) {
 				var player:PlayerInfoRecord=sdat.playerInfo[playerIndex];
+
+				if(!player) continue;
+				
 				var item:Object={type: "player", index: playerIndex};
 				item.info=player;
 				
@@ -433,7 +443,10 @@
 			
 			for(var groupIndex:uint=0;groupIndex<sdat.groupInfo.length;++groupIndex) {
 				var item:Object={index: groupIndex, type: "group" };
+			
 				item.info=sdat.groupInfo[groupIndex];
+				if(!item.info) continue;
+			
 				item.sublist=providerForGroup(sdat,item.info);
 				
 				if(sdat.groupSymbols) {
@@ -589,9 +602,14 @@
 			
 			for(var seqIndex:uint=0;seqIndex<sdat.sequenceInfo.length;++seqIndex) {
 				try {
+					var info:SequenceInfoRecord = sdat.sequenceInfo[seqIndex];
+					if(!info) {
+						provider.addItem( {type:"null", colorTransform: new ColorTransform(0.4,0.4,0.4)} );
+						continue;
+					}
 					var sseq:SSEQ=sdat.openSSEQ(seqIndex);
 					
-					var item:Object=listSequence(seqIndex,sseq.sequence,sdat.sequenceInfo[seqIndex],sdat.seqSymbols);
+					var item:Object=listSequence(seqIndex,sseq.sequence,info,sdat.seqSymbols);
 					
 					provider.addItem(item);
 				} catch(err:Error) {
@@ -620,6 +638,11 @@
 			var provider:DataProvider=new DataProvider();
 			
 			for(var streamIndex:uint=0;streamIndex<sdat.streamInfo.length;++streamIndex) {
+				
+				var info:StreamInfoRecord = sdat.streamInfo[streamIndex];
+				if(!info) {
+					provider.addItem( {type:"null", colorTransform: new ColorTransform(0.4,0.4,0.4)} );
+				}
 				
 				var strm:STRM=sdat.openSTRM(streamIndex);
 				
@@ -689,6 +712,9 @@
 		private function listLabeler(item:Object,includeTime:Boolean=true):String {
 			var name:String="";
 			
+			if(!item) return "NULL";
+			if(item.type=="null") return "NULL";
+			
 			name=item.name;
 				
 			if(!name || !name.match(/\S/i)) {
@@ -714,6 +740,8 @@
 		}
 		
 		private function instrumentSelected(obj:Object):void {
+			if(!obj) return;
+			
 			playback_txt.visible=true;
 			var inst:Instrument=obj.inst;
 			if(!inst) {
@@ -756,6 +784,13 @@
 			}
 			
 			playingItem=list_mc.selectedItem;
+
+			if(!playingItem) {
+				player=null;
+				playback_txt.visible=progress_mc.visible=export_mc.visible=false;
+				return;
+			}
+		
 			if(playingItem.type=="stream") {
 				player=new STRMPlayer(playingItem.stream);
 			} else if(playingItem.type=="wave") {

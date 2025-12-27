@@ -221,7 +221,10 @@
 				var seqRecord:SequenceInfoRecord=new SequenceInfoRecord();
 				
 				offset=sequenceInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					sequenceInfo.push(null);
+					continue;
+				}
 				info.position=offset;
 				
 				seqRecord.fatId=info.readUnsignedShort();
@@ -253,7 +256,10 @@
 				var sequenceArchiveRecord:BaseInfoRecord=new BaseInfoRecord();
 				
 				offset=sequenceArchiveInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					sequenceArchiveInfo.push(null);
+					continue;
+				}
 				info.position=offset;
 				
 				sequenceArchiveRecord.fatId=info.readUnsignedShort();
@@ -276,7 +282,10 @@
 				var bankRecord:BankInfoRecord=new BankInfoRecord();
 				
 				offset=bankInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					bankInfo.push(null);
+					continue;
+				}
 				info.position=offset;
 				
 				bankRecord.fatId=info.readUnsignedShort();
@@ -305,7 +314,10 @@
 				var waveArchiveRecord:BaseInfoRecord=new BaseInfoRecord();
 				
 				offset=waveArchiveInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					waveArchiveInfo.push(null);
+					continue;
+				}
 				info.position=offset;
 				
 				waveArchiveRecord.fatId=info.readUnsignedShort();
@@ -323,7 +335,10 @@
 			playerInfo=new Vector.<PlayerInfoRecord>(playerCount);
 			for(i=0;i<playerCount;++i) {
 				offset=playerInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					playerInfo[i]=null;
+					continue;
+				}
 				info.position=offset;				
 				
 				var playerRecord:PlayerInfoRecord=new PlayerInfoRecord();
@@ -346,7 +361,10 @@
 			groupInfo=new Vector.<GroupInfoRecord>();
 			for(i=0;i<groupCount;++i) {
 				offset=groupInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					groupInfo.push(null);
+					continue;
+				}
 				info.position=offset;
 				
 				var groupInfoRecord:GroupInfoRecord=new GroupInfoRecord();
@@ -376,7 +394,10 @@
 				var streamRecord:StreamInfoRecord=new StreamInfoRecord();
 				
 				offset=streamInfoOffsets[i];
-				if(offset==0) continue;
+				if(offset==0) {
+					streamInfo.push(null);
+					continue;
+				}
 				info.position=streamInfoOffsets[i];
 				
 				streamRecord.fatId=info.readUnsignedShort();

@@ -3,7 +3,6 @@
 	import fl.controls.listClasses.*;
 	import flash.geom.ColorTransform;
 
-	
 	public class ColoredCellRenderer extends CellRenderer {
 		
 		public function ColoredCellRenderer() {}
@@ -12,6 +11,8 @@
 			//super.listData = value;
 		protected override function drawBackground():void {
 			super.drawBackground();
+			
+			if(!data.colorTransform) return;
 			
 			background.transform.colorTransform=data.colorTransform;
 		}
