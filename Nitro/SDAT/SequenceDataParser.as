@@ -35,6 +35,8 @@
 			var jmpEvt:JumpEvent;
 			
 			var suffixIf:Boolean=false;
+			var suffixVar:Boolean=false;
+			var suffixRand:Boolean=false;
 			
 parseLoop: for(;;) {
 				
@@ -82,53 +84,60 @@ parseLoop: for(;;) {
 						untranslatedJumps.push(jmpEvt);
 						newFlow=new Flow(jmpTarget);
 					break;
-					
+					case 0xA0:
+						suffixRand=true;
+						//randMin=data.readShort();
+						//randMax=data.readShort();
+						continue parseLoop;
+					case 0xA1:
+						suffixVar=true;
+						continue parseLoop;
 					case 0xA2:
 						suffixIf=true;
 						continue parseLoop;
 					break;
 					
 					case 0xB0:
-						evt=new VarEvent(VarEvent.assign,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.assign,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB1:
-						evt=new VarEvent(VarEvent.addition,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.addition,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB2:
-						evt=new VarEvent(VarEvent.subtract,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.subtract,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB3:
-						evt=new VarEvent(VarEvent.multiply,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.multiply,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB4:
-						evt=new VarEvent(VarEvent.divide,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.divide,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB5:
-						evt=new VarEvent(VarEvent.shift,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.shift,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB6:
-						evt=new VarEvent(VarEvent.random,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.random,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB7:
-						evt=new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB8:
-						evt=new VarEvent(VarEvent.equals,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.equals,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xB9:
-						evt=new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xBA:
-						evt=new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xBB:
-						evt=new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xBC:
-						evt=new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),data.readShort());
 					break;
 					case 0xBD:
-						evt=new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),read3ByteInt(data));
+						evt=new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),data.readShort());
 					break;
 					
 					case 0xC0:
@@ -264,6 +273,16 @@ parseLoop: for(;;) {
 					if(suffixIf) {
 						evt.suffixIf=true;
 						suffixIf=false;
+					}
+					if(suffixRand) {
+						evt.suffixRand=true;
+						//evt.randMin=randMin;
+						//evt.randMax=randMax;
+						suffixRand=false;
+					}
+					if(suffixVar) {
+						evt.suffixVar=true;
+						suffixVar=false;
 					}
 				
 					//must push null to keep indexes correct
