@@ -13,6 +13,13 @@
 		private var unparsedFlows:Vector.<Flow>;
 		private var commandIndex:uint=0;
 		
+		private var untranslatedJumps:Vector.<JumpEvent>;
+		
+		private var data:ByteArray;
+		
+		private var suffixIf:Boolean=false;
+		private var flowOver:Boolean=false;
+		
 		public function SequenceDataParser() {
 			flows={};
 			unparsedFlows=new Vector.<Flow>();
@@ -23,6 +30,8 @@
 		@return The parsed data*/
 		sequenceInternal function parse(data:ByteArray):Sequence {
 			
+			this.data=data;
+			
 			var seq:Sequence=new Sequence();
 			
 			var newFlow:Flow;
@@ -31,241 +40,18 @@
 			flows[data.position]=newFlow;
 			newFlow.parsed=true;
 			
-			var untranslatedJumps:Vector.<JumpEvent>=new Vector.<JumpEvent>();
-			var jmpEvt:JumpEvent;
+			untranslatedJumps=new Vector.<JumpEvent>();
 			
-			var suffixIf:Boolean=false;
 			var suffixVar:Boolean=false;
 			var suffixRand:Boolean=false;
 			
 parseLoop: for(;;) {
 				
-				var flowOver:Boolean=false;
+				flowOver=false;
 				
 				newFlow=null;
-				
-				var command:uint=data.readUnsignedByte();
-				
-				var evt:SequenceEvent=null;
-				
-				if(command<0x80) {//notes
-					evt=new NoteEvent(command,data.readUnsignedByte(),readVarLen(data));
-				} else switch(command) {
-					
-					case 0x80:
-						evt=new RestEvent(readVarLen(data));
-					break;
-					
-					case 0x81:
-						evt=new ProgramChangeEvent(readVarLen(data));
-					break;
-					
-					case 0x93://open track
-						var trackId:uint=data.readUnsignedByte();
-						var trackPos:uint=read3ByteInt(data);
-						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
-						newFlow=new Flow(trackPos);
-					
-						evt=jmpEvt=new OpenTrackEvent(trackPos,trackId);
-						untranslatedJumps.push(jmpEvt);
-					break;
-					
-					case 0x94:
-						var jmpTarget:uint=read3ByteInt(data);
-						evt=jmpEvt=new JumpEvent(jmpTarget,JumpEvent.JT_JUMP);
-						untranslatedJumps.push(jmpEvt);
-						newFlow=new Flow(jmpTarget);
-						flowOver=!suffixIf;
-					break;
-					
-					case 0x95://call
-						jmpTarget=read3ByteInt(data);
-						evt=jmpEvt=new JumpEvent(jmpTarget,JumpEvent.JT_CALL);
-						untranslatedJumps.push(jmpEvt);
-						newFlow=new Flow(jmpTarget);
-					break;
-					case 0xA0:
-						suffixRand=true;
-						//randMin=data.readShort();
-						//randMax=data.readShort();
-						continue parseLoop;
-					case 0xA1:
-						suffixVar=true;
-						continue parseLoop;
-					case 0xA2:
-						suffixIf=true;
-						continue parseLoop;
-					break;
-					
-					case 0xB0:
-						evt=new VarEvent(VarEvent.assign,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB1:
-						evt=new VarEvent(VarEvent.addition,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB2:
-						evt=new VarEvent(VarEvent.subtract,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB3:
-						evt=new VarEvent(VarEvent.multiply,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB4:
-						evt=new VarEvent(VarEvent.divide,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB5:
-						evt=new VarEvent(VarEvent.shift,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB6:
-						evt=new VarEvent(VarEvent.random,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB7:
-						evt=new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB8:
-						evt=new VarEvent(VarEvent.equals,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xB9:
-						evt=new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xBA:
-						evt=new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xBB:
-						evt=new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xBC:
-						evt=new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),data.readShort());
-					break;
-					case 0xBD:
-						evt=new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),data.readShort());
-					break;
-					
-					case 0xC0:
-						evt=new PanEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xC1:
-						evt=new VolumeEvent(data.readUnsignedByte(),false);
-					break;
-					
-					case 0xC2:
-						evt=new VolumeEvent(data.readUnsignedByte(),true);//master
-					break;
-					
-					case 0xC3:
-						evt=new TransposeEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xC4:
-						evt=new PitchBendEvent(data.readUnsignedByte(),false);
-					break;
-					
-					case 0xC5:
-						evt=new PitchBendEvent(data.readUnsignedByte(),true);//range
-					break;
-					
-					case 0xC6:
-						evt=new PriorityEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xC7:
-						evt=new MonoPolyEvent(data.readBoolean());
-					break;
-					
-					case 0xC8:
-						evt=new TieEvent(data.readBoolean());
-					break;
-					
-					case 0xC9:
-						evt=new PortamentoKeyEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xCA:
-						evt=new ModulationEvent("depth",data.readUnsignedByte());
-					break;
-					
-					case 0xCB:
-						evt=new ModulationEvent("speed",data.readUnsignedByte());
-					break;
-					
-					case 0xCC:
-						evt=new ModulationEvent("type",data.readUnsignedByte());
-					break;
-					
-					case 0xCD:
-						evt=new ModulationEvent("range",data.readUnsignedByte());
-					break;
-					
-					case 0xCE:
-						evt=new PortamentoEvent(data.readBoolean());
-					break;
-					
-					case 0xCF:
-						evt=new PortamentoTimeEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xD0:
-						evt=new ADSREvent("A",data.readUnsignedByte());
-					break;
-					
-					case 0xD1:
-						evt=new ADSREvent("D",data.readUnsignedByte());
-					break;
-					
-					case 0xD2:
-						evt=new ADSREvent("S",data.readUnsignedByte());
-					break;
-					
-					case 0xD3:
-						evt=new ADSREvent("R",data.readUnsignedByte());
-					break;
-					
-					case 0xD4:
-						evt=new LoopStartEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xD5://Expression
-						evt=new ExpressionEvent(data.readUnsignedByte());
-					break;
-					
-					case 0xD6://print var
-						evt=new PrintVarEvent(data.readUnsignedByte());
-					break;	
-					
-					case 0xE0:
-						evt=new ModulationEvent("delay",data.readUnsignedShort());
-					break;
-					
-					case 0xE1:
-						evt=new TempoEvent(data.readUnsignedShort());
-					break;
-					
-					case 0xE3:
-						evt=new SweepPitchEvent(data.readUnsignedShort());
-					break;
-					
-					case 0xFE://Multitrack marker op
-						evt=new AllocateTrackEvent(data.readUnsignedShort());
-					break;
-					
-					case 0xFC:
-						evt=new LoopEndEvent();
-					break;
-					
-					case 0xFD:
-						evt=new ReturnEvent();
-						flowOver=!suffixIf;
-					break;
-					
-					case 0xFF:
-						evt=new EndTrackEvent();
-						flowOver=!suffixIf;
-					break;
-					
-					default:
-						trace("unknown command: "+command.toString(16));
-					break;
-				}
+	
+				var evt:SequenceEvent=readEvent(data);
 				
 				if(evt) {
 					commandIndex++;
@@ -274,15 +60,13 @@ parseLoop: for(;;) {
 						evt.suffixIf=true;
 						suffixIf=false;
 					}
-					if(suffixRand) {
-						evt.suffixRand=true;
-						//evt.randMin=randMin;
-						//evt.randMax=randMax;
-						suffixRand=false;
-					}
-					if(suffixVar) {
-						evt.suffixVar=true;
-						suffixVar=false;
+				
+					
+					var jmpEvt:JumpEvent = evt as JumpEvent;
+					if(jmpEvt) {
+						untranslatedJumps.push(jmpEvt);
+						newFlow=new Flow(jmpEvt.target);
+						flowOver=!suffixIf;
 					}
 				
 					//must push null to keep indexes correct
@@ -308,15 +92,261 @@ parseLoop: for(;;) {
 				}//end if flowOver
 			}//end forever
 			
-			for(var i:uint=0;i<untranslatedJumps.length;++i) {
-				jmpEvt=untranslatedJumps[i];
-				jmpEvt.target=flows[jmpEvt.target].commandIndex;
-			}
+			translateJumpEvents();
 			
 			return seq;
 		}
+	
+		private function translateJumpEvents():void {
+			for(var i:uint=0;i<untranslatedJumps.length;++i) {
+				var jmpEvt:JumpEvent=untranslatedJumps[i];
+				jmpEvt.target=flows[jmpEvt.target].commandIndex;
+			}
+		}
+	
+		private function readEvent(data:ByteArray):SequenceEvent {
+			var command:uint=data.readUnsignedByte();
+				
+				if(command<0x80) {//notes
+					return new NoteEvent(command,data.readUnsignedByte(),readVarLen());
+				} else switch(command) {
+					
+					case 0x80:
+						return new RestEvent(readVarLen());
+					break;
+					
+					case 0x81:
+						return new ProgramChangeEvent(readVarLen());
+					break;
+					
+					case 0x93://open track
+						var trackId:uint=data.readUnsignedByte();
+						var trackPos:uint=read3ByteInt();
+						if(trackPos>data.length) throw new RangeError("Can't begin a track after the end of the end of the data");
+						return new OpenTrackEvent(trackPos,trackId);
+					break;
+					
+					case 0x94:
+						var jmpTarget:uint=read3ByteInt();
+						return new JumpEvent(jmpTarget,JumpEvent.JT_JUMP);
+					break;
+					
+					case 0x95://call
+						jmpTarget=read3ByteInt();
+						return new JumpEvent(jmpTarget,JumpEvent.JT_CALL);
+					break;
+					case 0xA0://rand
+						return readRandEvent();
+					case 0xA1://var
+						return readVarEvent();
+					case 0xA2:
+						suffixIf=true;
+						return null;
+					break;
+					
+					case 0xB0:
+						return new VarEvent(VarEvent.assign,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB1:
+						return new VarEvent(VarEvent.addition,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB2:
+						return new VarEvent(VarEvent.subtract,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB3:
+						return new VarEvent(VarEvent.multiply,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB4:
+						return new VarEvent(VarEvent.divide,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB5:
+						return new VarEvent(VarEvent.shift,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB6:
+						return new VarEvent(VarEvent.random,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB7:
+						return new VarEvent(VarEvent.unknownOp,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB8:
+						return new VarEvent(VarEvent.equals,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xB9:
+						return new VarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xBA:
+						return new VarEvent(VarEvent.greaterThan,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xBB:
+						return new VarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xBC:
+						return new VarEvent(VarEvent.lessThan,data.readUnsignedByte(),data.readShort());
+					break;
+					case 0xBD:
+						return new VarEvent(VarEvent.notEqual,data.readUnsignedByte(),data.readShort());
+					break;
+					
+					case 0xC0:
+						return new PanEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xC1:
+						return new VolumeEvent(data.readUnsignedByte(),false);
+					break;
+					
+					case 0xC2:
+						return new VolumeEvent(data.readUnsignedByte(),true);//master
+					break;
+					
+					case 0xC3:
+						return new TransposeEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xC4:
+						return new PitchBendEvent(data.readByte(),false);
+					break;
+					
+					case 0xC5:
+						return new PitchBendEvent(data.readByte(),true);//range
+					break;
+					
+					case 0xC6:
+						return new PriorityEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xC7:
+						return new MonoPolyEvent(data.readBoolean());
+					break;
+					
+					case 0xC8:
+						return new TieEvent(data.readBoolean());
+					break;
+					
+					case 0xC9:
+						return new PortamentoKeyEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xCA:
+						return new ModulationEvent("depth",data.readUnsignedByte());
+					break;
+					
+					case 0xCB:
+						return new ModulationEvent("speed",data.readUnsignedByte());
+					break;
+					
+					case 0xCC:
+						return new ModulationEvent("type",data.readUnsignedByte());
+					break;
+					
+					case 0xCD:
+						return new ModulationEvent("range",data.readUnsignedByte());
+					break;
+					
+					case 0xCE:
+						return new PortamentoEvent(data.readBoolean());
+					break;
+					
+					case 0xCF:
+						return new PortamentoTimeEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xD0:
+						return new ADSREvent("A",data.readUnsignedByte());
+					break;
+					
+					case 0xD1:
+						return new ADSREvent("D",data.readUnsignedByte());
+					break;
+					
+					case 0xD2:
+						return new ADSREvent("S",data.readUnsignedByte());
+					break;
+					
+					case 0xD3:
+						return new ADSREvent("R",data.readUnsignedByte());
+					break;
+					
+					case 0xD4:
+						return new LoopStartEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xD5://Expression
+						return new ExpressionEvent(data.readUnsignedByte());
+					break;
+					
+					case 0xD6://print var
+						return new PrintVarEvent(data.readUnsignedByte());
+					break;	
+					
+					case 0xE0:
+						return new ModulationEvent("delay",data.readUnsignedShort());
+					break;
+					
+					case 0xE1:
+						return new TempoEvent(data.readUnsignedShort());
+					break;
+					
+					case 0xE3:
+						return new SweepPitchEvent(data.readUnsignedShort());
+					break;
+					
+					case 0xFE://Multitrack marker op
+						return new AllocateTrackEvent(data.readUnsignedShort());
+					break;
+					
+					case 0xFC:
+						return new LoopEndEvent();
+					break;
+					
+					case 0xFD:
+						flowOver=!suffixIf;
+						return new ReturnEvent();
+					break;
+					
+					case 0xFF:
+						flowOver=!suffixIf;
+						return new EndTrackEvent();
+					break;
+					
+					default:
+						trace("unknown command: "+command.toString(16));
+						return null;
+					break;
+				}
+			
+			return null;
+		}
+	
+		private function readRandEvent():SequenceEvent {
+				var command:uint=data.readUnsignedByte();
+				
+				if(command<0x80) {//notes
+					return new RandNoteEvent(command,data.readUnsignedByte(),data.readUnsignedShort(),data.readUnsignedShort());
+				} else switch(command) {
+					case 0x80:
+						return new RandRestEvent(data.readUnsignedShort(),data.readUnsignedShort());
+					break;
+					
+					case 0xC4:
+						return new RandPitchBendEvent(data.readShort(),data.readShort(),false);
+					
+					case 0xC5:
+						return new RandPitchBendEvent(data.readShort(),data.readShort(),true);//range
+					
+					default:
+						trace("unknown rand command: "+command.toString(16));
+						return null;
+				}
+			
+				return null;
+		}
+	
+		private function readVarEvent():SequenceEvent {
+			return null;
+		}
 		
-		private static function readVarLen(data:ByteArray):uint {
+		private function readVarLen():uint {
 			var value:uint=0;
 			do {
 				var byte:uint=data.readUnsignedByte();
@@ -327,7 +357,7 @@ parseLoop: for(;;) {
 			return value;
 		}
 		
-		private static function read3ByteInt(data:ByteArray):uint {
+		private function read3ByteInt():uint {
 			var value:uint=data.readUnsignedByte();
 			value+=data.readUnsignedShort()<<8;
 			return value;

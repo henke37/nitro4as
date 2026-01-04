@@ -3,36 +3,64 @@
 	
 	public class SequenceSerializer {
 		
+		private var trackEntries:Object={};
+		private var jumpTargets:Object={};
+		
 		public function SequenceSerializer() {
 			// constructor code
 		}
 		
 		public function serializeSequence(seq:Sequence):String {
-			var evt:SequenceEvent;
-			
-			var jumpTargets:Object={};
-			for each(evt in seq.events) {
-				var jmpEvt:JumpEvent=evt as JumpEvent;
-				if(!jmpEvt) continue;
-				jumpTargets[jmpEvt.target]=true;
-			}
+			preprocessJumps(seq);
 			var o:String="";
 			for(var evtIndex:uint=0;evtIndex<seq.events.length;++evtIndex) {
-				evt=seq.events[evtIndex];
+				var evt:SequenceEvent=seq.events[evtIndex];
 				if(evtIndex in jumpTargets) {
-					o+="L"+evtIndex+":\n";
+					o+=jumpLabel(evtIndex)+":\n";
 				}
 				o+=this.serializeEvent(evt)+"\n";
 			}
 			return o;
 		}
 		
+		private function preprocessJumps(seq:Sequence):void {
+			for each(var evt:SequenceEvent in seq.events) {
+				var jmpEvt:JumpEvent=evt as JumpEvent;
+				if(!jmpEvt) continue;
+				
+				var trckEvt:OpenTrackEvent=jmpEvt as OpenTrackEvent;
+				
+				if(!trckEvt) {
+					if(!(jmpEvt.target in jumpTargets)) {
+						jumpTargets[jmpEvt.target]=-1
+					}
+					continue;
+				}
+				jumpTargets[jmpEvt.target]=trckEvt.track;
+				var trckEntry:*=trackEntries[trckEvt.track];
+				if(trckEntry) {
+					trckEntry.push(trckEvt.target);
+				} else {
+					trackEntries[trckEvt.track]=[trckEvt.target];
+				}
+			}
+		}
+		
+		private function jumpLabel(target:uint):String {
+			var track:int=jumpTargets[target];
+			if(track==-1) return "L"+target;
+			var trackEntry:Array=trackEntries[track];
+			if(trackEntry.length==1) {
+				return "T"+track;
+			}
+			var index:int=trackEntry.indexOf(target);
+			return "T"+track+"_"+index;
+		}
+		
 		public function serializeEvent(evt:SequenceEvent):String {
 			var params:Array=parameterizeEvent(evt);
 			var cmd:String=params.shift();
 			if(evt.suffixIf) cmd+="_if";
-			if(evt.suffixVar) cmd+="_v";
-			if(evt.suffixRand) cmd+="_r";
 			
 			if(params.length) {
 				return cmd+" "+params.join(", ");
@@ -108,11 +136,11 @@
 			if(evt is JumpEvent) {
 				switch(JumpEvent(evt).jumpType) {
 					case JumpEvent.JT_CALL:
-					return ["call", "L"+JumpEvent(evt).target];
+					return ["call", jumpLabel(JumpEvent(evt).target)];
 					case JumpEvent.JT_JUMP:
-					return ["jump", "L"+JumpEvent(evt).target];
+					return ["jump", jumpLabel(JumpEvent(evt).target)];
 					case JumpEvent.JT_TRACK:
-					return ["opentrack", "L"+JumpEvent(evt).target, OpenTrackEvent(evt).track];
+					return ["opentrack", jumpLabel(JumpEvent(evt).target), OpenTrackEvent(evt).track];
 				}
 			}
 			if(evt is ReturnEvent) {
@@ -196,6 +224,18 @@
 			}
 			if(evt is PrintVarEvent) {
 				return ["printvar",PrintVarEvent(evt).variable];
+			}
+			if(evt is RandNoteEvent) {
+				var rnEvt:RandNoteEvent=RandNoteEvent(evt);
+				return [noteName(rnEvt.note)+"_r",rnEvt.velocity,rnEvt.minDuration,rnEvt.maxDuration];
+			}
+			if(evt is RandPitchBendEvent) {
+				var rpbEvt:RandPitchBendEvent=RandPitchBendEvent(evt);
+				if(rpbEvt.range) {
+					return ["bendrange_r",rpbEvt.minBend,rpbEvt.maxBend];
+				} else {
+					return ["pitchbend_r",rpbEvt.minBend,rpbEvt.maxBend];
+				}
 			}
 			throw new Error("Unknown event type!");
 		}
