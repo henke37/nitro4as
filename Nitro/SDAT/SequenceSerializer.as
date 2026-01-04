@@ -225,6 +225,7 @@
 			if(evt is PrintVarEvent) {
 				return ["printvar",PrintVarEvent(evt).variable];
 			}
+		
 			if(evt is RandNoteEvent) {
 				var rnEvt:RandNoteEvent=RandNoteEvent(evt);
 				return [noteName(rnEvt.note)+"_r",rnEvt.velocity,rnEvt.minDuration,rnEvt.maxDuration];
@@ -236,6 +237,11 @@
 				} else {
 					return ["pitchbend_r",rpbEvt.minBend,rpbEvt.maxBend];
 				}
+			}
+		
+			if(evt is VarNoteEvent) {
+				var vnEvt:VarNoteEvent=VarNoteEvent(evt);
+				return [noteName(vnEvt.note)+"_v",vnEvt.velocity,vnEvt.durationVar];
 			}
 			throw new Error("Unknown event type!");
 		}

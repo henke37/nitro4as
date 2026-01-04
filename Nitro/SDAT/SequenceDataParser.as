@@ -343,7 +343,17 @@ parseLoop: for(;;) {
 		}
 	
 		private function readVarEvent():SequenceEvent {
-			return null;
+				var command:uint=data.readUnsignedByte();
+				
+				if(command<0x80) {//notes
+					return new VarNoteEvent(command,data.readUnsignedByte(),data.readUnsignedByte());
+				} else switch(command) {
+					default:
+						trace("unknown var command: "+command.toString(16));
+						return null;
+				}
+			
+				return null;
 		}
 		
 		private function readVarLen():uint {
