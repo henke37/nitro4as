@@ -336,28 +336,28 @@
 			
 			
 			for(var seqArchiveIndex:uint=0;seqArchiveIndex<sdat.sequenceArchiveInfo.length;++seqArchiveIndex) {
-				//try {
-					var seqArchive:SSAR=sdat.openSSAR(seqArchiveIndex);
-					
-					var seqArchiveSource:Object={};
-					var symb:SeqArcSymbRecord;
-					
-					if(sdat.seqArchiveSymbols) {
-						symb=sdat.seqArchiveSymbols[seqArchiveIndex];
-					}
-					
-					if(!name) {
-						name="SSAR #"+seqArchiveIndex;
-					}
-					seqArchiveSource.name=name;
-					seqArchiveSource.fileName=fileName;
-					seqArchiveSource.fileIndex=fileId;
-					seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
-					seqArchiveSource.colorTransform=sequenceArchiveColor;
-					sources.addItem(seqArchiveSource);
-				//} catch(err:Error) {
-					//trace(err);
-				//}
+				var seqArchInfo:BaseInfoRecord = sdat.sequenceArchiveInfo[seqArchiveIndex];
+				if(!seqArchInfo) continue;
+				
+				var seqArchive:SSAR=sdat.openSSAR(seqArchiveIndex);
+				
+				var seqArchiveSource:Object={};
+				var symb:SeqArcSymbRecord;
+				
+				if(sdat.seqArchiveSymbols) {
+					symb=sdat.seqArchiveSymbols[seqArchiveIndex];
+				}
+				
+				if(!name) {
+					name="SSAR #"+seqArchiveIndex;
+				}
+				seqArchiveSource.name=name;
+				seqArchiveSource.fileName=fileName;
+				seqArchiveSource.fileIndex=fileId;
+				seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
+				seqArchiveSource.colorTransform=sequenceArchiveColor;
+				sources.addItem(seqArchiveSource);
+			
 			}
 			
 			if(sdat.bankInfo.length>0) {
@@ -392,6 +392,11 @@
 			
 			if(sdat.waveArchiveInfo.length>0) {
 				for(var waveArchiveIndex:uint=0;waveArchiveIndex<sdat.waveArchiveInfo.length;++waveArchiveIndex) {
+					var waveArchInfo:BaseInfoRecord=sdat.waveArchiveInfo[waveArchiveIndex];
+					if(!waveArchInfo) {
+						continue;
+					}
+					
 					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
 					
 					var waveArchiveSource:Object={};
@@ -508,6 +513,13 @@
 			var provider:DataProvider=new DataProvider();
 			
 			for(var bankIndex:uint=0;bankIndex<sdat.bankInfo.length;++bankIndex) {
+				var info:BankInfoRecord = sdat.bankInfo[bankIndex];
+				
+				if(!info) {
+						provider.addItem( {type:"null", colorTransform: new ColorTransform(0.4,0.4,0.4)} );
+						continue;
+				}
+				
 				var sbnk:SBNK=sdat.openBank(bankIndex);
 				
 				var item:Object= { index: bankIndex, type: "bank" };
@@ -642,6 +654,7 @@
 				var info:StreamInfoRecord = sdat.streamInfo[streamIndex];
 				if(!info) {
 					provider.addItem( {type:"null", colorTransform: new ColorTransform(0.4,0.4,0.4)} );
+					continue;
 				}
 				
 				var strm:STRM=sdat.openSTRM(streamIndex);
