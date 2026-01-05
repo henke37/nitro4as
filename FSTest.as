@@ -161,7 +161,7 @@
 		}
 		
 		private function goSource(e:Event):void {
-			navigateToURL(new URLRequest("https://www.assembla.com/code/sdat4as/subversion/nodes/Nitro"));
+			navigateToURL(new URLRequest("https://github.com/henke37/nitro4as"));
 		}
 		
 		private function reset(e:Event):void {
