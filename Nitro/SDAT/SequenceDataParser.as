@@ -326,17 +326,61 @@ parseLoop: for(;;) {
 				} else switch(command) {
 					case 0x80:
 						return new RandRestEvent(data.readUnsignedShort(),data.readUnsignedShort());
-					break;
+					
+					case 0x81:
+						return new RandProgramChangeEvent(data.readUnsignedShort(),data.readUnsignedShort());
+					
+					case 0xC0:
+						return new RandPanEvent(data.readShort(),data.readShort());
 					
 					case 0xC1:
 						return new RandVolumeEvent(data.readShort(),data.readShort(),false);
-					break;
+					
+					case 0xC3:
+						return new RandTransposeEvent(data.readShort(),data.readShort());
 					
 					case 0xC4:
 						return new RandPitchBendEvent(data.readShort(),data.readShort(),false);
 					
 					case 0xC5:
 						return new RandPitchBendEvent(data.readShort(),data.readShort(),true);//range
+					
+					case 0xCA:
+						return new RandModulationEvent("depth",data.readShort(),data.readShort());
+					
+					case 0xCB:
+						return new RandModulationEvent("speed",data.readShort(),data.readShort());
+					
+					case 0xCC:
+						return new RandModulationEvent("type",data.readShort(),data.readShort());
+					
+					case 0xCD:
+						return new RandModulationEvent("range",data.readShort(),data.readShort());
+					
+					case 0xCF:
+						return new RandPortamentoTimeEvent(data.readShort(),data.readShort());
+					
+					case 0xD0:
+						return new RandADSREvent("A",data.readShort(),data.readShort());
+					break;
+					
+					case 0xD1:
+						return new RandADSREvent("D",data.readShort(),data.readShort());
+					break;
+					
+					case 0xD2:
+						return new RandADSREvent("S",data.readShort(),data.readShort());
+					break;
+					
+					case 0xD3:
+						return new RandADSREvent("R",data.readShort(),data.readShort());
+					break;
+					
+					case 0xD5://Expression
+						return new RandExpressionEvent(data.readShort(),data.readShort());
+					
+					case 0xE3:
+						return new RandSweepPitchEvent(data.readShort(),data.readShort());
 					
 					default:
 						trace("unknown rand command: "+command.toString(16));
@@ -352,9 +396,104 @@ parseLoop: for(;;) {
 				if(command<0x80) {//notes
 					return new VarNoteEvent(command,data.readUnsignedByte(),data.readUnsignedByte());
 				} else switch(command) {
-					case 0xC4:
-						return new VarPitchBendEvent(data.readByte(),false);
+					
+					
+					case 0x80:
+						return new VarRestEvent(data.readUnsignedByte());
 					break;
+					
+					case 0x81:
+						return new VarProgramChangeEvent(data.readUnsignedByte());
+					
+					
+					case 0xB0:
+						return new VarVarEvent(VarEvent.assign,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB1:
+						return new VarVarEvent(VarEvent.addition,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB2:
+						return new VarVarEvent(VarEvent.subtract,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB3:
+						return new VarVarEvent(VarEvent.multiply,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB4:
+						return new VarVarEvent(VarEvent.divide,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB5:
+						return new VarVarEvent(VarEvent.shift,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB6:
+						return new VarVarEvent(VarEvent.random,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB7:
+						return new VarVarEvent(VarEvent.unknownOp,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB8:
+						return new VarVarEvent(VarEvent.equals,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xB9:
+						return new VarVarEvent(VarEvent.greaterThanEq,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xBA:
+						return new VarVarEvent(VarEvent.greaterThan,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xBB:
+						return new VarVarEvent(VarEvent.lessThanEq,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xBC:
+						return new VarVarEvent(VarEvent.lessThan,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					case 0xBD:
+						return new VarVarEvent(VarEvent.notEqual,data.readUnsignedByte(),data.readUnsignedByte());
+					break;
+					
+					case 0xC0:
+						return new VarPanEvent(data.readUnsignedByte());
+					
+					case 0xC3:
+						return new VarTransposeEvent(data.readUnsignedByte());
+					
+					case 0xC4:
+						return new VarPitchBendEvent(data.readUnsignedByte(),false);
+					
+					case 0xCA:
+						return new VarModulationEvent("depth",data.readUnsignedByte());
+					
+					case 0xCB:
+						return new VarModulationEvent("speed",data.readUnsignedByte());
+					
+					case 0xCC:
+						return new VarModulationEvent("type",data.readUnsignedByte());
+					
+					case 0xCD:
+						return new VarModulationEvent("range",data.readUnsignedByte());
+					
+					case 0xCF:
+						return new VarPortamentoTimeEvent(data.readUnsignedByte());
+					
+					case 0xD0:
+						return new VarADSREvent("A",data.readUnsignedByte());
+					
+					case 0xD1:
+						return new VarADSREvent("D",data.readUnsignedByte());
+					
+					case 0xD2:
+						return new VarADSREvent("S",data.readUnsignedByte());
+					
+					case 0xD3:
+						return new VarADSREvent("R",data.readUnsignedByte());
+					
+					case 0xD4:
+						return new VarLoopStartEvent(data.readUnsignedByte());
+					
+					case 0xD5://Expression
+						return new VarExpressionEvent(data.readUnsignedByte());
+					
+					case 0xE3:
+						return new VarSweepPitchEvent(data.readUnsignedByte());
+					
 					default:
 						trace("unknown var command: "+command.toString(16));
 						return null;

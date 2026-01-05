@@ -246,6 +246,56 @@
 					return ["volume_r",rvolEvt.minVolume,rvolEvt.minVolume]; 
 				}
 			}
+			if(evt is RandPanEvent) {
+				return ["pan_r",RandPanEvent(evt).minPan,RandPanEvent(evt).maxPan];
+			}
+			if(evt is RandExpressionEvent) {
+				return ["volume2_r",RandExpressionEvent(evt).minValue,RandExpressionEvent(evt).maxValue];
+			}
+			if(evt is RandADSREvent) {
+				var radsrEvt:RandADSREvent=RandADSREvent(evt);
+				switch(radsrEvt.type) {
+					case "A":
+						return ["attack_r",radsrEvt.minValue,radsrEvt.minValue];
+					case "D":
+						return ["decay_r",radsrEvt.minValue,radsrEvt.minValue];
+					case "S":
+						return ["sustain_r",radsrEvt.minValue,radsrEvt.minValue];
+					case "R":
+						return ["release_r",radsrEvt.minValue,radsrEvt.minValue];
+				}
+			}
+			if(evt is RandProgramChangeEvent) {
+				return ["prg_r",RandProgramChangeEvent(evt).minProgram,RandProgramChangeEvent(evt).maxProgram];
+			}
+			if(evt is RandModulationEvent) {
+				var rmEvt:RandModulationEvent=RandModulationEvent(evt);
+				switch(rmEvt.type) {
+					case "delay":
+						return ["mod_delay_r",rmEvt.minValue,rmEvt.maxValue];
+					case "depth":
+						return ["mod_depth_r",rmEvt.minValue,rmEvt.maxValue];
+					case "speed":
+						return ["mod_speed_r",rmEvt.minValue,rmEvt.maxValue];
+					case "type":
+						return ["mod_type_r",rmEvt.minValue,rmEvt.maxValue];
+					case "range":
+						return ["mod_range_r",rmEvt.minValue,rmEvt.maxValue];
+				}
+			}
+			if(evt is RandTransposeEvent) {
+				return ["transpose_r",RandTransposeEvent(evt).minTranspose,RandTransposeEvent(evt).maxTranspose];
+			}
+		
+			if(evt is RandSweepPitchEvent) {
+				return ["sweep_pitch_r",RandSweepPitchEvent(evt).minAmmount,RandSweepPitchEvent(evt).maxAmmount];
+			}
+			if(evt is RandPortamentoTimeEvent) {
+				return ["porta_time_r",RandPortamentoTimeEvent(evt).minTime,RandPortamentoTimeEvent(evt).maxTime];
+			}
+			if(evt is RandRestEvent) {
+				return ["wait_r",RandRestEvent(evt).minRest,RandRestEvent(evt).maxRest];
+			}
 		
 			if(evt is VarNoteEvent) {
 				var vnEvt:VarNoteEvent=VarNoteEvent(evt);
@@ -258,6 +308,89 @@
 				} else {
 					return ["pitchbend_v",vpbEvt.bendVar];
 				}
+			}
+			if(evt is VarPanEvent) {
+				return ["pan_v",VarPanEvent(evt).panVar];
+			}
+			if(evt is VarExpressionEvent) {
+				return ["volume2_v",VarExpressionEvent(evt).valueVar];
+			}
+			if(evt is VarADSREvent) {
+				var vadsrEvt:VarADSREvent=VarADSREvent(evt);
+				switch(vadsrEvt.type) {
+					case "A":
+						return ["attack_v",vadsrEvt.valueVar];
+					case "D":
+						return ["decay_v",vadsrEvt.valueVar];
+					case "S":
+						return ["sustain_v",vadsrEvt.valueVar];
+					case "R":
+						return ["release_v",vadsrEvt.valueVar];
+				}
+			}
+			if(evt is VarModulationEvent) {
+				var vmEvt:VarModulationEvent=VarModulationEvent(evt);
+				switch(vmEvt.type) {
+					case "delay":
+						return ["mod_delay_v",vmEvt.valueVar];
+					case "depth":
+						return ["mod_depth_v",vmEvt.valueVar];
+					case "speed":
+						return ["mod_speed_v",vmEvt.valueVar];
+					case "type":
+						return ["mod_type_v",vmEvt.valueVar];
+					case "range":
+						return ["mod_range_v",vmEvt.valueVar];
+				}
+			}
+			if(evt is VarProgramChangeEvent) {
+				return ["prg_v",VarProgramChangeEvent(evt).programVar];
+			}
+			if(evt is VarTransposeEvent) {
+				return ["transpose_v",VarTransposeEvent(evt).transposeVar];
+			}
+			if(evt is VarSweepPitchEvent) {
+				return ["sweep_pitch_v",VarSweepPitchEvent(evt).ammountVar];
+			}
+			if(evt is VarPortamentoTimeEvent) {
+				return ["porta_time_v",VarPortamentoTimeEvent(evt).timeVar];
+			}
+			if(evt is VarVarEvent) {
+				var vvarEvt:VarVarEvent=VarVarEvent(evt); 
+				switch(vvarEvt.operation) {
+					case VarEvent.assign:
+						return ["setvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.addition:
+						return ["addvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.subtract:
+						return ["subvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.multiply:
+						return ["mulvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.divide:
+						return ["divvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.shift:
+						return ["shiftvar_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.equals:
+						return ["cmp_eq_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.greaterThan:
+						return ["cmp_gt_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.greaterThanEq:
+						return ["cmp_ge_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.lessThanEq:
+						return ["cmp_le_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.lessThan:
+						return ["cmp_lt_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.notEqual:
+						return ["cmp_ne_v",vvarEvt.variable1,vvarEvt.variable2];
+					case VarEvent.random:
+						return ["randvar_v",vvarEvt.variable1,vvarEvt.variable2];
+				}
+			}
+			if(evt is VarRestEvent) {
+				return ["wait_v",VarRestEvent(evt).restVar];
+			}
+			if(evt is VarLoopStartEvent) {
+				return ["loop_start_v",VarLoopStartEvent(evt).countVar];
 			}
 			throw new Error("Unknown event type!");
 		}
