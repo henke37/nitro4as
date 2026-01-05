@@ -238,10 +238,26 @@
 					return ["pitchbend_r",rpbEvt.minBend,rpbEvt.maxBend];
 				}
 			}
+			if(evt is RandVolumeEvent) {
+				var rvolEvt:RandVolumeEvent=RandVolumeEvent(evt);
+				if(rvolEvt.master) {
+					return ["main_volume_r",rvolEvt.minVolume,rvolEvt.minVolume];
+				} else {
+					return ["volume_r",rvolEvt.minVolume,rvolEvt.minVolume]; 
+				}
+			}
 		
 			if(evt is VarNoteEvent) {
 				var vnEvt:VarNoteEvent=VarNoteEvent(evt);
 				return [noteName(vnEvt.note)+"_v",vnEvt.velocity,vnEvt.durationVar];
+			}
+			if(evt is VarPitchBendEvent) {
+				var vpbEvt:VarPitchBendEvent=VarPitchBendEvent(evt);
+				if(vpbEvt.range) {
+					return ["bendrange_v",vpbEvt.bendVar];
+				} else {
+					return ["pitchbend_v",vpbEvt.bendVar];
+				}
 			}
 			throw new Error("Unknown event type!");
 		}

@@ -328,6 +328,10 @@ parseLoop: for(;;) {
 						return new RandRestEvent(data.readUnsignedShort(),data.readUnsignedShort());
 					break;
 					
+					case 0xC1:
+						return new RandVolumeEvent(data.readShort(),data.readShort(),false);
+					break;
+					
 					case 0xC4:
 						return new RandPitchBendEvent(data.readShort(),data.readShort(),false);
 					
@@ -348,6 +352,9 @@ parseLoop: for(;;) {
 				if(command<0x80) {//notes
 					return new VarNoteEvent(command,data.readUnsignedByte(),data.readUnsignedByte());
 				} else switch(command) {
+					case 0xC4:
+						return new VarPitchBendEvent(data.readByte(),false);
+					break;
 					default:
 						trace("unknown var command: "+command.toString(16));
 						return null;
