@@ -401,7 +401,7 @@
 					
 					var waveArchive:SWAR=sdat.openSWAR(waveArchiveIndex);
 					
-					var waveArchiveSource:Object={};
+					var waveArchiveSource:Object={ type: "waveArc"};
 					var name:String;
 					
 					if(sdat.waveArchiveSymbols) {

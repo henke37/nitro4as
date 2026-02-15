@@ -33,8 +33,18 @@
 			var sdat:SDAT = SDAT(data["sdat"]);
 			var blob:ByteArray = sdat.openFileById(info.fatId);
 			
+			var fileName:String = data["name"];
+			
+			switch(data["type"]) {
+				case "sequence": fileName+=".sseq"; break;
+				case "bank": fileName+=".sbnk"; break;
+				case "stream": fileName+=".strm"; break;
+				case "wave": fileName+=".swav"; break;
+				case "waveArc": fileName+=".swar"; break;
+			}
+			
 			fr=new FileReference();
-			fr.save(blob);
+			fr.save(blob, fileName);
 		}
 
 	}
