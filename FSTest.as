@@ -104,7 +104,7 @@
 			status_txt.text=CLICKLOAD;
 			stage.addEventListener(MouseEvent.CLICK,stageClick);
 			
-			source_mc.dropdown.setStyle("cellRenderer",ColoredCellRenderer);
+			source_mc.dropdown.setStyle("cellRenderer",FSTestCellRenderer);
 			source_mc.x=Banner.ICON_WIDTH*iconZoom;
 			source_mc.y=title_txt.y+title_txt.height;
 			source_mc.labelFunction=sourceLabeler;
@@ -115,14 +115,14 @@
 			
 			sublist_mc.setSize(Banner.ICON_WIDTH*iconZoom,Banner.ICON_HEIGHT*iconZoom);
 			sublist_mc.visible=false;
-			sublist_mc.setStyle("cellRenderer",ColoredCellRenderer);			
+			sublist_mc.setStyle("cellRenderer",FSTestCellRenderer);			
 			sublist_mc.addEventListener(Event.CHANGE,sublistSelect);
 			
 			list_mc.visible=false;
 			list_mc.addEventListener(Event.CHANGE,listSelect);
 			list_mc.x=Banner.ICON_WIDTH*iconZoom;
 			list_mc.y=source_mc.y+source_mc.height;
-			list_mc.setStyle("cellRenderer",ColoredCellRenderer);	
+			list_mc.setStyle("cellRenderer",FSTestCellRenderer);	
 			list_mc.setSize(550-Banner.ICON_WIDTH*iconZoom,400-(source_mc.y+source_mc.height));
 			list_mc.labelFunction=listLabeler;
 			
@@ -352,6 +352,8 @@
 					name="SSAR #"+seqArchiveIndex;
 				}
 				seqArchiveSource.name=name;
+				seqArchiveSource.sdat=sdat;
+				seqArchiveSource.info=seqArchInfo;
 				seqArchiveSource.fileName=fileName;
 				seqArchiveSource.fileIndex=fileId;
 				seqArchiveSource.dataProvider=listSsar(seqArchive,symb);
@@ -410,6 +412,8 @@
 						name="SWAR #"+waveArchiveIndex;
 					}
 					waveArchiveSource.name=name;
+					waveArchiveSource.sdat=sdat;
+					waveArchiveSource.info=waveArchInfo;
 					waveArchiveSource.fileName=fileName;
 					waveArchiveSource.fileIndex=fileId;
 					waveArchiveSource.dataProvider=listSwar(waveArchive);
@@ -429,6 +433,7 @@
 				
 				var item:Object={type: "player", index: playerIndex};
 				item.info=player;
+				item.sdat=sdat;
 				
 				if(sdat.playerSymbols && playerIndex in sdat.playerSymbols) {
 					item.name=sdat.playerSymbols[playerIndex];
@@ -450,6 +455,7 @@
 				var item:Object={index: groupIndex, type: "group" };
 			
 				item.info=sdat.groupInfo[groupIndex];
+				item.sdat=sdat;
 				if(!item.info) continue;
 			
 				item.sublist=providerForGroup(sdat,item.info);
@@ -523,6 +529,8 @@
 				var sbnk:SBNK=sdat.openBank(bankIndex);
 				
 				var item:Object= { index: bankIndex, type: "bank" };
+				item.info=info;
+				item.sdat=sdat;
 				item.instruments=sbnk.instruments;
 				item.info=sdat.bankInfo[bankIndex];
 				item.sublist=providerForBank(sbnk);
@@ -622,6 +630,7 @@
 					var sseq:SSEQ=sdat.openSSEQ(seqIndex);
 					
 					var item:Object=listSequence(seqIndex,sseq.sequence,info,sdat.seqSymbols);
+					item.sdat=sdat;
 					
 					provider.addItem(item);
 				} catch(err:Error) {
@@ -661,6 +670,8 @@
 				
 				var item:Object={ index: streamIndex, type: "stream" };
 				
+				item.info=info;
+				item.sdat=sdat;
 				item.length=strm.sampleCount;
 				item.loopPoint=strm.loopPoint;
 				item.loops=strm.loop;
@@ -834,9 +845,19 @@
 		
 		private function bankSelected():void {
 			var bankInfo:BankInfoRecord=list_mc.selectedItem.info;
+			var sdat:SDAT=list_mc.selectedItem.sdat;
 			playback_txt.visible=true;
 			var o:String="Bank\nSWARs:";
-			o+=bankInfo.swars.join(", ");
+			var swars:Array=[];
+			for(var bankItr=0;bankItr<4;++bankItr) {
+				var bankId:int=bankInfo.swars[bankItr];
+				if(sdat.waveArchiveSymbols && (bankId in sdat.waveArchiveSymbols)) {
+					swars.push(sdat.waveArchiveSymbols[bankId]+"("+bankId+")");
+				} else {
+					swars.push(bankId);
+				}
+			}
+			o+=swars.join(", ");
 			playback_txt.text=o;
 		}
 		
@@ -856,14 +877,34 @@
 		
 		private function sequenceSelected():void {
 			var info:SequenceInfoRecord=list_mc.selectedItem.info;
+			var sdat:SDAT=list_mc.selectedItem.sdat;
 			var seq:Sequence=list_mc.selectedItem.seq;
 			
 			playback_txt.visible=true;
 			
 			var o:String="Sequence # "+list_mc.selectedItem.index;
+			
 			if(info) {
-				o+="\nBank: "+info.bankId+" Player: "+info.player+" Vol: "+info.vol;
-				o+="\nPlayer prio: "+info.playerPriority+" Chan prio: "+info.channelPriority;
+				o+="\nBank: ";
+				if(sdat.bankSymbols) {
+					if(info.bankId in sdat.bankSymbols) {
+						o+=sdat.bankSymbols[info.bankId];
+						o+="("+info.bankId+")";
+					}
+				} else {
+					o+=info.bankId;
+				}
+				o+=" Player: ";
+				if(sdat.playerSymbols) {
+					if(info.player in sdat.playerSymbols) {
+						o+=sdat.playerSymbols[info.player];
+						o+="("+info.player+")";
+					}
+				} else {
+					o+=info.player;
+				}
+				o+="\nVol: "+info.vol;
+				o+=" Player prio: "+info.playerPriority+" Chan prio: "+info.channelPriority;
 			} else {
 				o+="\nNULL sequence";
 			}
