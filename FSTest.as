@@ -31,8 +31,8 @@
 		
 		private static const iconZoom:Number=10;
 		private static const title_txtHeight:Number=40;
-		private static const TITLE:String="Nitro SDAT Stream player WIP";
-		private static const CLICKLOAD:String="Click to load game from disk";
+		private static const TITLE:String="Nitro Composer Explorer";
+		private static const CLICKLOAD:String="Click to load Nintendo DS game from disk";
 		
 		private var sources:DataProvider;
 		
@@ -243,7 +243,7 @@
 			
 			fr=new FileReference();
 			fr.addEventListener(Event.SELECT,fileSelected);
-			fr.browse([new FileFilter("Nitro games","*.nds"),new FileFilter("SDAT archives","*.sdat")]);
+			fr.browse([new FileFilter("Nintendo DS games (*.nds)","*.nds"),new FileFilter("SDAT archives (*.sdat)","*.sdat")]);
 		}
 		
 		private function fileSelected(e:Event):void {
